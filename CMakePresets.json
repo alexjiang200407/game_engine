@@ -1,0 +1,76 @@
+{
+  "version": 5,
+  "configurePresets": [
+    {
+      "name": "vcpkg",
+      "hidden": true,
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "VCPKG_OVERLAY_PORTS": "${sourceDir}/cmake/ports/"
+      }
+    },
+    {
+      "name": "windows",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static"
+      }
+    },
+    {
+      "name": "vs2022",
+      "hidden": true,
+      "generator": "Visual Studio 17 2022",
+      "toolset": "v143"
+    },
+    {
+      "name": "clang-cl",
+      "hidden": true,
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "clang-cl",
+        "CMAKE_CXX_COMPILER": "clang-cl"
+      },
+      "environment": {
+        "CC": "clang-cl",
+        "CXX": "clang-cl"
+      }
+    },
+    {
+      "name": "windows-clang-cl-debug",
+      "displayName": "Windows Clang-CL Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/clang-cl-debug",
+      "inherits": [
+        "vcpkg",
+        "windows",
+        "vs2022",
+        "clang-cl"
+      ]
+    },
+    {
+      "name": "windows-clang-cl-release",
+      "displayName": "Windows Clang-CL Release",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/clang-cl-release",
+      "inherits": [
+        "vcpkg",
+        "windows",
+        "vs2022",
+        "clang-cl"
+      ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows-clang-cl-release",
+      "configurePreset": "windows-clang-cl-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "windows-clang-cl-debug",
+      "configurePreset": "windows-clang-cl-debug",
+      "configuration": "Debug"
+    }
+  ]
+}
