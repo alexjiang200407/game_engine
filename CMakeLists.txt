@@ -22,4 +22,6 @@ else ()
 	)
 endif ()
 
-add_executable(game_engine WIN32 src/WinMain.cpp)
+add_executable(game_engine WIN32 src/WinMain.cpp src/Window.cpp)
+
+target_include_directories(game_engine PRIVATE src)
