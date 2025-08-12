@@ -1,6 +1,7 @@
 #include "Window.h"
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 Window::Window(HINSTANCE hInstance, int width, int height, const wchar_t* title) :
 	hInstance_(hInstance)
@@ -16,6 +17,7 @@ Window::Window(HINSTANCE hInstance, int width, int height, const wchar_t* title)
 		throw std::runtime_error("Failed to register window class");
 	}
 	CreateAppWindow(hInstance_, width, height, title);
+	RegisterInput();
 }
 
 Window::~Window() noexcept
@@ -57,6 +59,30 @@ void Window::CreateAppWindow(HINSTANCE hInstance, int width, int height, const w
 	UpdateWindow(hWnd_);
 }
 
+void Window::RegisterInput() const noexcept
+{
+	RAWINPUTDEVICE rid[2] = {};
+
+	// Register mouse
+	rid[0].usUsagePage = 0x01;  // Generic Desktop Controls
+	rid[0].usUsage     = 0x02;  // Mouse
+	rid[0].dwFlags     = RIDEV_INPUTSINK;
+	rid[0].hwndTarget  = hWnd_;
+
+	// Register keyboard
+	rid[1].usUsagePage = 0x01;
+	rid[1].usUsage     = 0x06;
+	rid[1].dwFlags     = RIDEV_INPUTSINK;
+	rid[1].hwndTarget  = hWnd_;
+
+	if (!RegisterRawInputDevices(rid, 2, sizeof(rid[0])))
+	{
+		DWORD err = GetLastError();
+		throw std::runtime_error(
+			"Failed to register raw input devices. Error: " + std::to_string(err));
+	}
+}
+
 LRESULT CALLBACK Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (uMsg == WM_NCCREATE)
@@ -84,9 +110,46 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	case WM_DESTROY:
 		return 0;
 
-	default:
-		return DefWindowProc(hWnd, uMsg, wParam, lParam);
+	case WM_INPUT:
+		{
+			UINT dwSize = 0;
+			GetRawInputData((HRAWINPUT)lParam, RID_INPUT, nullptr, &dwSize, sizeof(RAWINPUTHEADER));
+			if (dwSize == 0)
+				break;
+
+			std::vector<BYTE> lpb(dwSize);
+			if (GetRawInputData(
+					(HRAWINPUT)lParam,
+					RID_INPUT,
+					lpb.data(),
+					&dwSize,
+					sizeof(RAWINPUTHEADER)) != dwSize)
+			{
+				break;
+			}
+
+			RAWINPUT* raw = reinterpret_cast<RAWINPUT*>(lpb.data());
+
+			if (raw->header.dwType == RIM_TYPEMOUSE)
+			{
+				RAWMOUSE& mouse = raw->data.mouse;
+				if (mouse.usFlags == MOUSE_MOVE_RELATIVE)
+				{
+					int dx = mouse.lLastX;
+					int dy = mouse.lLastY;
+					logger::info("Mouse moved: dx = {}, dy = {}", dx, dy);
+				}
+			}
+			else if (raw->header.dwType == RIM_TYPEKEYBOARD)
+			{
+				RAWKEYBOARD& kb      = raw->data.keyboard;
+				bool         keyDown = !(kb.Flags & RI_KEY_BREAK);
+				UINT         vkey    = kb.VKey;
+				logger::info((keyDown ? "Key down: " : "Key up: ") + std::to_string(vkey));
+			}
+		}
 	}
+	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
 LRESULT Window::HandleMessageStatic(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

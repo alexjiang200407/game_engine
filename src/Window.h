@@ -1,10 +1,5 @@
 #pragma once
 
-#define UNICODE
-#define _UNICODE
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
-
 class Window
 {
 public:
@@ -22,6 +17,7 @@ private:
 	static LRESULT HandleMessageStatic(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	void CreateAppWindow(HINSTANCE hInstance, int width, int height, const wchar_t* title);
+	void RegisterInput() const noexcept;
 
 	HWND                     hWnd_        = nullptr;
 	HINSTANCE                hInstance_   = nullptr;

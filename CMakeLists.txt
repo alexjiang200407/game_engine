@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(game_engine LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 macro(set_from_environment VARIABLE)
@@ -22,6 +22,16 @@ else ()
 	)
 endif ()
 
-add_executable(game_engine WIN32 src/WinMain.cpp src/Window.cpp)
+find_package(spdlog CONFIG REQUIRED)
 
-target_include_directories(game_engine PRIVATE src)
+add_executable(game_engine WIN32 src/WinMain.cpp src/Window.cpp src/logger.cpp)
+
+target_precompile_headers(${PROJECT_NAME} PRIVATE
+	src/PCH.h
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE src)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+	spdlog::spdlog
+)
