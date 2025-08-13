@@ -16,22 +16,10 @@ if (DEFINED VCPKG_ROOT)
 	set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 	set(VCPKG_TARGET_TRIPLET "x64-windows-static" CACHE STRING "")
 else ()
-	message(
-		WARNING
-		"Variable VCPKG_ROOT is not set. Continuing without vcpkg."
-	)
+	message(WARNING "Variable VCPKG_ROOT is not set. Continuing without vcpkg.")
 endif ()
 
 find_package(spdlog CONFIG REQUIRED)
 
-add_executable(game_engine WIN32 src/WinMain.cpp src/Window.cpp src/logger.cpp)
-
-target_precompile_headers(${PROJECT_NAME} PRIVATE
-	src/PCH.h
-)
-
-target_include_directories(${PROJECT_NAME} PRIVATE src)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE
-	spdlog::spdlog
-)
+# Let src/CMakeLists handle the sources
+add_subdirectory(src)

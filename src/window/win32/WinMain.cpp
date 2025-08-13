@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "window/win32/Window.h"
 #include <stdexcept>
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
@@ -7,12 +7,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	{
 		logger::Init();
 		Window wnd{ hInstance, 800, 600, L"Game Engine" };
-		while (wnd.ProcessMessages());
-	} catch (const std::exception& e)
+		while (wnd.ProcessMessages())
+		{
+			while (const auto key = wnd.kbd.ReadKey())
+			{
+				if (key->code == 65)
+				{
+					logger::info("A was pressed");
+				}
+			}
+		};
+	}
+	catch (const std::exception& e)
 	{
 		MessageBoxA(nullptr, e.what(), "Error", MB_OK | MB_ICONERROR);
 		return -1;
-	} catch (...)
+	}
+	catch (...)
 	{
 		MessageBoxA(nullptr, "An unknown error occurred.", "Error", MB_OK | MB_ICONERROR);
 		return -1;

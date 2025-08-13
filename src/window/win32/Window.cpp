@@ -1,10 +1,7 @@
-#include "Window.h"
-#include <stdexcept>
-#include <string>
-#include <vector>
+#include "window/win32/Window.h"
 
 Window::Window(HINSTANCE hInstance, int width, int height, const wchar_t* title) :
-	hInstance_(hInstance)
+	hInstance(hInstance)
 {
 	WNDCLASSEX wc    = {};
 	wc.cbSize        = sizeof(wc);
@@ -16,18 +13,18 @@ Window::Window(HINSTANCE hInstance, int width, int height, const wchar_t* title)
 	{
 		throw std::runtime_error("Failed to register window class");
 	}
-	CreateAppWindow(hInstance_, width, height, title);
+	CreateAppWindow(hInstance, width, height, title);
 	RegisterInput();
 }
 
 Window::~Window() noexcept
 {
-	if (hWnd_)
+	if (hWnd)
 	{
-		DestroyWindow(hWnd_);
-		hWnd_ = nullptr;
+		DestroyWindow(hWnd);
+		hWnd = nullptr;
 	}
-	UnregisterClass(CLASS_NAME, hInstance_);
+	UnregisterClass(CLASS_NAME, hInstance);
 }
 
 void Window::CreateAppWindow(HINSTANCE hInstance, int width, int height, const wchar_t* title)
@@ -35,7 +32,7 @@ void Window::CreateAppWindow(HINSTANCE hInstance, int width, int height, const w
 	RECT rect = { 0, 0, width, height };
 	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
 
-	hWnd_ = CreateWindowEx(
+	hWnd = CreateWindowEx(
 		0,
 		CLASS_NAME,
 		title,
@@ -49,14 +46,14 @@ void Window::CreateAppWindow(HINSTANCE hInstance, int width, int height, const w
 		hInstance,
 		this);
 
-	if (!hWnd_)
+	if (!hWnd)
 	{
 		DWORD err = GetLastError();
 		throw std::runtime_error("Failed to create window, error code: " + std::to_string(err));
 	}
 
-	ShowWindow(hWnd_, SW_SHOW);
-	UpdateWindow(hWnd_);
+	ShowWindow(hWnd, SW_SHOW);
+	UpdateWindow(hWnd);
 }
 
 void Window::RegisterInput() const noexcept
@@ -66,14 +63,14 @@ void Window::RegisterInput() const noexcept
 	// Register mouse
 	rid[0].usUsagePage = 0x01;  // Generic Desktop Controls
 	rid[0].usUsage     = 0x02;  // Mouse
-	rid[0].dwFlags     = RIDEV_INPUTSINK;
-	rid[0].hwndTarget  = hWnd_;
+	rid[0].dwFlags     = 0;
+	rid[0].hwndTarget  = hWnd;
 
 	// Register keyboard
 	rid[1].usUsagePage = 0x01;
 	rid[1].usUsage     = 0x06;
-	rid[1].dwFlags     = RIDEV_INPUTSINK;
-	rid[1].hwndTarget  = hWnd_;
+	rid[1].dwFlags     = 0;
+	rid[1].hwndTarget  = hWnd;
 
 	if (!RegisterRawInputDevices(rid, 2, sizeof(rid[0])))
 	{
@@ -97,6 +94,37 @@ LRESULT CALLBACK Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 		return pWnd->HandleMessage(hWnd, uMsg, wParam, lParam);
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+}
+
+namespace
+{
+	int utf16_to_utf32(char16_t buffer[], int count, char32_t ret[])
+	{
+		char16_t* p         = buffer;
+		int       remaining = count;
+		int       retCnt    = 0;
+		while (remaining > 0)
+		{
+			char32_t codepoint;
+			if (p[0] >= 0xD800 && p[0] <= 0xDBFF && remaining >= 2)  // high surrogate
+			{
+				codepoint = ((p[0] - 0xD800) << 10) + (p[1] - 0xDC00) + 0x10000;
+				p += 2;
+				remaining -= 2;
+			}
+			else
+			{
+				codepoint = p[0];
+				p += 1;
+				remaining -= 1;
+			}
+
+			ret[retCnt] = codepoint;
+			++retCnt;
+		}
+
+		return retCnt;
+	}
 }
 
 LRESULT Window::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept
@@ -145,7 +173,26 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 				RAWKEYBOARD& kb      = raw->data.keyboard;
 				bool         keyDown = !(kb.Flags & RI_KEY_BREAK);
 				UINT         vkey    = kb.VKey;
-				logger::info((keyDown ? "Key down: " : "Key up: ") + std::to_string(vkey));
+
+				if (keyDown)
+				{
+					kbd.OnKeyDown(vkey);
+					BYTE keyboardState[256];
+					GetKeyboardState(keyboardState);
+
+					wchar_t buffer[5] = {};
+					int     count     = ToUnicode(vkey, kb.MakeCode, keyboardState, buffer, 4, 0);
+
+					if (count)
+					{
+						char32_t utf32[2] = {};
+						int      retcount =
+							utf16_to_utf32(reinterpret_cast<char16_t*>(buffer), count, utf32);
+						for (int i = 0; i < retcount; ++i) kbd.OnChar(utf32[i]);
+					}
+				}
+				else
+					kbd.OnKeyUp(vkey);
 			}
 		}
 	}

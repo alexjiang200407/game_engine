@@ -1,4 +1,5 @@
 #pragma once
+#include "window/Keyboard.h"
 
 class Window
 {
@@ -8,8 +9,8 @@ public:
 	Window(const Window&)            = delete;
 	Window& operator=(const Window&) = delete;
 
-	HWND GetHWND() const noexcept { return hWnd_; }
-	bool ProcessMessages() noexcept;
+	[[nodiscard]] HWND GetHWND() const noexcept { return hWnd; }
+	[[nodiscard]] bool ProcessMessages() noexcept;
 
 private:
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -19,7 +20,11 @@ private:
 	void CreateAppWindow(HINSTANCE hInstance, int width, int height, const wchar_t* title);
 	void RegisterInput() const noexcept;
 
-	HWND                     hWnd_        = nullptr;
-	HINSTANCE                hInstance_   = nullptr;
+public:
+	Keyboard kbd;
+
+private:
+	HWND                     hWnd         = nullptr;
+	HINSTANCE                hInstance    = nullptr;
 	static constexpr wchar_t CLASS_NAME[] = L"GameEngineWindow";
 };
