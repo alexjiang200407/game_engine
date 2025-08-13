@@ -3,7 +3,8 @@
 
 namespace fs = std::filesystem;
 
-void logger::Init()
+void
+logger::Init()
 {
 	wchar_t exePath[MAX_PATH];
 	GetModuleFileNameW(nullptr, exePath, MAX_PATH);

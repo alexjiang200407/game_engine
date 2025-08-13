@@ -1,7 +1,9 @@
 #include "window/win32/Window.h"
+#include <array>
+#include <span>
 
-Window::Window(HINSTANCE hInstance, int width, int height, const wchar_t* title) :
-	hInstance(hInstance)
+Window::Window(HINSTANCE a_hInstance, int width, int height, const wchar_t* title) :
+	hInstance(a_hInstance)
 {
 	WNDCLASSEX wc    = {};
 	wc.cbSize        = sizeof(wc);
@@ -27,7 +29,8 @@ Window::~Window() noexcept
 	UnregisterClass(CLASS_NAME, hInstance);
 }
 
-void Window::CreateAppWindow(HINSTANCE hInstance, int width, int height, const wchar_t* title)
+void
+Window::CreateAppWindow(HINSTANCE a_hInstance, int width, int height, const wchar_t* title)
 {
 	RECT rect = { 0, 0, width, height };
 	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
@@ -43,7 +46,7 @@ void Window::CreateAppWindow(HINSTANCE hInstance, int width, int height, const w
 		rect.bottom - rect.top,
 		nullptr,
 		nullptr,
-		hInstance,
+		a_hInstance,
 		this);
 
 	if (!hWnd)
@@ -56,7 +59,8 @@ void Window::CreateAppWindow(HINSTANCE hInstance, int width, int height, const w
 	UpdateWindow(hWnd);
 }
 
-void Window::RegisterInput() const noexcept
+void
+Window::RegisterInput() const
 {
 	RAWINPUTDEVICE rid[2] = {};
 
@@ -80,7 +84,8 @@ void Window::RegisterInput() const noexcept
 	}
 }
 
-LRESULT CALLBACK Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK
+Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (uMsg == WM_NCCREATE)
 	{
@@ -98,36 +103,40 @@ LRESULT CALLBACK Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 namespace
 {
-	int utf16_to_utf32(char16_t buffer[], int count, char32_t ret[])
+	size_t
+	utf16_to_utf32(std::span<const char16_t> buffer, std::span<char32_t> ret)
 	{
-		char16_t* p         = buffer;
-		int       remaining = count;
-		int       retCnt    = 0;
-		while (remaining > 0)
+		size_t retCnt = 0;
+		size_t i      = 0;
+		while (i < buffer.size() && retCnt < ret.size())
 		{
 			char32_t codepoint;
-			if (p[0] >= 0xD800 && p[0] <= 0xDBFF && remaining >= 2)  // high surrogate
+			char16_t current = buffer[i];
+
+			if (current >= 0xD800 && current <= 0xDBFF && (i + 1) < buffer.size())
 			{
-				codepoint = ((p[0] - 0xD800) << 10) + (p[1] - 0xDC00) + 0x10000;
-				p += 2;
-				remaining -= 2;
+				// high surrogate + low surrogate
+				char16_t high = current;
+				char16_t low  = buffer[i + 1];
+				codepoint     = static_cast<char32_t>((high - 0xD800) << 10) +
+				            static_cast<char32_t>(low - 0xDC00) + 0x10000;
+				i += 2;
 			}
 			else
 			{
-				codepoint = p[0];
-				p += 1;
-				remaining -= 1;
+				codepoint = current;
+				++i;
 			}
 
-			ret[retCnt] = codepoint;
-			++retCnt;
+			ret[retCnt++] = codepoint;
 		}
 
 		return retCnt;
 	}
 }
 
-LRESULT Window::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept
+LRESULT
+Window::HandleMessage(HWND a_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	switch (uMsg)
 	{
@@ -141,13 +150,18 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	case WM_INPUT:
 		{
 			UINT dwSize = 0;
-			GetRawInputData((HRAWINPUT)lParam, RID_INPUT, nullptr, &dwSize, sizeof(RAWINPUTHEADER));
+			GetRawInputData(
+				reinterpret_cast<HRAWINPUT>(lParam),
+				RID_INPUT,
+				nullptr,
+				&dwSize,
+				sizeof(RAWINPUTHEADER));
 			if (dwSize == 0)
 				break;
 
 			std::vector<BYTE> lpb(dwSize);
 			if (GetRawInputData(
-					(HRAWINPUT)lParam,
+					reinterpret_cast<HRAWINPUT>(lParam),
 					RID_INPUT,
 					lpb.data(),
 					&dwSize,
@@ -180,32 +194,42 @@ LRESULT Window::HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 					BYTE keyboardState[256];
 					GetKeyboardState(keyboardState);
 
-					wchar_t buffer[5] = {};
-					int     count     = ToUnicode(vkey, kb.MakeCode, keyboardState, buffer, 4, 0);
+					char16_t buffer[5] = {};
+					int      count     = ToUnicode(
+                        vkey,
+                        kb.MakeCode,
+                        keyboardState,
+                        reinterpret_cast<wchar_t*>(buffer),
+                        4,
+                        0);
 
 					if (count)
 					{
-						char32_t utf32[2] = {};
-						int      retcount =
-							utf16_to_utf32(reinterpret_cast<char16_t*>(buffer), count, utf32);
-						for (int i = 0; i < retcount; ++i) kbd.OnChar(utf32[i]);
+						std::array<char32_t, 2> utf32    = {};
+						size_t                  retcount = utf16_to_utf32(buffer, utf32);
+						for (size_t i = 0; i < retcount; ++i) kbd.OnChar(utf32[i]);
 					}
 				}
 				else
 					kbd.OnKeyUp(vkey);
 			}
 		}
+		break;
+	default:
+		return DefWindowProc(a_hWnd, uMsg, wParam, lParam);
 	}
-	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+	return DefWindowProc(a_hWnd, uMsg, wParam, lParam);
 }
 
-LRESULT Window::HandleMessageStatic(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT
+Window::HandleMessageStatic(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	auto* const pWnd = reinterpret_cast<Window*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	return pWnd->HandleMessage(hWnd, uMsg, wParam, lParam);
 }
 
-bool Window::ProcessMessages() noexcept
+bool
+Window::ProcessMessages() noexcept
 {
 	MSG msg{};
 	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))

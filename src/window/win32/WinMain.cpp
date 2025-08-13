@@ -1,8 +1,13 @@
 #include "window/win32/Window.h"
 #include <stdexcept>
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int WINAPI
+WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	(void)hPrevInstance;
+	(void)lpCmdLine;
+	(void)nCmdShow;
+
 	try
 	{
 		logger::Init();
@@ -16,7 +21,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 					logger::info("A was pressed");
 				}
 			}
-		};
+		}
 	}
 	catch (const std::exception& e)
 	{

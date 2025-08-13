@@ -2,13 +2,15 @@
 #include <cassert>
 
 [[nodiscard]]
-bool Keyboard::IsKeyPressed(uint32_t keycode) const noexcept
+bool
+Keyboard::IsKeyPressed(uint32_t keycode) const noexcept
 {
 	return keyStates[keycode];
 }
 
 [[nodiscard]]
-std::optional<Keyboard::KeyEvent> Keyboard::ReadKey() noexcept
+std::optional<Keyboard::KeyEvent>
+Keyboard::ReadKey() noexcept
 {
 	if (keyBuffer.empty())
 		return std::nullopt;
@@ -18,7 +20,8 @@ std::optional<Keyboard::KeyEvent> Keyboard::ReadKey() noexcept
 }
 
 [[nodiscard]]
-std::optional<Keyboard::CharEvent> Keyboard::ReadChar() noexcept
+std::optional<Keyboard::CharEvent>
+Keyboard::ReadChar() noexcept
 {
 	if (charBuffer.empty())
 		return std::nullopt;
@@ -28,25 +31,36 @@ std::optional<Keyboard::CharEvent> Keyboard::ReadChar() noexcept
 }
 
 [[nodiscard]]
-bool Keyboard::Empty() const noexcept
+bool
+Keyboard::Empty() const noexcept
 {
 	return keyBuffer.empty();
 }
 
-void Keyboard::Clear() noexcept { keyBuffer = {}; }
+void
+Keyboard::Clear() noexcept
+{
+	keyBuffer = {};
+}
 
-void Keyboard::OnKeyDown(uint32_t keycode) noexcept
+void
+Keyboard::OnKeyDown(uint32_t keycode) noexcept
 {
 	assert(keycode < nKeys);
 	keyStates[keycode] = true;
 	keyBuffer.push({ KeyEvent::Type::kDown, keycode });
 }
 
-void Keyboard::OnKeyUp(uint32_t keycode) noexcept
+void
+Keyboard::OnKeyUp(uint32_t keycode) noexcept
 {
 	assert(keycode < nKeys);
 	keyStates[keycode] = false;
 	keyBuffer.push({ KeyEvent::Type::kUp, keycode });
 }
 
-void Keyboard::OnChar(char32_t ch) noexcept { charBuffer.push({ ch }); }
+void
+Keyboard::OnChar(char32_t ch) noexcept
+{
+	charBuffer.push({ ch });
+}
