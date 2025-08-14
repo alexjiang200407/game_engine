@@ -1,4 +1,4 @@
-#include "window/win32/Window.h"
+#include "window/Window.h"
 #include <array>
 #include <span>
 
@@ -89,6 +89,34 @@ Window::RegisterInput() const
 		throw std::runtime_error(
 			"Failed to register raw input devices. Error: " + std::to_string(err));
 	}
+}
+
+bool
+Window::Process() noexcept
+{
+	bool shouldContinue = ProcessMessages();
+
+	if (shouldContinue)
+	{
+		while (const auto key = kbd.ReadKey())
+		{
+			if (key->code == 65)
+			{
+				logger::info("A was pressed");
+			}
+		}
+
+		while (const auto mouseEvt = mouse.ReadEvent())
+		{
+			if (mouseEvt->state.all(Mouse::StateFlags::kInsideWindow) &&
+			    mouseEvt->type == Mouse::Event::Type::kMove)
+			{
+				logger::info("Moving Inside Window");
+			}
+		}
+	}
+
+	return shouldContinue;
 }
 
 LRESULT CALLBACK

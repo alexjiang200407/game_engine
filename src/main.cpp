@@ -1,4 +1,5 @@
-#include "window/win32/Window.h"
+#include "Game.h"
+#include "window/Window.h"
 #include <stdexcept>
 
 int WINAPI
@@ -12,25 +13,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdS
 	{
 		logger::Init();
 		Window wnd{ hInstance, 800, 600, L"Game Engine" };
-		while (wnd.ProcessMessages())
-		{
-			while (const auto key = wnd.kbd.ReadKey())
-			{
-				if (key->code == 65)
-				{
-					logger::info("A was pressed");
-				}
-			}
-
-			while (const auto mouseEvt = wnd.mouse.ReadEvent())
-			{
-				if (mouseEvt->state.all(Mouse::StateFlags::kInsideWindow) &&
-				    mouseEvt->type == Mouse::Event::Type::kMove)
-				{
-					logger::info("Moving Inside Window");
-				}
-			}
-		}
+		Game{}.Play(wnd);
 	}
 	catch (const std::exception& e)
 	{

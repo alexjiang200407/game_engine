@@ -1,5 +1,7 @@
 set(CORE_SOURCES
     logger.cpp
+    main.cpp
+    Game.cpp
 )
 
 add_executable(${PROJECT_NAME} WIN32
