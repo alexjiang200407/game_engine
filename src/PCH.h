@@ -14,6 +14,7 @@
 #include <string>
 #include <vector>
 
+#include "containers/EnumSet.h"
 #include "logger.h"
 
 using namespace std::string_literals;

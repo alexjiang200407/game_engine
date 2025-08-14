@@ -1,4 +1,4 @@
-#include "Keyboard.h"
+#include "window/Keyboard.h"
 #include <cassert>
 
 [[nodiscard]]
@@ -38,13 +38,13 @@ Keyboard::Empty() const noexcept
 }
 
 void
-Keyboard::Clear() noexcept
+Keyboard::Clear()
 {
 	keyBuffer = {};
 }
 
 void
-Keyboard::OnKeyDown(uint32_t keycode) noexcept
+Keyboard::OnKeyDown(uint32_t keycode)
 {
 	assert(keycode < nKeys);
 	keyStates[keycode] = true;
@@ -52,7 +52,7 @@ Keyboard::OnKeyDown(uint32_t keycode) noexcept
 }
 
 void
-Keyboard::OnKeyUp(uint32_t keycode) noexcept
+Keyboard::OnKeyUp(uint32_t keycode)
 {
 	assert(keycode < nKeys);
 	keyStates[keycode] = false;
@@ -60,7 +60,7 @@ Keyboard::OnKeyUp(uint32_t keycode) noexcept
 }
 
 void
-Keyboard::OnChar(char32_t ch) noexcept
+Keyboard::OnChar(char32_t ch)
 {
 	charBuffer.push({ ch });
 }

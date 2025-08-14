@@ -1,5 +1,6 @@
 #pragma once
 #include "window/Keyboard.h"
+#include "window/Mouse.h"
 
 class Window
 {
@@ -36,8 +37,15 @@ private:
 	void
 	RegisterInput() const;
 
+	void
+	HandleMouse(RAWMOUSE& rawMouse);
+
+	void
+	HandleKeyboard(RAWKEYBOARD& rawKeyboard);
+
 public:
 	Keyboard kbd;
+	Mouse    mouse;
 
 private:
 	HWND                     hWnd         = nullptr;

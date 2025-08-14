@@ -21,6 +21,15 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdS
 					logger::info("A was pressed");
 				}
 			}
+
+			while (const auto mouseEvt = wnd.mouse.ReadEvent())
+			{
+				if (mouseEvt->state.all(Mouse::StateFlags::kInsideWindow) &&
+				    mouseEvt->type == Mouse::Event::Type::kMove)
+				{
+					logger::info("Moving Inside Window");
+				}
+			}
 		}
 	}
 	catch (const std::exception& e)

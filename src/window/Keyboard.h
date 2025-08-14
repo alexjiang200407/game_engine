@@ -37,19 +37,19 @@ public:
 	Empty() const noexcept;
 
 	void
-	Clear() noexcept;
+	Clear();
 
 private:
 	Keyboard() = default;
 
 	void
-	OnKeyDown(uint32_t keycode) noexcept;
+	OnKeyDown(uint32_t keycode);
 
 	void
-	OnKeyUp(uint32_t keycode) noexcept;
+	OnKeyUp(uint32_t keycode);
 
 	void
-	OnChar(char32_t character) noexcept;
+	OnChar(char32_t character);
 
 private:
 	static constexpr size_t nKeys = 256u;

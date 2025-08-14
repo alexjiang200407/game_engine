@@ -16,6 +16,13 @@ Window::Window(HINSTANCE a_hInstance, int width, int height, const wchar_t* titl
 		throw std::runtime_error("Failed to register window class");
 	}
 	CreateAppWindow(hInstance, width, height, title);
+
+	{
+		POINT pt;
+		GetCursorPos(&pt);
+		ScreenToClient(hWnd, &pt);
+		mouse.SetPos(pt.x, pt.y);
+	}
 	RegisterInput();
 }
 
@@ -174,44 +181,11 @@ Window::HandleMessage(HWND a_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noex
 
 			if (raw->header.dwType == RIM_TYPEMOUSE)
 			{
-				RAWMOUSE& mouse = raw->data.mouse;
-				if (mouse.usFlags == MOUSE_MOVE_RELATIVE)
-				{
-					int dx = mouse.lLastX;
-					int dy = mouse.lLastY;
-					logger::info("Mouse moved: dx = {}, dy = {}", dx, dy);
-				}
+				HandleMouse(raw->data.mouse);
 			}
 			else if (raw->header.dwType == RIM_TYPEKEYBOARD)
 			{
-				RAWKEYBOARD& kb      = raw->data.keyboard;
-				bool         keyDown = !(kb.Flags & RI_KEY_BREAK);
-				UINT         vkey    = kb.VKey;
-
-				if (keyDown)
-				{
-					kbd.OnKeyDown(vkey);
-					BYTE keyboardState[256];
-					GetKeyboardState(keyboardState);
-
-					char16_t buffer[5] = {};
-					int      count     = ToUnicode(
-                        vkey,
-                        kb.MakeCode,
-                        keyboardState,
-                        reinterpret_cast<wchar_t*>(buffer),
-                        4,
-                        0);
-
-					if (count)
-					{
-						std::array<char32_t, 2> utf32    = {};
-						size_t                  retcount = utf16_to_utf32(buffer, utf32);
-						for (size_t i = 0; i < retcount; ++i) kbd.OnChar(utf32[i]);
-					}
-				}
-				else
-					kbd.OnKeyUp(vkey);
+				HandleKeyboard(raw->data.keyboard);
 			}
 		}
 		break;
@@ -219,6 +193,79 @@ Window::HandleMessage(HWND a_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noex
 		return DefWindowProc(a_hWnd, uMsg, wParam, lParam);
 	}
 	return DefWindowProc(a_hWnd, uMsg, wParam, lParam);
+}
+
+void
+Window::HandleMouse(RAWMOUSE& rawMouse)
+{
+	if (rawMouse.usFlags == MOUSE_MOVE_RELATIVE)
+	{
+		mouse.OnMouseMove(rawMouse.lLastX, rawMouse.lLastY);
+	}
+
+	if (rawMouse.usButtonFlags & RI_MOUSE_WHEEL)
+	{
+		short zDelta = static_cast<short>(rawMouse.usButtonData);
+		mouse.OnWheel(zDelta);
+	}
+
+	if (rawMouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN)
+		mouse.OnLeftDown();
+	if (rawMouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_UP)
+		mouse.OnLeftUp();
+
+	if (rawMouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN)
+		mouse.OnRightDown();
+	if (rawMouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_UP)
+		mouse.OnRightUp();
+
+	if (rawMouse.usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_DOWN)
+		mouse.OnMiddleDown();
+	if (rawMouse.usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_UP)
+		mouse.OnMiddleUp();
+
+	POINT pt;
+	GetCursorPos(&pt);
+	RECT rc;
+	GetClientRect(hWnd, &rc);
+	MapWindowPoints(hWnd, nullptr, reinterpret_cast<LPPOINT>(&rc), 2);
+
+	bool inside = PtInRect(&rc, pt);
+	if (inside && !mouse.HasStateFlag(Mouse::StateFlags::kInsideWindow))
+	{
+		mouse.OnMouseEnter();
+	}
+	else if (!inside && mouse.HasStateFlag(Mouse::StateFlags::kInsideWindow))
+	{
+		mouse.OnMouseLeave();
+	}
+}
+
+void
+Window::HandleKeyboard(RAWKEYBOARD& kb)
+{
+	bool keyDown = !(kb.Flags & RI_KEY_BREAK);
+	UINT vkey    = kb.VKey;
+
+	if (keyDown)
+	{
+		kbd.OnKeyDown(vkey);
+		BYTE keyboardState[256];
+		GetKeyboardState(keyboardState);
+
+		char16_t buffer[5] = {};
+		int      count =
+			ToUnicode(vkey, kb.MakeCode, keyboardState, reinterpret_cast<wchar_t*>(buffer), 4, 0);
+
+		if (count)
+		{
+			std::array<char32_t, 2> utf32    = {};
+			size_t                  retcount = utf16_to_utf32(buffer, utf32);
+			for (size_t i = 0; i < retcount; ++i) kbd.OnChar(utf32[i]);
+		}
+	}
+	else
+		kbd.OnKeyUp(vkey);
 }
 
 LRESULT
