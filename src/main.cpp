@@ -5,6 +5,7 @@
 int WINAPI
 WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	(void)hInstance;
 	(void)hPrevInstance;
 	(void)lpCmdLine;
 	(void)nCmdShow;
@@ -12,8 +13,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdS
 	try
 	{
 		logger::Init();
-		wnd::Window wnd{ hInstance, 800, 600, L"Game Engine" };
-		Game{}.Play(wnd);
+		Game{}.Play();
 	}
 	catch (const std::exception& e)
 	{

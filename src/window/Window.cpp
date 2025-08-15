@@ -5,8 +5,7 @@
 
 using namespace wnd;
 
-Window::Window(HINSTANCE a_hInstance, int width, int height, const wchar_t* title) :
-	hInstance(a_hInstance)
+Window::Window(int width, int height) : hInstance(GetModuleHandle(nullptr))
 {
 	WNDCLASSEX wc    = {};
 	wc.cbSize        = sizeof(wc);
@@ -15,7 +14,7 @@ Window::Window(HINSTANCE a_hInstance, int width, int height, const wchar_t* titl
 	wc.lpszClassName = CLASS_NAME;
 
 	WIN32_ERR_TEST_AND_THROW(RegisterClassEx(&wc));
-	CreateAppWindow(hInstance, width, height, title);
+	CreateAppWindow(hInstance, width, height, L"Game Engine");  // TODO: Settings to get Window Name
 
 	{
 		POINT pt;
@@ -106,6 +105,12 @@ Window::Process()
 	}
 
 	return shouldContinue;
+}
+
+gfx::Graphics
+wnd::Window::CreateGraphics(int width, int height) const
+{
+	return gfx::Graphics(hWnd, width, height);
 }
 
 LRESULT CALLBACK

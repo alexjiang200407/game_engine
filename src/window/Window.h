@@ -1,27 +1,30 @@
 #pragma once
+#include "gfx/Graphics.h"
 #include "window/Keyboard.h"
 #include "window/Mouse.h"
+
+namespace gfx
+{
+	class Graphics;
+}
 
 namespace wnd
 {
 	class Window
 	{
 	public:
-		Window(HINSTANCE hInstance, int width, int height, const wchar_t* title);
+		Window(int width, int height);
 		~Window() noexcept;
 		Window(const Window&) = delete;
 
 		Window&
 		operator=(const Window&) = delete;
 
-		[[nodiscard]] HWND
-		GetHWND() const noexcept
-		{
-			return hWnd;
-		}
-
 		[[nodiscard]] bool
 		Process();
+
+		[[nodiscard]] gfx::Graphics
+		CreateGraphics(int width, int height) const;
 
 	private:
 		static LRESULT CALLBACK

@@ -1,20 +1,23 @@
 #pragma once
 
-#ifdef _WIN32
-
-#	include "window/Window.h"
-
-#endif  // _WIN32
+#include "gfx/Graphics.h"
+#include "util/Timer.h"
+#include "window/Window.h"
 
 class Game
 {
 public:
-	Game() noexcept = default;
+	Game();
 
 	void
-	Play(wnd::Window& wnd);
+	Play();
 
 private:
 	void
 	DoFrame();
+
+private:
+	util::Timer   timer;
+	wnd::Window   wnd;
+	gfx::Graphics gfx;
 };

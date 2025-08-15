@@ -9,6 +9,7 @@
 
 #include <bitset>
 #include <cassert>
+#include <memory>
 #include <optional>
 #include <queue>
 #include <stdexcept>
@@ -18,5 +19,8 @@
 
 #include "logger.h"
 #include "util/EnumSet.h"
+
+#include <d3d11.h>
+#include <dxgi.h>
 
 using namespace std::string_literals;
