@@ -19,7 +19,7 @@ public:
 	}
 
 	[[nodiscard]] bool
-	Process() noexcept;
+	Process();
 
 private:
 	static LRESULT CALLBACK
@@ -44,7 +44,7 @@ private:
 	HandleKeyboard(RAWKEYBOARD& rawKeyboard);
 
 	[[nodiscard]] bool
-	ProcessMessages() noexcept;
+	ProcessMessages();
 
 public:
 	Keyboard kbd;

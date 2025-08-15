@@ -1,4 +1,5 @@
 #include "window/Window.h"
+#include "error/Win32Exception.h"
 #include <array>
 #include <span>
 
@@ -11,16 +12,13 @@ Window::Window(HINSTANCE a_hInstance, int width, int height, const wchar_t* titl
 	wc.hInstance     = hInstance;
 	wc.lpszClassName = CLASS_NAME;
 
-	if (!RegisterClassEx(&wc))
-	{
-		throw std::runtime_error("Failed to register window class");
-	}
+	WIN32_ERR_TEST_AND_THROW(RegisterClassEx(&wc));
 	CreateAppWindow(hInstance, width, height, title);
 
 	{
 		POINT pt;
-		GetCursorPos(&pt);
-		ScreenToClient(hWnd, &pt);
+		WIN32_ERR_TEST_AND_THROW(GetCursorPos(&pt));
+		WIN32_ERR_TEST_AND_THROW(ScreenToClient(hWnd, &pt));
 		mouse.SetPos(pt.x, pt.y);
 	}
 	RegisterInput();
@@ -30,19 +28,19 @@ Window::~Window() noexcept
 {
 	if (hWnd)
 	{
-		DestroyWindow(hWnd);
+		assert(DestroyWindow(hWnd) != 0);
 		hWnd = nullptr;
 	}
-	UnregisterClass(CLASS_NAME, hInstance);
+	assert(UnregisterClass(CLASS_NAME, hInstance) != 0);
 }
 
 void
 Window::CreateAppWindow(HINSTANCE a_hInstance, int width, int height, const wchar_t* title)
 {
 	RECT rect = { 0, 0, width, height };
-	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
+	WIN32_ERR_TEST_AND_THROW(AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE));
 
-	hWnd = CreateWindowEx(
+	hWnd = WIN32_ERR_TEST_AND_THROW(CreateWindowEx(
 		0,
 		CLASS_NAME,
 		title,
@@ -54,16 +52,10 @@ Window::CreateAppWindow(HINSTANCE a_hInstance, int width, int height, const wcha
 		nullptr,
 		nullptr,
 		a_hInstance,
-		this);
+		this));
 
-	if (!hWnd)
-	{
-		DWORD err = GetLastError();
-		throw std::runtime_error("Failed to create window, error code: " + std::to_string(err));
-	}
-
-	ShowWindow(hWnd, SW_SHOW);
-	UpdateWindow(hWnd);
+	WIN32_ERR_TEST_AND_THROW(ShowWindow(hWnd, SW_SHOW));
+	WIN32_ERR_TEST_AND_THROW(UpdateWindow(hWnd));
 }
 
 void
@@ -83,16 +75,11 @@ Window::RegisterInput() const
 	rid[1].dwFlags     = 0;
 	rid[1].hwndTarget  = hWnd;
 
-	if (!RegisterRawInputDevices(rid, 2, sizeof(rid[0])))
-	{
-		DWORD err = GetLastError();
-		throw std::runtime_error(
-			"Failed to register raw input devices. Error: " + std::to_string(err));
-	}
+	WIN32_ERR_TEST_AND_THROW(RegisterRawInputDevices(rid, 2, sizeof(rid[0])));
 }
 
 bool
-Window::Process() noexcept
+Window::Process()
 {
 	bool shouldContinue = ProcessMessages();
 
@@ -126,11 +113,12 @@ Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		const CREATESTRUCTW* const pCreate = reinterpret_cast<CREATESTRUCTW*>(lParam);
 		Window* const              pWnd    = static_cast<Window*>(pCreate->lpCreateParams);
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd));
-		SetWindowLongPtr(
+		WIN32_ERR_TEST_AND_EXIT(
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pWnd)));
+		WIN32_ERR_TEST_AND_EXIT(SetWindowLongPtr(
 			hWnd,
 			GWLP_WNDPROC,
-			reinterpret_cast<LONG_PTR>(&Window::HandleMessageStatic));
+			reinterpret_cast<LONG_PTR>(&Window::HandleMessageStatic)));
 		return pWnd->HandleMessage(hWnd, uMsg, wParam, lParam);
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -191,16 +179,17 @@ Window::HandleMessage(HWND a_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noex
 				nullptr,
 				&dwSize,
 				sizeof(RAWINPUTHEADER));
-			if (dwSize == 0)
+			if (dwSize == 0 || dwSize == static_cast<UINT>(-1))
 				break;
 
 			std::vector<BYTE> lpb(dwSize);
-			if (GetRawInputData(
+			if (const auto copied = GetRawInputData(
 					reinterpret_cast<HRAWINPUT>(lParam),
 					RID_INPUT,
 					lpb.data(),
 					&dwSize,
-					sizeof(RAWINPUTHEADER)) != dwSize)
+					sizeof(RAWINPUTHEADER));
+			    copied != dwSize || copied == static_cast<UINT>(-1))
 			{
 				break;
 			}
@@ -252,11 +241,18 @@ Window::HandleMouse(RAWMOUSE& rawMouse)
 	if (rawMouse.usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_UP)
 		mouse.OnMiddleUp();
 
-	POINT pt;
-	GetCursorPos(&pt);
-	RECT rc;
-	GetClientRect(hWnd, &rc);
-	MapWindowPoints(hWnd, nullptr, reinterpret_cast<LPPOINT>(&rc), 2);
+	POINT pt{};
+	RECT  rc{};
+
+	if (!GetCursorPos(&pt))
+		return;
+	if (!GetClientRect(hWnd, &rc))
+		return;
+
+	SetLastError(0);
+	if (MapWindowPoints(hWnd, nullptr, reinterpret_cast<LPPOINT>(&rc), 2) == 0 &&
+	    GetLastError() != 0)
+		return;
 
 	bool inside = PtInRect(&rc, pt);
 	if (inside && !mouse.HasStateFlag(Mouse::StateFlags::kInsideWindow))
@@ -304,14 +300,13 @@ Window::HandleMessageStatic(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 bool
-Window::ProcessMessages() noexcept
+Window::ProcessMessages()
 {
 	MSG msg{};
 	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 	{
 		if (msg.message == WM_QUIT)
 			return false;
-
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}

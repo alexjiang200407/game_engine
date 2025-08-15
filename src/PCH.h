@@ -12,7 +12,9 @@
 #include <queue>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <vector>
+#include <cassert>
 
 #include "containers/EnumSet.h"
 #include "logger.h"
