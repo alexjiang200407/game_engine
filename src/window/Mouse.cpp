@@ -1,5 +1,7 @@
 #include "window/Mouse.h"
 
+using namespace wnd;
+
 [[nodiscard]] bool
 Mouse::Empty() const noexcept
 {

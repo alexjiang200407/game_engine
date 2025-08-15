@@ -1,6 +1,8 @@
 #include "window/Keyboard.h"
 #include <cassert>
 
+using namespace wnd;
+
 [[nodiscard]]
 bool
 Keyboard::IsKeyPressed(uint32_t keycode) const noexcept

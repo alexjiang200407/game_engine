@@ -8,15 +8,15 @@
 #endif
 
 #include <bitset>
+#include <cassert>
 #include <optional>
 #include <queue>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <vector>
-#include <cassert>
 
-#include "containers/EnumSet.h"
 #include "logger.h"
+#include "util/EnumSet.h"
 
 using namespace std::string_literals;

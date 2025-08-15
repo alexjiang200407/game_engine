@@ -2,56 +2,59 @@
 #include "window/Keyboard.h"
 #include "window/Mouse.h"
 
-class Window
+namespace wnd
 {
-public:
-	Window(HINSTANCE hInstance, int width, int height, const wchar_t* title);
-	~Window() noexcept;
-	Window(const Window&) = delete;
-
-	Window&
-	operator=(const Window&) = delete;
-
-	[[nodiscard]] HWND
-	GetHWND() const noexcept
+	class Window
 	{
-		return hWnd;
-	}
+	public:
+		Window(HINSTANCE hInstance, int width, int height, const wchar_t* title);
+		~Window() noexcept;
+		Window(const Window&) = delete;
 
-	[[nodiscard]] bool
-	Process();
+		Window&
+		operator=(const Window&) = delete;
 
-private:
-	static LRESULT CALLBACK
-	WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+		[[nodiscard]] HWND
+		GetHWND() const noexcept
+		{
+			return hWnd;
+		}
 
-	LRESULT
-	HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
+		[[nodiscard]] bool
+		Process();
 
-	static LRESULT
-	HandleMessageStatic(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	private:
+		static LRESULT CALLBACK
+		WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	void
-	CreateAppWindow(HINSTANCE hInstance, int width, int height, const wchar_t* title);
+		LRESULT
+		HandleMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept;
 
-	void
-	RegisterInput() const;
+		static LRESULT
+		HandleMessageStatic(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	void
-	HandleMouse(RAWMOUSE& rawMouse);
+		void
+		CreateAppWindow(HINSTANCE hInstance, int width, int height, const wchar_t* title);
 
-	void
-	HandleKeyboard(RAWKEYBOARD& rawKeyboard);
+		void
+		RegisterInput() const;
 
-	[[nodiscard]] bool
-	ProcessMessages();
+		void
+		HandleMouse(RAWMOUSE& rawMouse);
 
-public:
-	Keyboard kbd;
-	Mouse    mouse;
+		void
+		HandleKeyboard(RAWKEYBOARD& rawKeyboard);
 
-private:
-	HWND                     hWnd         = nullptr;
-	HINSTANCE                hInstance    = nullptr;
-	static constexpr wchar_t CLASS_NAME[] = L"GameEngineWindow";
-};
+		[[nodiscard]] bool
+		ProcessMessages();
+
+	public:
+		Keyboard kbd;
+		Mouse    mouse;
+
+	private:
+		HWND                     hWnd         = nullptr;
+		HINSTANCE                hInstance    = nullptr;
+		static constexpr wchar_t CLASS_NAME[] = L"GameEngineWindow";
+	};
+}

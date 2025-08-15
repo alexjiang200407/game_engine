@@ -1,7 +1,7 @@
 #include "Game.h"
 
 void
-Game::Play(Window& wnd)
+Game::Play(wnd::Window& wnd)
 {
 	while (wnd.Process())
 	{

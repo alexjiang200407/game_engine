@@ -12,7 +12,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdS
 	try
 	{
 		logger::Init();
-		Window wnd{ hInstance, 800, 600, L"Game Engine" };
+		wnd::Window wnd{ hInstance, 800, 600, L"Game Engine" };
 		Game{}.Play(wnd);
 	}
 	catch (const std::exception& e)

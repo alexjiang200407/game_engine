@@ -1,7 +1,9 @@
 #include "window/Window.h"
-#include "error/Win32Exception.h"
+#include "window/Win32Exception.h"
 #include <array>
 #include <span>
+
+using namespace wnd;
 
 Window::Window(HINSTANCE a_hInstance, int width, int height, const wchar_t* title) :
 	hInstance(a_hInstance)

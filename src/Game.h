@@ -12,7 +12,7 @@ public:
 	Game() noexcept = default;
 
 	void
-	Play(Window& wnd);
+	Play(wnd::Window& wnd);
 
 private:
 	void
