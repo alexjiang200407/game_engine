@@ -18,5 +18,11 @@ target_link_libraries(${PROJECT_NAME}
         d3d11
         dxgi
         d3dcompiler
+        dxguid
+)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    $<$<CONFIG:Debug>:DEBUG>
+    PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
 )
 

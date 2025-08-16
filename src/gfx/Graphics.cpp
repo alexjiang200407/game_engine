@@ -1,3 +1,4 @@
+#include "gfx/GFXException.h"
 #include <gfx/Graphics.h>
 
 namespace wrl = Microsoft::WRL;
@@ -35,26 +36,32 @@ gfx::Graphics::Graphics(HWND hWnd, int width, int height)
 	sd.Flags                              = 0;
 
 	UINT swapCreateFlags = 0u;
-#ifndef NDEBUG
+
+#ifdef DEBUG
 	swapCreateFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-	D3D11CreateDeviceAndSwapChain(
-		nullptr,
-		D3D_DRIVER_TYPE_HARDWARE,
-		nullptr,
-		swapCreateFlags,
-		nullptr,
-		0,
-		D3D11_SDK_VERSION,
-		&sd,
-		&pSwap,
-		&pDevice,
-		nullptr,
-		&pContext);
+	GFX_ERROR_TEST_AND_THROW(
+		D3D11CreateDeviceAndSwapChain(
+			nullptr,
+			D3D_DRIVER_TYPE_HARDWARE,
+			nullptr,
+			swapCreateFlags,
+			nullptr,
+			0,
+			D3D11_SDK_VERSION,
+			&sd,
+			&pSwap,
+			&pDevice,
+			nullptr,
+			&pContext),
+		dxgiInfoManager.get());
 
 	wrl::ComPtr<ID3D11Resource> pBackBuffer{};
-	pSwap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-
-	pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pTarget);
+	GFX_ERROR_TEST_AND_THROW(
+		pSwap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)),
+		dxgiInfoManager.get());
+	GFX_ERROR_TEST_AND_THROW(
+		pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pTarget),
+		dxgiInfoManager.get());
 }

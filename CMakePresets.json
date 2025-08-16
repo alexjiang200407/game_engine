@@ -30,8 +30,8 @@
       "cacheVariables": {
         "CMAKE_C_COMPILER": "clang-cl",
         "CMAKE_CXX_COMPILER": "clang-cl",
-        "CMAKE_CXX_FLAGS": "/EHsc -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wall -Wdeprecated -Wextra -Werror -Wcast-align -Wdouble-promotion -Wimplicit-fallthrough -Wmisleading-indentation -Wnon-virtual-dtor -Wnull-dereference -Wold-style-cast -Woverloaded-virtual -Wpedantic -Wshadow -Wconversion -Wundef -Wuninitialized -Wno-language-extension-token",
-        "CMAKE_CXX_FLAGS_RELEASE": "/EHsc -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wall -Wdeprecated -Wextra -Werror -Wcast-align -Wdouble-promotion -Wimplicit-fallthrough -Wmisleading-indentation -Wnon-virtual-dtor -Wnull-dereference -Wold-style-cast -Woverloaded-virtual -Wpedantic -Wshadow -Wconversion -Wundef -Wuninitialized -Wno-language-extension-token"
+        "CMAKE_CXX_FLAGS": "/EHsc -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wall -Wdeprecated -Wextra -Werror -Wcast-align -Wdouble-promotion -Wimplicit-fallthrough -Wmisleading-indentation -Wnon-virtual-dtor -Wnull-dereference -Wold-style-cast -Woverloaded-virtual -Wpedantic -Wshadow -Wconversion -Wundef -Wuninitialized -Wno-language-extension-token -Wno-unsafe-buffer-usage",
+        "CMAKE_CXX_FLAGS_RELEASE": "/EHsc -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wall -Wdeprecated -Wextra -Werror -Wcast-align -Wdouble-promotion -Wimplicit-fallthrough -Wmisleading-indentation -Wnon-virtual-dtor -Wnull-dereference -Wold-style-cast -Woverloaded-virtual -Wpedantic -Wshadow -Wconversion -Wundef -Wuninitialized -Wno-language-extension-token -Wno-unsafe-buffer-usage"
       },
       "environment": {
         "CC": "clang-cl",

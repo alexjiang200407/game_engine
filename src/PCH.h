@@ -5,16 +5,21 @@
 #	define _UNICODE
 #	define WIN32_LEAN_AND_MEAN
 #	include <Windows.h>
+#	include <wrl/client.h>
 #endif
+
+#define __REL_FILE__ (&((__FILE__)[sizeof(PROJECT_SOURCE_DIR)]))
 
 #include <bitset>
 #include <cassert>
 #include <memory>
+#include <mutex>
 #include <optional>
 #include <queue>
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "logger.h"
