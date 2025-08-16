@@ -1,4 +1,5 @@
 #pragma once
+#include <util/RingQueue.h>
 
 namespace wnd
 {
@@ -38,7 +39,7 @@ namespace wnd
 
 			State state;
 			int   x, y;
-			int   wheelDelta;
+			int   wheelDelta = 0;
 		};
 
 	public:
@@ -46,7 +47,7 @@ namespace wnd
 		Empty() const noexcept;
 
 		void
-		Clear();
+		Clear() noexcept;
 
 		[[nodiscard]] std::pair<int, int>
 		GetPoint() const noexcept;
@@ -64,38 +65,39 @@ namespace wnd
 		SetPos(int newX, int newY) noexcept;
 
 		void
-		OnMouseMove(int dx, int dy);
+		OnMouseMove(int dx, int dy) noexcept;
 
 		void
-		OnLeftDown();
+		OnLeftDown() noexcept;
 
 		void
-		OnRightDown();
+		OnRightDown() noexcept;
 
 		void
-		OnMiddleDown();
+		OnMiddleDown() noexcept;
 
 		void
-		OnLeftUp();
+		OnLeftUp() noexcept;
 
 		void
-		OnRightUp();
+		OnRightUp() noexcept;
 
 		void
-		OnMiddleUp();
+		OnMiddleUp() noexcept;
 
 		void
-		OnWheel(int wheelDelta);
+		OnWheel(int wheelDelta) noexcept;
 
 		void
-		OnMouseLeave();
+		OnMouseLeave() noexcept;
 
 		void
-		OnMouseEnter();
+		OnMouseEnter() noexcept;
 
 	private:
-		std::queue<Event> mouseEvents{};
-		State             state{};
-		int               x = 0, y = 0;
+		static constexpr auto                  mouseBufferLen = 512u;
+		util::RingQueue<Event, mouseBufferLen> mouseBuffer{};
+		State                                  state{};
+		int                                    x = 0, y = 0;
 	};
 }

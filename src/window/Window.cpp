@@ -80,7 +80,7 @@ Window::RegisterInput() const
 }
 
 bool
-Window::Process()
+Window::Process() noexcept
 {
 	bool shouldContinue = ProcessMessages();
 
@@ -88,9 +88,14 @@ Window::Process()
 	{
 		while (const auto key = kbd.ReadKey())
 		{
-			if (key->code == 65)
+			if (key->code == 65 && key->type == Keyboard::KeyEvent::Type::kDown)
 			{
-				logger::info("A was pressed");
+				logger::info("A down");
+			}
+
+			if (key->code == 65 && key->type == Keyboard::KeyEvent::Type::kUp)
+			{
+				logger::info("A up");
 			}
 		}
 
@@ -99,7 +104,7 @@ Window::Process()
 			if (mouseEvt->state.all(Mouse::StateFlags::kInsideWindow) &&
 			    mouseEvt->type == Mouse::Event::Type::kMove)
 			{
-				logger::info("Moving Inside Window");
+				logger::info("Moving Inside Window x: {}, y: {}", mouseEvt->x, mouseEvt->y);
 			}
 		}
 	}
@@ -307,7 +312,7 @@ Window::HandleMessageStatic(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 bool
-Window::ProcessMessages()
+Window::ProcessMessages() noexcept
 {
 	MSG msg{};
 	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))

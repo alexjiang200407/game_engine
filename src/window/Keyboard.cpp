@@ -40,29 +40,29 @@ Keyboard::Empty() const noexcept
 }
 
 void
-Keyboard::Clear()
+Keyboard::Clear() noexcept
 {
-	keyBuffer = {};
+	keyBuffer.clear();
 }
 
 void
-Keyboard::OnKeyDown(uint32_t keycode)
+Keyboard::OnKeyDown(uint32_t keycode) noexcept
 {
 	assert(keycode < nKeys);
 	keyStates[keycode] = true;
-	keyBuffer.push({ KeyEvent::Type::kDown, keycode });
+	keyBuffer.emplace(KeyEvent::Type::kDown, keycode);
 }
 
 void
-Keyboard::OnKeyUp(uint32_t keycode)
+Keyboard::OnKeyUp(uint32_t keycode) noexcept
 {
 	assert(keycode < nKeys);
 	keyStates[keycode] = false;
-	keyBuffer.push({ KeyEvent::Type::kUp, keycode });
+	keyBuffer.emplace(KeyEvent::Type::kUp, keycode);
 }
 
 void
-Keyboard::OnChar(char32_t ch)
+Keyboard::OnChar(char32_t ch) noexcept
 {
-	charBuffer.push({ ch });
+	charBuffer.emplace(ch);
 }

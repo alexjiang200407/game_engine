@@ -5,13 +5,13 @@ using namespace wnd;
 [[nodiscard]] bool
 Mouse::Empty() const noexcept
 {
-	return mouseEvents.empty();
+	return mouseBuffer.empty();
 }
 
 void
-Mouse::Clear()
+Mouse::Clear() noexcept
 {
-	mouseEvents = {};
+	mouseBuffer.clear();
 }
 
 [[nodiscard]]
@@ -27,8 +27,8 @@ Mouse::ReadEvent() noexcept
 	if (Empty())
 		return std::nullopt;
 
-	auto ret = mouseEvents.front();
-	mouseEvents.pop();
+	auto ret = mouseBuffer.front();
+	mouseBuffer.pop();
 	return ret;
 }
 
@@ -46,71 +46,71 @@ Mouse::SetPos(int newX, int newY) noexcept
 }
 
 void
-Mouse::OnMouseMove(int dx, int dy)
+Mouse::OnMouseMove(int dx, int dy) noexcept
 {
 	x += dx;
 	y += dy;
-	mouseEvents.emplace(Event::Type::kMove, state, x, y);
+	mouseBuffer.emplace(Event::Type::kMove, state, x, y);
 }
 
 void
-Mouse::OnLeftDown()
+Mouse::OnLeftDown() noexcept
 {
 	state.set(StateFlags::kLeftDown);
-	mouseEvents.emplace(Event::Type::kLPress, state, x, y);
+	mouseBuffer.emplace(Event::Type::kLPress, state, x, y);
 }
 
 void
-Mouse::OnRightDown()
+Mouse::OnRightDown() noexcept
 {
 	state.set(StateFlags::kRightDown);
-	mouseEvents.emplace(Event::Type::kRPress, state, x, y);
+	mouseBuffer.emplace(Event::Type::kRPress, state, x, y);
 }
 
 void
-Mouse::OnMiddleDown()
+Mouse::OnMiddleDown() noexcept
 {
 	state.set(StateFlags::kMiddleDown);
-	mouseEvents.emplace(Event::Type::kMPress, state, x, y);
+	mouseBuffer.emplace(Event::Type::kMPress, state, x, y);
 }
 
 void
-Mouse::OnLeftUp()
+Mouse::OnLeftUp() noexcept
 {
 	state.reset(StateFlags::kLeftDown);
-	mouseEvents.emplace(Event::Type::kLRelease, state, x, y);
+	mouseBuffer.emplace(Event::Type::kLRelease, state, x, y);
 }
 
 void
-Mouse::OnRightUp()
+Mouse::OnRightUp() noexcept
 {
 	state.reset(StateFlags::kRightDown);
-	mouseEvents.emplace(Event::Type::kRRelease, state, x, y);
+	mouseBuffer.emplace(Event::Type::kRRelease, state, x, y);
 }
 
 void
-Mouse::OnMiddleUp()
+Mouse::OnMiddleUp() noexcept
 {
 	state.reset(StateFlags::kMiddleDown);
-	mouseEvents.emplace(Event::Type::kMRelease, state, x, y);
+	mouseBuffer.emplace(Event::Type::kMRelease, state, x, y);
 }
 
 void
-Mouse::OnWheel(int wheelDelta)
+Mouse::OnWheel(int wheelDelta) noexcept
 {
-	mouseEvents.emplace(Event::Type::kWheel, state, x, y, wheelDelta);
+	mouseBuffer.emplace(Event::Type::kWheel, state, x, y, wheelDelta);
 }
 
 void
-Mouse::OnMouseLeave()
+Mouse::OnMouseLeave() noexcept
 {
 	state.reset(StateFlags::kInsideWindow);
-	mouseEvents.emplace(Event::Type::kLeave, state, x, y);
+	mouseBuffer.emplace(Event::Type::kLeave, state, x, y);
 }
 
 void
-Mouse::OnMouseEnter()
+Mouse::OnMouseEnter() noexcept
 {
 	state.set(StateFlags::kInsideWindow);
-	mouseEvents.emplace(Event::Type::kEnter, state, x, y);
+	mouseBuffer.emplace(Event::Type::kEnter, state, x, y);
 }

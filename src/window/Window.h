@@ -21,7 +21,7 @@ namespace wnd
 		operator=(const Window&) = delete;
 
 		[[nodiscard]] bool
-		Process();
+		Process() noexcept;
 
 		[[nodiscard]] gfx::Graphics
 		CreateGraphics(int width, int height) const;
@@ -49,7 +49,7 @@ namespace wnd
 		HandleKeyboard(RAWKEYBOARD& rawKeyboard);
 
 		[[nodiscard]] bool
-		ProcessMessages();
+		ProcessMessages() noexcept;
 
 	public:
 		Keyboard kbd;
