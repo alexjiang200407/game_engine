@@ -1,4 +1,5 @@
 #pragma once
+#include "util/math.h"
 #include <cassert>
 #include <cstddef>
 #include <memory>
@@ -10,6 +11,9 @@ namespace util
 	class RingQueue
 	{
 		static_assert(N != 0, "N cannot be equal to zero!");
+		static_assert(
+			util::math::is_power_of_two(N),
+			"RingBuffer size must be a power of two for bitmask optimization");
 
 	public:
 		RingQueue() noexcept : head(0), tail(0), count(0) {}
@@ -134,12 +138,13 @@ namespace util
 		std::size_t
 		nextIndex(std::size_t idx) const noexcept
 		{
-			return (idx + 1) % N;
+			return (idx + 1) & (N - 1);
 		}
+
 		std::size_t
 		prevIndex(std::size_t idx) const noexcept
 		{
-			return (idx + N - 1) % N;
+			return (idx - 1) & (N - 1);
 		}
 
 		alignas(T) unsigned char rawData[sizeof(T) * N];

@@ -25,6 +25,7 @@
 
 #include "logger.h"
 #include "util/EnumSet.h"
+#include "util/math.h"
 
 #include <d3d11.h>
 #include <dxgi.h>
