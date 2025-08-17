@@ -31,11 +31,7 @@ namespace gfx
 		Graphics(HWND hWnd, int width, int height);
 
 	private:
-#ifdef DEBUG
-		std::unique_ptr<DXGIInfoManager> dxgiInfoManager = std::make_unique<DXGIInfoManager>();
-#else
-		std::unique_ptr<DXGIInfoManager> dxgiInfoManager = nullptr;
-#endif
+		DXGIInfoManager                                dxgiInfoManager;
 		Microsoft::WRL::ComPtr<ID3D11Device>           pDevice;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext>    pContext;
 		Microsoft::WRL::ComPtr<IDXGISwapChain>         pSwap;

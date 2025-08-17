@@ -44,3 +44,10 @@ gfx::DXGIInfoManager::GetMessages()
 	}
 	return messages;
 }
+
+bool
+gfx::DXGIInfoManager::Empty()
+{
+	std::lock_guard<std::mutex> lock(mtx);
+	return pDxgiInfoQueue->GetNumStoredMessages(DXGI_DEBUG_ALL) == next;
+}

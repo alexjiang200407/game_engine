@@ -2,61 +2,82 @@
 
 using namespace gfx;
 
-GFXException::GFXException(
+namespace
+{
+	std::string
+	GetHRESULTErrorMessage(HRESULT hr)
+	{
+		LPWSTR buffer = nullptr;
+		DWORD  size   = FormatMessageW(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+            nullptr,
+            static_cast<DWORD>(hr),
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            reinterpret_cast<LPWSTR>(&buffer),
+            0,
+            nullptr);
+
+		std::wstring wmsg;
+		if (size && buffer)
+		{
+			wmsg.assign(buffer, size);
+			LocalFree(buffer);
+		}
+		else
+		{
+			wmsg = L"Unknown HRESULT: 0x" + std::to_wstring(hr);
+		}
+		return "Graphics Error!\n "s + std::string(wmsg.begin(), wmsg.end());
+	}
+}
+
+DirectXHRESULTException::DirectXHRESULTException(
 	HRESULT          hr,
 	int              line,
 	const char*      file,
-	DXGIInfoManager* dxgiInfoManager) noexcept
+	DXGIInfoManager& dxgiInfoManager) noexcept :
+	DirectXException(line, file, dxgiInfoManager, GetHRESULTErrorMessage(hr))
+{}
+
+gfx::DirectXException::DirectXException(
+	int                             line,
+	const char*                     file,
+	DXGIInfoManager&                dxgiInfoManager,
+	std::optional<std::string_view> before) noexcept
 {
-	msg = FormatErrorMessage(hr, file, line, dxgiInfoManager);
+	std::ostringstream oss;
+	FormatErrorMessage(oss, file, line, before, dxgiInfoManager);
+	msg = oss.str();
 }
 
 const char*
-gfx::GFXException::what() const noexcept
+gfx::DirectXException::what() const noexcept
 {
 	return msg.c_str();
 }
 
-std::string
-GFXException::FormatErrorMessage(
-	HRESULT          hr,
-	const char*      file,
-	int              line,
-	DXGIInfoManager* dxgiInfoManager)
+void
+gfx::DirectXException::FormatErrorMessage(
+	std::ostream&                   os,
+	const char*                     file,
+	int                             line,
+	std::optional<std::string_view> before,
+	DXGIInfoManager&                dxgiInfoManager)
 {
-	LPWSTR buffer = nullptr;
-	DWORD  size   = FormatMessageW(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        nullptr,
-        static_cast<DWORD>(hr),
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        reinterpret_cast<LPWSTR>(&buffer),
-        0,
-        nullptr);
+	os << file << ":" << line;
 
-	std::wstring wmsg;
-	if (size && buffer)
+	if (before)
+		os << '\n' << *before;
+
+	const auto messages = dxgiInfoManager.GetMessages();
+
+	if (messages.empty())
+		return;
+
+	os << "\nReason:\n";
+	for (const auto& message : messages)
 	{
-		wmsg.assign(buffer, size);
-		LocalFree(buffer);
+		os << message << '\n';
 	}
-	else
-	{
-		wmsg = L"Unknown HRESULT: 0x" + std::to_wstring(hr);
-	}
-
-	std::ostringstream oss;
-	oss << file << ":" << line << "\nGraphics Error!\n" << std::string(wmsg.begin(), wmsg.end());
-
-	if (dxgiInfoManager)
-	{
-		oss << "\nDescription:\n";
-		const auto messages = dxgiInfoManager->GetMessages();
-		for (const auto& message : messages)
-		{
-			oss << message << '\n';
-		}
-	}
-
-	return oss.str();
 }

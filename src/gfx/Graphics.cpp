@@ -55,13 +55,11 @@ gfx::Graphics::Graphics(HWND hWnd, int width, int height)
 			&pDevice,
 			nullptr,
 			&pContext),
-		dxgiInfoManager.get());
+		dxgiInfoManager);
 
 	wrl::ComPtr<ID3D11Resource> pBackBuffer{};
-	GFX_ERROR_TEST_AND_THROW(
-		pSwap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)),
-		dxgiInfoManager.get());
+	GFX_ERROR_TEST_AND_THROW(pSwap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)), dxgiInfoManager);
 	GFX_ERROR_TEST_AND_THROW(
 		pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pTarget),
-		dxgiInfoManager.get());
+		dxgiInfoManager);
 }

@@ -20,6 +20,9 @@ namespace gfx
 		std::vector<std::string>
 		GetMessages();
 
+		bool
+		Empty();
+
 	private:
 		unsigned long long                     next = 0u;
 		Microsoft::WRL::ComPtr<IDXGIInfoQueue> pDxgiInfoQueue;
