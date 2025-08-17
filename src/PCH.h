@@ -10,6 +10,7 @@
 
 #define __REL_FILE__ (&((__FILE__)[sizeof(PROJECT_SOURCE_DIR)]))
 
+#include <algorithm>
 #include <bitset>
 #include <cassert>
 #include <memory>
@@ -28,6 +29,7 @@
 #include "util/math.h"
 
 #include <d3d11.h>
+#include <d3dcompiler.h>
 #include <dxgi.h>
 
 using namespace std::string_literals;

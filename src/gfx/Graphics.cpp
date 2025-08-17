@@ -16,6 +16,67 @@ gfx::Graphics::ClearBuffer(float red, float green, float blue) noexcept
 	pContext->ClearRenderTargetView(pTarget.Get(), color);
 }
 
+void
+gfx::Graphics::DrawTestTriangle()
+{
+	struct Vertex
+	{
+		float x, y;
+	};
+
+	const Vertex vertices[] = { { 0.0f, 0.5f }, { 0.5f, -0.5f }, { -0.5f, -0.5f } };
+
+	wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
+	D3D11_BUFFER_DESC         desc{};
+	D3D11_SUBRESOURCE_DATA    sd{};
+
+	{
+		desc.BindFlags           = D3D11_BIND_VERTEX_BUFFER;
+		desc.Usage               = D3D11_USAGE_DEFAULT;
+		desc.CPUAccessFlags      = 0;
+		desc.MiscFlags           = 0;
+		desc.ByteWidth           = sizeof(vertices);
+		desc.StructureByteStride = sizeof(Vertex);
+	}
+
+	{
+		sd.pSysMem = vertices;
+	}
+
+	GFX_ERROR_TEST_AND_THROW(
+		pDevice->CreateBuffer(&desc, &sd, pVertexBuffer.GetAddressOf()),
+		dxgiInfoManager);
+
+	static const UINT stride = sizeof(Vertex);
+	static const UINT offset = 0u;
+
+	GFX_ERROR(
+		pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset),
+		dxgiInfoManager);
+
+	// Create Vertex Shader
+	{
+		wrl::ComPtr<ID3D11VertexShader> pVertexShader;
+		wrl::ComPtr<ID3DBlob>           pBlob;
+
+		GFX_ERROR_TEST_AND_THROW(
+			D3DReadFileToBlob(L"shaders/vs_test.cso", &pBlob),
+			dxgiInfoManager);
+
+		GFX_ERROR_TEST_AND_THROW(
+			pDevice->CreateVertexShader(
+				pBlob->GetBufferPointer(),
+				pBlob->GetBufferSize(),
+				nullptr,
+				&pVertexShader),
+			dxgiInfoManager);
+
+		pContext->VSSetShader(pVertexShader.Get(), nullptr, 0u);
+	}
+
+	GFX_ERROR(pContext->Draw(static_cast<UINT>(std::size(vertices)), 0u), dxgiInfoManager);
+}
+
 gfx::Graphics::Graphics(HWND hWnd, int width, int height)
 {
 	DXGI_SWAP_CHAIN_DESC sd               = {};

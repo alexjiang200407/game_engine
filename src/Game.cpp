@@ -16,5 +16,6 @@ Game::DoFrame()
 {
 	const float c = sin(timer.Peek()) / 2.0f + 0.5f;
 	gfx.ClearBuffer(c, c, 1.0f);
+	gfx.DrawTestTriangle();
 	gfx.EndFrame();
 }

@@ -1,0 +1,7 @@
+macro(require_env_var VAR_NAME DESC)
+    if(DEFINED ENV{${VAR_NAME}} AND NOT "$ENV{${VAR_NAME}}" STREQUAL "")
+        set(${VAR_NAME} "$ENV{${VAR_NAME}}" CACHE STRING "Path from environment variable ${VAR_NAME}")
+    else()
+        message(FATAL_ERROR "Environment variable ${VAR_NAME} is not set. Please define it before configuring. ${DESC}")
+    endif()
+endmacro()
