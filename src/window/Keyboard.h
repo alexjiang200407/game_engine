@@ -56,7 +56,7 @@ namespace wnd
 
 	private:
 		static constexpr size_t               nKeys     = 256u;
-		static constexpr auto                 bufferLen = 512u;
+		static constexpr auto                 bufferLen = 256u;
 		std::bitset<nKeys>                    keyStates;
 		util::RingQueue<KeyEvent, bufferLen>  keyBuffer;
 		util::RingQueue<CharEvent, bufferLen> charBuffer;

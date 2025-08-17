@@ -95,7 +95,7 @@ namespace wnd
 		OnMouseEnter() noexcept;
 
 	private:
-		static constexpr auto                  mouseBufferLen = 512u;
+		static constexpr auto                  mouseBufferLen = 256u;
 		util::RingQueue<Event, mouseBufferLen> mouseBuffer{};
 		State                                  state{};
 		int                                    x = 0, y = 0;
