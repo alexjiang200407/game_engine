@@ -54,10 +54,29 @@ gfx::Graphics::DrawTestTriangle()
 		pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset),
 		dxgiInfoManager);
 
+	// Create Pixel Shader
+	wrl::ComPtr<ID3DBlob> pBlob;
+	{
+		wrl::ComPtr<ID3D11PixelShader> pPixelShader;
+
+		GFX_ERROR_TEST_AND_THROW(
+			D3DReadFileToBlob(L"shaders/ps_test.cso", &pBlob),
+			dxgiInfoManager);
+
+		GFX_ERROR_TEST_AND_THROW(
+			pDevice->CreatePixelShader(
+				pBlob->GetBufferPointer(),
+				pBlob->GetBufferSize(),
+				nullptr,
+				&pPixelShader),
+			dxgiInfoManager);
+
+		GFX_ERROR(pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u), dxgiInfoManager);
+	}
+
 	// Create Vertex Shader
 	{
 		wrl::ComPtr<ID3D11VertexShader> pVertexShader;
-		wrl::ComPtr<ID3DBlob>           pBlob;
 
 		GFX_ERROR_TEST_AND_THROW(
 			D3DReadFileToBlob(L"shaders/vs_test.cso", &pBlob),
@@ -71,13 +90,48 @@ gfx::Graphics::DrawTestTriangle()
 				&pVertexShader),
 			dxgiInfoManager);
 
-		pContext->VSSetShader(pVertexShader.Get(), nullptr, 0u);
+		GFX_ERROR(pContext->VSSetShader(pVertexShader.Get(), nullptr, 0u), dxgiInfoManager);
+	}
+
+	{
+		wrl::ComPtr<ID3D11InputLayout> pInputLayout;
+		const D3D11_INPUT_ELEMENT_DESC layout[] = {
+			{ "Position", 0u, DXGI_FORMAT_R32G32_FLOAT, 0u, 0u, D3D11_INPUT_PER_VERTEX_DATA, 0u }
+		};
+		GFX_ERROR_TEST_AND_THROW(
+			pDevice->CreateInputLayout(
+				layout,
+				static_cast<UINT>(std::size(layout)),
+				pBlob->GetBufferPointer(),
+				pBlob->GetBufferSize(),
+				&pInputLayout),
+			dxgiInfoManager);
+
+		GFX_ERROR(pContext->IASetInputLayout(pInputLayout.Get()), dxgiInfoManager);
+	}
+
+	GFX_ERROR(pContext->OMSetRenderTargets(1u, pTarget.GetAddressOf(), nullptr), dxgiInfoManager);
+
+	GFX_ERROR(
+		pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
+		dxgiInfoManager);
+
+	// Setup Viewport
+	{
+		D3D11_VIEWPORT viewport{};
+		viewport.Width    = static_cast<FLOAT>(width);
+		viewport.Height   = static_cast<FLOAT>(height);
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+		viewport.TopLeftX = 0.0f;
+		viewport.TopLeftY = 0.0f;
+		pContext->RSSetViewports(1u, &viewport);
 	}
 
 	GFX_ERROR(pContext->Draw(static_cast<UINT>(std::size(vertices)), 0u), dxgiInfoManager);
 }
 
-gfx::Graphics::Graphics(HWND hWnd, int width, int height)
+gfx::Graphics::Graphics(int a_width, int a_height) : width(a_width), height(a_height)
 {
 	DXGI_SWAP_CHAIN_DESC sd               = {};
 	sd.BufferDesc.Width                   = static_cast<UINT>(width);
@@ -91,7 +145,7 @@ gfx::Graphics::Graphics(HWND hWnd, int width, int height)
 	sd.SampleDesc.Quality                 = 0;
 	sd.BufferUsage                        = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	sd.BufferCount                        = 1;
-	sd.OutputWindow                       = hWnd;
+	sd.OutputWindow                       = GetActiveWindow();
 	sd.Windowed                           = TRUE;
 	sd.SwapEffect                         = DXGI_SWAP_EFFECT_DISCARD;
 	sd.Flags                              = 0;

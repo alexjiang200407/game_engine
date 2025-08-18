@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game() : wnd(1280, 720), gfx(wnd.CreateGraphics(1280, 720)) {}
+Game::Game() : wnd(1280, 720), gfx(1280, 720) {}
 
 void
 Game::Play()

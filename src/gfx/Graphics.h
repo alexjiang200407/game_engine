@@ -16,6 +16,7 @@ namespace gfx
 		friend class wnd::Window;
 
 	public:
+		Graphics(int width, int height);
 		Graphics(const Graphics&) = delete;
 
 		Graphics&
@@ -31,14 +32,13 @@ namespace gfx
 		DrawTestTriangle();
 
 	private:
-		Graphics(HWND hWnd, int width, int height);
-
-	private:
 		DXGIInfoManager                                dxgiInfoManager;
 		D3D_FEATURE_LEVEL                              featureLevel;
 		Microsoft::WRL::ComPtr<ID3D11Device>           pDevice;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext>    pContext;
 		Microsoft::WRL::ComPtr<IDXGISwapChain>         pSwap;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
+		int                                            width;
+		int                                            height;
 	};
 }

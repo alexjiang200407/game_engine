@@ -112,12 +112,6 @@ Window::Process() noexcept
 	return shouldContinue;
 }
 
-gfx::Graphics
-wnd::Window::CreateGraphics(int width, int height) const
-{
-	return gfx::Graphics(hWnd, width, height);
-}
-
 LRESULT CALLBACK
 Window::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {

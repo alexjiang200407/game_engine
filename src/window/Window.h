@@ -23,9 +23,6 @@ namespace wnd
 		[[nodiscard]] bool
 		Process() noexcept;
 
-		[[nodiscard]] gfx::Graphics
-		CreateGraphics(int width, int height) const;
-
 	private:
 		static LRESULT CALLBACK
 		WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
