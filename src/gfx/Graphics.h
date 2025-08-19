@@ -32,7 +32,6 @@ namespace gfx
 		DrawTestTriangle(float angle, int x, int y, int z);
 
 	private:
-		DXGIInfoManager                                dxgiInfoManager;
 		D3D_FEATURE_LEVEL                              featureLevel;
 		Microsoft::WRL::ComPtr<ID3D11Device>           pDevice;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext>    pContext;

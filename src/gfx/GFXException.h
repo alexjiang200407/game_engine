@@ -1,9 +1,12 @@
-#include "gfx/DXGIInfoManager.h"
 #include <exception>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <utility>
+
+#ifdef DEBUG
+#	include "gfx/DXGIInfoManager.h"
+#endif
 
 namespace gfx
 {
@@ -13,7 +16,6 @@ namespace gfx
 		DirectXException(
 			int                             line,
 			const char*                     file,
-			DXGIInfoManager&                dxgiInfoManager,
 			std::optional<std::string_view> before = std::nullopt) noexcept;
 
 		const char*
@@ -25,8 +27,7 @@ namespace gfx
 			std::ostream&                   os,
 			const char*                     file,
 			int                             line,
-			std::optional<std::string_view> before,
-			DXGIInfoManager&                dxgiInfoManager);
+			std::optional<std::string_view> before);
 
 		std::string msg;
 	};
@@ -34,39 +35,60 @@ namespace gfx
 	class DirectXHRESULTException : public DirectXException
 	{
 	public:
-		explicit DirectXHRESULTException(
-			HRESULT          a_hr,
-			int              line,
-			const char*      file,
-			DXGIInfoManager& dxgiInfoManager) noexcept;
+		explicit DirectXHRESULTException(HRESULT a_hr, int line, const char* file) noexcept;
 	};
 }
 
-#define GFX_ERROR_TEST_AND_THROW(expr, dxgiInfoManager)                                      \
-	([&]() {                                                                                 \
-		dxgiInfoManager.Set();                                                               \
-		HRESULT hr = (expr);                                                                 \
-		if (FAILED(hr))                                                                      \
-			throw gfx::DirectXHRESULTException(hr, __LINE__, __REL_FILE__, dxgiInfoManager); \
-		return hr;                                                                           \
-	}())
+#ifdef DEBUG
 
-#define GFX_ERROR_TEST_AND_EXIT(expr, dxgiInfoManager)                                             \
-	([&]() {                                                                                       \
-		dxgiInfoManager.Set();                                                                     \
-		HRESULT hr = (expr);                                                                       \
-		if (FAILED(hr))                                                                            \
-		{                                                                                          \
-			std::cerr << gfx::DirectXHRESULTException(hr, __LINE__, __REL_FILE__, dxgiInfoManager) \
-							 .what()                                                               \
-					  << "\n";                                                                     \
-			std::exit(1);                                                                          \
-		}                                                                                          \
-		return hr;                                                                                 \
-	}())
+#	define DX_HR_ERROR_TEST_AND_THROW(expr)                                      \
+		([&]() {                                                                \
+			gfx::DXGIInfoManager::GetSingleton().Set();                         \
+			HRESULT hr = (expr);                                                \
+			if (FAILED(hr))                                                     \
+				throw gfx::DirectXHRESULTException(hr, __LINE__, __REL_FILE__); \
+			return hr;                                                          \
+		}())
 
-#define GFX_ERROR(expr, dxgiInfoManager) \
-	dxgiInfoManager.Set();               \
-	expr;                                \
-	if (!dxgiInfoManager.Empty())        \
-	throw gfx::DirectXException(__LINE__, __REL_FILE__, dxgiInfoManager)\
+#	define DX_HR_ERROR_TEST_AND_EXIT(expr)                                                    \
+		([&]() {                                                                             \
+			gfx::DXGIInfoManager::GetSingleton().Set();                                      \
+			HRESULT hr = (expr);                                                             \
+			if (FAILED(hr))                                                                  \
+			{                                                                                \
+				std::cerr << gfx::DirectXHRESULTException(hr, __LINE__, __REL_FILE__).what() \
+						  << "\n";                                                           \
+				std::exit(1);                                                                \
+			}                                                                                \
+			return hr;                                                                       \
+		}())
+
+#	define DX_CALL(expr)                                \
+		gfx::DXGIInfoManager::GetSingleton().Set();        \
+		expr;                                              \
+		if (!gfx::DXGIInfoManager::GetSingleton().Empty()) \
+		throw gfx::DirectXException(__LINE__, __REL_FILE__)
+
+#else
+
+#	define DX_HR_ERROR_TEST_AND_THROW(expr)                                       \
+		([&]() {                                                                \
+			HRESULT hr = (expr);                                                \
+			if (FAILED(hr))                                                     \
+				throw gfx::DirectXHRESULTException(hr, __LINE__, __REL_FILE__); \
+			return hr;                                                          \
+		}())
+
+#	define DX_HR_ERROR_TEST_AND_EXIT(expr) \
+		([&]() {                         \
+			HRESULT hr = (expr);         \
+			if (FAILED(hr))              \
+			{                            \
+				std::exit(1);            \
+			}                            \
+			return hr;                   \
+		}())
+
+#	define DX_CALL(expr) expr
+
+#endif

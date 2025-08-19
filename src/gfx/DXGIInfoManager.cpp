@@ -51,3 +51,13 @@ gfx::DXGIInfoManager::Empty()
 	std::lock_guard<std::mutex> lock(mtx);
 	return pDxgiInfoQueue->GetNumStoredMessages(DXGI_DEBUG_ALL) == next;
 }
+
+gfx::DXGIInfoManager&
+gfx::DXGIInfoManager::GetSingleton()
+{
+#ifdef __clang__
+	[[clang::always_destroy]]
+#endif
+	static DXGIInfoManager singleton{};
+	return singleton;
+}

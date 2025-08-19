@@ -1,9 +1,37 @@
 #include "GFXException.h"
+#include <codecvt>
 
 using namespace gfx;
 
 namespace
 {
+	std::string
+	WStringToString(const std::wstring& wstr)
+	{
+		if (wstr.empty())
+			return {};
+		int size_needed = WideCharToMultiByte(
+			CP_UTF8,
+			0,
+			wstr.data(),
+			(int)wstr.size(),
+			nullptr,
+			0,
+			nullptr,
+			nullptr);
+		std::string result(size_needed, 0);
+		WideCharToMultiByte(
+			CP_UTF8,
+			0,
+			wstr.data(),
+			(int)wstr.size(),
+			result.data(),
+			size_needed,
+			nullptr,
+			nullptr);
+		return result;
+	}
+
 	std::string
 	GetHRESULTErrorMessage(HRESULT hr)
 	{
@@ -28,26 +56,21 @@ namespace
 		{
 			wmsg = L"Unknown HRESULT: 0x" + std::to_wstring(hr);
 		}
-		return "Graphics Error!\n "s + std::string(wmsg.begin(), wmsg.end());
+		return "Graphics Error!\n "s + WStringToString(wmsg);
 	}
 }
 
-DirectXHRESULTException::DirectXHRESULTException(
-	HRESULT          hr,
-	int              line,
-	const char*      file,
-	DXGIInfoManager& dxgiInfoManager) noexcept :
-	DirectXException(line, file, dxgiInfoManager, GetHRESULTErrorMessage(hr))
+DirectXHRESULTException::DirectXHRESULTException(HRESULT hr, int line, const char* file) noexcept :
+	DirectXException(line, file, GetHRESULTErrorMessage(hr))
 {}
 
 gfx::DirectXException::DirectXException(
 	int                             line,
 	const char*                     file,
-	DXGIInfoManager&                dxgiInfoManager,
 	std::optional<std::string_view> before) noexcept
 {
 	std::ostringstream oss;
-	FormatErrorMessage(oss, file, line, before, dxgiInfoManager);
+	FormatErrorMessage(oss, file, line, before);
 	msg = oss.str();
 }
 
@@ -62,15 +85,16 @@ gfx::DirectXException::FormatErrorMessage(
 	std::ostream&                   os,
 	const char*                     file,
 	int                             line,
-	std::optional<std::string_view> before,
-	DXGIInfoManager&                dxgiInfoManager)
+	std::optional<std::string_view> before)
 {
 	os << file << ":" << line;
 
 	if (before)
 		os << '\n' << *before;
 
-	const auto messages = dxgiInfoManager.GetMessages();
+#ifdef DEBUG
+
+	const auto messages = DXGIInfoManager::GetSingleton().GetMessages();
 
 	if (messages.empty())
 		return;
@@ -80,4 +104,6 @@ gfx::DirectXException::FormatErrorMessage(
 	{
 		os << message << '\n';
 	}
+
+#endif
 }

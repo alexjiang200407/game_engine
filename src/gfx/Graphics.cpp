@@ -15,10 +15,8 @@ void
 gfx::Graphics::ClearBuffer(float red, float green, float blue)
 {
 	const float color[] = { red, green, blue, 1.0f };
-	GFX_ERROR(pContext->ClearRenderTargetView(pTarget.Get(), color), dxgiInfoManager);
-	GFX_ERROR(
-		pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u),
-		dxgiInfoManager);
+	DX_CALL(pContext->ClearRenderTargetView(pTarget.Get(), color));
+	DX_CALL(pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u));
 }
 
 void
@@ -96,54 +94,42 @@ gfx::Graphics::DrawTestTriangle(float angle, int x, int y, int z)
 		sd.pSysMem = vertices;
 	}
 
-	GFX_ERROR_TEST_AND_THROW(
-		pDevice->CreateBuffer(&desc, &sd, pVertexBuffer.GetAddressOf()),
-		dxgiInfoManager);
+	DX_HR_ERROR_TEST_AND_THROW(pDevice->CreateBuffer(&desc, &sd, pVertexBuffer.GetAddressOf()));
 
 	static const UINT stride = sizeof(Vertex);
 	static const UINT offset = 0u;
 
-	GFX_ERROR(
-		pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset),
-		dxgiInfoManager);
+	DX_CALL(pContext->IASetVertexBuffers(0u, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset));
 
 	// Create Pixel Shader
 	wrl::ComPtr<ID3DBlob> pBlob;
 	{
 		wrl::ComPtr<ID3D11PixelShader> pPixelShader;
 
-		GFX_ERROR_TEST_AND_THROW(
-			D3DReadFileToBlob(L"shaders/ps_test.cso", &pBlob),
-			dxgiInfoManager);
+		DX_HR_ERROR_TEST_AND_THROW(D3DReadFileToBlob(L"shaders/ps_test.cso", &pBlob));
 
-		GFX_ERROR_TEST_AND_THROW(
-			pDevice->CreatePixelShader(
-				pBlob->GetBufferPointer(),
-				pBlob->GetBufferSize(),
-				nullptr,
-				&pPixelShader),
-			dxgiInfoManager);
+		DX_HR_ERROR_TEST_AND_THROW(pDevice->CreatePixelShader(
+			pBlob->GetBufferPointer(),
+			pBlob->GetBufferSize(),
+			nullptr,
+			&pPixelShader));
 
-		GFX_ERROR(pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u), dxgiInfoManager);
+		DX_CALL(pContext->PSSetShader(pPixelShader.Get(), nullptr, 0u));
 	}
 
 	// Create Vertex Shader
 	{
 		wrl::ComPtr<ID3D11VertexShader> pVertexShader;
 
-		GFX_ERROR_TEST_AND_THROW(
-			D3DReadFileToBlob(L"shaders/vs_test.cso", &pBlob),
-			dxgiInfoManager);
+		DX_HR_ERROR_TEST_AND_THROW(D3DReadFileToBlob(L"shaders/vs_test.cso", &pBlob));
 
-		GFX_ERROR_TEST_AND_THROW(
-			pDevice->CreateVertexShader(
-				pBlob->GetBufferPointer(),
-				pBlob->GetBufferSize(),
-				nullptr,
-				&pVertexShader),
-			dxgiInfoManager);
+		DX_HR_ERROR_TEST_AND_THROW(pDevice->CreateVertexShader(
+			pBlob->GetBufferPointer(),
+			pBlob->GetBufferSize(),
+			nullptr,
+			&pVertexShader));
 
-		GFX_ERROR(pContext->VSSetShader(pVertexShader.Get(), nullptr, 0u), dxgiInfoManager);
+		DX_CALL(pContext->VSSetShader(pVertexShader.Get(), nullptr, 0u));
 	}
 
 	{
@@ -167,13 +153,9 @@ gfx::Graphics::DrawTestTriangle(float angle, int x, int y, int z)
 		ibd.StructureByteStride = 0u;
 		D3D11_SUBRESOURCE_DATA csd{};
 		csd.pSysMem = &cb;
-		GFX_ERROR_TEST_AND_THROW(
-			pDevice->CreateBuffer(&ibd, &csd, &pConstantBuffer),
-			dxgiInfoManager);
+		DX_HR_ERROR_TEST_AND_THROW(pDevice->CreateBuffer(&ibd, &csd, &pConstantBuffer));
 
-		GFX_ERROR(
-			pContext->VSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf()),
-			dxgiInfoManager);
+		DX_CALL(pContext->VSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf()));
 	}
 
 	{
@@ -204,13 +186,9 @@ gfx::Graphics::DrawTestTriangle(float angle, int x, int y, int z)
 		ibd.StructureByteStride = 0u;
 		D3D11_SUBRESOURCE_DATA csd{};
 		csd.pSysMem = &cb;
-		GFX_ERROR_TEST_AND_THROW(
-			pDevice->CreateBuffer(&ibd, &csd, &pConstantBuffer),
-			dxgiInfoManager);
+		DX_HR_ERROR_TEST_AND_THROW(pDevice->CreateBuffer(&ibd, &csd, &pConstantBuffer));
 
-		GFX_ERROR(
-			pContext->PSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf()),
-			dxgiInfoManager);
+		DX_CALL(pContext->PSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf()));
 	}
 
 	{
@@ -225,21 +203,17 @@ gfx::Graphics::DrawTestTriangle(float angle, int x, int y, int z)
 			  0u },
 		};
 
-		GFX_ERROR_TEST_AND_THROW(
-			pDevice->CreateInputLayout(
-				layout,
-				static_cast<UINT>(std::size(layout)),
-				pBlob->GetBufferPointer(),
-				pBlob->GetBufferSize(),
-				&pInputLayout),
-			dxgiInfoManager);
+		DX_HR_ERROR_TEST_AND_THROW(pDevice->CreateInputLayout(
+			layout,
+			static_cast<UINT>(std::size(layout)),
+			pBlob->GetBufferPointer(),
+			pBlob->GetBufferSize(),
+			&pInputLayout));
 
-		GFX_ERROR(pContext->IASetInputLayout(pInputLayout.Get()), dxgiInfoManager);
+		DX_CALL(pContext->IASetInputLayout(pInputLayout.Get()));
 	}
 
-	GFX_ERROR(
-		pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
-		dxgiInfoManager);
+	DX_CALL(pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 
 	// Setup Viewport
 	{
@@ -266,16 +240,12 @@ gfx::Graphics::DrawTestTriangle(float angle, int x, int y, int z)
 		ibd.StructureByteStride = sizeof(unsigned short);
 		D3D11_SUBRESOURCE_DATA isd{};
 		isd.pSysMem = indices;
-		GFX_ERROR_TEST_AND_THROW(pDevice->CreateBuffer(&ibd, &isd, &pIndexBuffer), dxgiInfoManager);
+		DX_HR_ERROR_TEST_AND_THROW(pDevice->CreateBuffer(&ibd, &isd, &pIndexBuffer));
 
-		GFX_ERROR(
-			pContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u),
-			dxgiInfoManager);
+		DX_CALL(pContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u));
 	}
 
-	GFX_ERROR(
-		pContext->DrawIndexed(static_cast<UINT>(std::size(indices)), 0u, 0u),
-		dxgiInfoManager);
+	DX_CALL(pContext->DrawIndexed(static_cast<UINT>(std::size(indices)), 0u, 0u));
 }
 
 gfx::Graphics::Graphics(unsigned int a_width, unsigned int a_height) :
@@ -305,27 +275,23 @@ gfx::Graphics::Graphics(unsigned int a_width, unsigned int a_height) :
 	swapCreateFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-	GFX_ERROR_TEST_AND_THROW(
-		D3D11CreateDeviceAndSwapChain(
-			nullptr,
-			D3D_DRIVER_TYPE_HARDWARE,
-			nullptr,
-			swapCreateFlags,
-			nullptr,
-			0,
-			D3D11_SDK_VERSION,
-			&sd,
-			&pSwap,
-			&pDevice,
-			nullptr,
-			&pContext),
-		dxgiInfoManager);
+	DX_HR_ERROR_TEST_AND_THROW(D3D11CreateDeviceAndSwapChain(
+		nullptr,
+		D3D_DRIVER_TYPE_HARDWARE,
+		nullptr,
+		swapCreateFlags,
+		nullptr,
+		0,
+		D3D11_SDK_VERSION,
+		&sd,
+		&pSwap,
+		&pDevice,
+		nullptr,
+		&pContext));
 
 	wrl::ComPtr<ID3D11Resource> pBackBuffer{};
-	GFX_ERROR_TEST_AND_THROW(pSwap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)), dxgiInfoManager);
-	GFX_ERROR_TEST_AND_THROW(
-		pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pTarget),
-		dxgiInfoManager);
+	DX_HR_ERROR_TEST_AND_THROW(pSwap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));
+	DX_HR_ERROR_TEST_AND_THROW(pDevice->CreateRenderTargetView(pBackBuffer.Get(), nullptr, &pTarget));
 
 	{
 		D3D11_DEPTH_STENCIL_DESC dsDesc{};
@@ -333,10 +299,8 @@ gfx::Graphics::Graphics(unsigned int a_width, unsigned int a_height) :
 		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		dsDesc.DepthFunc      = D3D11_COMPARISON_LESS;
 		wrl::ComPtr<ID3D11DepthStencilState> pDSState;
-		GFX_ERROR_TEST_AND_THROW(
-			pDevice->CreateDepthStencilState(&dsDesc, &pDSState),
-			dxgiInfoManager);
-		GFX_ERROR(pContext->OMSetDepthStencilState(pDSState.Get(), 1u), dxgiInfoManager);
+		DX_HR_ERROR_TEST_AND_THROW(pDevice->CreateDepthStencilState(&dsDesc, &pDSState));
+		DX_CALL(pContext->OMSetDepthStencilState(pDSState.Get(), 1u));
 	}
 
 	wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
@@ -352,9 +316,7 @@ gfx::Graphics::Graphics(unsigned int a_width, unsigned int a_height) :
 		descDepth.Usage              = D3D11_USAGE_DEFAULT;
 		descDepth.BindFlags          = D3D11_BIND_DEPTH_STENCIL;
 
-		GFX_ERROR_TEST_AND_THROW(
-			pDevice->CreateTexture2D(&descDepth, nullptr, &pDepthStencil),
-			dxgiInfoManager);
+		DX_HR_ERROR_TEST_AND_THROW(pDevice->CreateTexture2D(&descDepth, nullptr, &pDepthStencil));
 	}
 
 	{
@@ -362,11 +324,8 @@ gfx::Graphics::Graphics(unsigned int a_width, unsigned int a_height) :
 		descDSV.Format             = DXGI_FORMAT_D32_FLOAT;
 		descDSV.ViewDimension      = D3D11_DSV_DIMENSION_TEXTURE2D;
 		descDSV.Texture2D.MipSlice = 0u;
-		GFX_ERROR_TEST_AND_THROW(
-			pDevice->CreateDepthStencilView(pDepthStencil.Get(), &descDSV, &pDSV),
-			dxgiInfoManager);
+		DX_HR_ERROR_TEST_AND_THROW(
+			pDevice->CreateDepthStencilView(pDepthStencil.Get(), &descDSV, &pDSV));
 	}
-	GFX_ERROR(
-		pContext->OMSetRenderTargets(1u, pTarget.GetAddressOf(), pDSV.Get()),
-		dxgiInfoManager);
+	DX_CALL(pContext->OMSetRenderTargets(1u, pTarget.GetAddressOf(), pDSV.Get()));
 }

@@ -21,6 +21,6 @@ Game::DoFrame()
 	auto wheelZ           = wnd.mouse.GetWheelOffset();
 
 	gfx.DrawTestTriangle(c, mouseX, mouseY, wheelZ);
-	gfx.DrawTestTriangle(c, 0.0f, 0.0f, 0.0f);
+	gfx.DrawTestTriangle(c, 0, 0, 0);
 	gfx.EndFrame();
 }

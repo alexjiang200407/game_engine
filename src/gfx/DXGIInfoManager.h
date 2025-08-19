@@ -1,13 +1,16 @@
 #pragma once
 #include <dxgidebug.h>
+#include <mutex>
 #include <wrl.h>
 
 namespace gfx
 {
 	class DXGIInfoManager
 	{
-	public:
+	private:
 		DXGIInfoManager();
+
+	public:
 		~DXGIInfoManager()                      = default;
 		DXGIInfoManager(const DXGIInfoManager&) = delete;
 
@@ -22,6 +25,9 @@ namespace gfx
 
 		bool
 		Empty();
+
+		static DXGIInfoManager&
+		GetSingleton();
 
 	private:
 		unsigned long long                     next = 0u;

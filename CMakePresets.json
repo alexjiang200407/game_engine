@@ -1,5 +1,5 @@
 {
-  "version": 5,
+  "version": 3,
   "configurePresets": [
     {
       "name": "vcpkg",
@@ -24,54 +24,46 @@
       "toolset": "v143"
     },
     {
-      "name": "clang-cl",
+      "name": "msvc",
       "hidden": true,
-      "generator": "Ninja",
       "cacheVariables": {
-        "CMAKE_C_COMPILER": "clang-cl",
-        "CMAKE_CXX_COMPILER": "clang-cl",
-        "CMAKE_CXX_FLAGS": "/EHsc -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wall -Wdeprecated -Wextra -Werror -Wcast-align -Wdouble-promotion -Wimplicit-fallthrough -Wmisleading-indentation -Wnon-virtual-dtor -Wnull-dereference -Wold-style-cast -Woverloaded-virtual -Wpedantic -Wshadow -Wconversion -Wundef -Wuninitialized -Wno-language-extension-token -Wno-unsafe-buffer-usage",
-        "CMAKE_CXX_FLAGS_RELEASE": "/EHsc -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wall -Wdeprecated -Wextra -Werror -Wcast-align -Wdouble-promotion -Wimplicit-fallthrough -Wmisleading-indentation -Wnon-virtual-dtor -Wnull-dereference -Wold-style-cast -Woverloaded-virtual -Wpedantic -Wshadow -Wconversion -Wundef -Wuninitialized -Wno-language-extension-token -Wno-unsafe-buffer-usage"
-      },
-      "environment": {
-        "CC": "clang-cl",
-        "CXX": "clang-cl"
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release",
+        "CMAKE_CXX_FLAGS": "/EHsc /MP /W4 /WX /external:W0 /we4265 /wd4996 /we4244 /we4267 /we4800 /we4305",
+        "CMAKE_CXX_FLAGS_RELEASE": "/O2 /DNDEBUG /EHsc /W4 /WX /external:W0 /we4265 /wd4996 /we4244 /we4267 /we4800 /we4305"
       }
     },
     {
-      "name": "windows-clang-cl-debug",
-      "displayName": "Windows Clang-CL Debug",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/clang-cl-debug",
+      "name": "windows-msvc-debug",
+      "displayName": "Windows MSVC Debug",
+      "binaryDir": "${sourceDir}/build/msvc-debug",
       "inherits": [
         "vcpkg",
         "windows",
         "vs2022",
-        "clang-cl"
+        "msvc"
       ]
     },
     {
-      "name": "windows-clang-cl-release",
-      "displayName": "Windows Clang-CL Release",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/clang-cl-release",
+      "name": "windows-msvc-release",
+      "displayName": "Windows MSVC Release",
+      "binaryDir": "${sourceDir}/build/msvc-release",
       "inherits": [
         "vcpkg",
         "windows",
         "vs2022",
-        "clang-cl"
+        "msvc"
       ]
     }
   ],
   "buildPresets": [
     {
-      "name": "windows-clang-cl-release",
-      "configurePreset": "windows-clang-cl-release",
+      "name": "windows-msvc-release",
+      "configurePreset": "windows-msvc-release",
       "configuration": "Release"
     },
     {
-      "name": "windows-clang-cl-debug",
-      "configurePreset": "windows-clang-cl-debug",
+      "name": "windows-msvc-debug",
+      "configurePreset": "windows-msvc-debug",
       "configuration": "Debug"
     }
   ]
