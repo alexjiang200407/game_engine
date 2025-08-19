@@ -58,6 +58,9 @@ namespace wnd
 		[[nodiscard]] bool
 		HasStateFlag(StateFlags flag) const noexcept;
 
+		[[nodiscard]] int
+		GetWheelOffset() const noexcept;
+
 	private:
 		Mouse() noexcept = default;
 
@@ -98,6 +101,7 @@ namespace wnd
 		static constexpr auto                  mouseBufferLen = 256u;
 		util::RingQueue<Event, mouseBufferLen> mouseBuffer{};
 		State                                  state{};
+		int                                    wheelOffset = 0;
 		int                                    x = 0, y = 0;
 	};
 }

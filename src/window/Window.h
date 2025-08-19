@@ -13,7 +13,7 @@ namespace wnd
 	class Window
 	{
 	public:
-		Window(int width, int height);
+		Window(unsigned int width, unsigned int height);
 		~Window() noexcept;
 		Window(const Window&) = delete;
 

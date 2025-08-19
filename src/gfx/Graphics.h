@@ -16,7 +16,7 @@ namespace gfx
 		friend class wnd::Window;
 
 	public:
-		Graphics(int width, int height);
+		Graphics(unsigned int width, unsigned int height);
 		Graphics(const Graphics&) = delete;
 
 		Graphics&
@@ -26,10 +26,10 @@ namespace gfx
 		EndFrame();
 
 		void
-		ClearBuffer(float red, float green, float blue) noexcept;
+		ClearBuffer(float red, float green, float blue);
 
 		void
-		DrawTestTriangle();
+		DrawTestTriangle(float angle, int x, int y, int z);
 
 	private:
 		DXGIInfoManager                                dxgiInfoManager;
@@ -38,7 +38,9 @@ namespace gfx
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext>    pContext;
 		Microsoft::WRL::ComPtr<IDXGISwapChain>         pSwap;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
-		int                                            width;
-		int                                            height;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
+		unsigned int                                   width;
+		unsigned int                                   height;
+		float                                          aspectRatio;
 	};
 }

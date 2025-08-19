@@ -38,6 +38,12 @@ Mouse::HasStateFlag(StateFlags flag) const noexcept
 	return state.all(flag);
 }
 
+int
+wnd::Mouse::GetWheelOffset() const noexcept
+{
+	return wheelOffset;
+}
+
 void
 Mouse::SetPos(int newX, int newY) noexcept
 {
@@ -99,6 +105,7 @@ void
 Mouse::OnWheel(int wheelDelta) noexcept
 {
 	mouseBuffer.emplace(Event::Type::kWheel, state, x, y, wheelDelta);
+	util::math::safe_add_assign(wheelOffset, wheelDelta);
 }
 
 void

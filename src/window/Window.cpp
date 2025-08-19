@@ -1,12 +1,18 @@
 #include "window/Window.h"
 #include "window/Win32Exception.h"
 #include <array>
+#include <cassert>
+#include <limits>
 #include <span>
 
 using namespace wnd;
 
-Window::Window(int width, int height) : hInstance(GetModuleHandle(nullptr))
+Window::Window(unsigned int width, unsigned int height) : hInstance(GetModuleHandle(nullptr))
 {
+	assert(
+		width < static_cast<unsigned int>(std::numeric_limits<int>::max()) &&
+		height < static_cast<unsigned int>(std::numeric_limits<int>::max()));
+
 	WNDCLASSEX wc    = {};
 	wc.cbSize        = sizeof(wc);
 	wc.lpfnWndProc   = WindowProc;
@@ -14,7 +20,11 @@ Window::Window(int width, int height) : hInstance(GetModuleHandle(nullptr))
 	wc.lpszClassName = CLASS_NAME;
 
 	WIN32_ERR_TEST_AND_THROW(RegisterClassEx(&wc));
-	CreateAppWindow(hInstance, width, height, L"Game Engine");  // TODO: Settings to get Window Name
+	CreateAppWindow(
+		hInstance,
+		static_cast<int>(width),
+		static_cast<int>(height),
+		L"Game Engine");  // TODO: Settings to get Window Name
 
 	{
 		POINT pt;
