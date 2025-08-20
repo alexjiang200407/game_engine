@@ -1,3 +1,4 @@
+#pragma once
 #include <exception>
 #include <iostream>
 #include <sstream>
@@ -41,7 +42,7 @@ namespace gfx
 
 #ifdef DEBUG
 
-#	define DX_HR_ERROR_TEST_AND_THROW(expr)                                      \
+#	define DX_HR_ERROR_TEST_AND_THROW(expr)                                    \
 		([&]() {                                                                \
 			gfx::DXGIInfoManager::GetSingleton().Set();                         \
 			HRESULT hr = (expr);                                                \
@@ -50,7 +51,7 @@ namespace gfx
 			return hr;                                                          \
 		}())
 
-#	define DX_HR_ERROR_TEST_AND_EXIT(expr)                                                    \
+#	define DX_HR_ERROR_TEST_AND_EXIT(expr)                                                  \
 		([&]() {                                                                             \
 			gfx::DXGIInfoManager::GetSingleton().Set();                                      \
 			HRESULT hr = (expr);                                                             \
@@ -63,7 +64,7 @@ namespace gfx
 			return hr;                                                                       \
 		}())
 
-#	define DX_CALL(expr)                                \
+#	define DX_CALL(expr)                                  \
 		gfx::DXGIInfoManager::GetSingleton().Set();        \
 		expr;                                              \
 		if (!gfx::DXGIInfoManager::GetSingleton().Empty()) \
@@ -71,7 +72,7 @@ namespace gfx
 
 #else
 
-#	define DX_HR_ERROR_TEST_AND_THROW(expr)                                       \
+#	define DX_HR_ERROR_TEST_AND_THROW(expr)                                    \
 		([&]() {                                                                \
 			HRESULT hr = (expr);                                                \
 			if (FAILED(hr))                                                     \
@@ -80,13 +81,13 @@ namespace gfx
 		}())
 
 #	define DX_HR_ERROR_TEST_AND_EXIT(expr) \
-		([&]() {                         \
-			HRESULT hr = (expr);         \
-			if (FAILED(hr))              \
-			{                            \
-				std::exit(1);            \
-			}                            \
-			return hr;                   \
+		([&]() {                            \
+			HRESULT hr = (expr);            \
+			if (FAILED(hr))                 \
+			{                               \
+				std::exit(1);               \
+			}                               \
+			return hr;                      \
 		}())
 
 #	define DX_CALL(expr) expr

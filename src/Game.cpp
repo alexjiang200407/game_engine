@@ -1,6 +1,10 @@
 #include "Game.h"
+#include "gfx/draw/Box.h"
 
-Game::Game() : wnd(1280u, 720u), gfx(1280u, 720u) {}
+Game::Game() : wnd(1280u, 720u), gfx(1280u, 720u)
+{
+	gfx.SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
+}
 
 void
 Game::Play()
@@ -14,13 +18,19 @@ Game::Play()
 void
 Game::DoFrame()
 {
-	const float c = sin(timer.Peek()) / 2.0f + 0.5f;
-	gfx.ClearBuffer(c, c, 1.0f);
+	auto dt = timer.Mark();
+	gfx.ClearBuffer(0.07f, 0.0f, 0.12f);
 
-	auto [mouseX, mouseY] = wnd.mouse.GetPoint();
-	auto wheelZ           = wnd.mouse.GetWheelOffset();
+	static std::uniform_real_distribution<float> adist(0.0f, 3.1415f * 2.0f);
+	static std::uniform_real_distribution<float> ddist(0.0f, 3.1415f * 2.0f);
+	static std::uniform_real_distribution<float> odist(0.0f, 3.1415f * 0.3f);
+	static std::uniform_real_distribution<float> rdist(6.0f, 20.0f);
 
-	gfx.DrawTestTriangle(c, mouseX, mouseY, wheelZ);
-	gfx.DrawTestTriangle(c, 0, 0, 0);
+	static std::mt19937 rng(std::random_device{}());
+	static gfx::Box     b{ gfx, rng, adist, ddist, odist, rdist };
+
+	b.Update(dt);
+	b.Draw(gfx);
+
 	gfx.EndFrame();
 }

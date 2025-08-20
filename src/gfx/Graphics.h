@@ -1,19 +1,16 @@
 #pragma once
 #include "gfx/DXGIInfoManager.h"
-#include "window/Window.h"
+#include "gfx/bind/Bindable.h"
+#include "gfx/bind/bind.h"
 #include <d3d11.h>
-
-namespace wnd
-{
-	class Window;
-}
 
 namespace gfx
 {
+	class Bindable;
 
 	class Graphics
 	{
-		friend class wnd::Window;
+		friend class gfx::Bindable;
 
 	public:
 		Graphics(unsigned int width, unsigned int height);
@@ -23,15 +20,22 @@ namespace gfx
 		operator=(const Graphics&) = delete;
 
 		void
-		EndFrame();
+		EndFrame() const;
 
 		void
-		ClearBuffer(float red, float green, float blue);
+		ClearBuffer(float red, float green, float blue) const;
 
 		void
-		DrawTestTriangle(float angle, int x, int y, int z);
+		DrawIndexed(unsigned int count) const noexcept(!DEBUG);
+
+		void
+		SetProjection(DirectX::FXMMATRIX proj) noexcept;
+
+		DirectX::XMMATRIX
+		GetProjection() const noexcept;
 
 	private:
+		DirectX::XMMATRIX                              projection;
 		D3D_FEATURE_LEVEL                              featureLevel;
 		Microsoft::WRL::ComPtr<ID3D11Device>           pDevice;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext>    pContext;
