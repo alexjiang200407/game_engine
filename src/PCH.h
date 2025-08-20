@@ -31,10 +31,9 @@
 #include "util/EnumSet.h"
 #include "util/math.h"
 
+#include <DirectXMath.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <dxgi.h>
-
-#include <DirectXMath.h>
 
 using namespace std::string_literals;

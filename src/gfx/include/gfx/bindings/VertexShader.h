@@ -1,0 +1,23 @@
+#pragma once
+#include "gfx/bindings/Bindable.h"
+
+namespace gfx
+{
+	class Graphics;
+
+	class VertexShader : public Bindable
+	{
+	public:
+		VertexShader(Graphics& gfx, const std::wstring& path);
+
+		void
+		Bind(Graphics& gfx) noexcept(!DEBUG) override;
+
+		ID3DBlob*
+		GetBytecode() const noexcept;
+
+	protected:
+		Microsoft::WRL::ComPtr<ID3DBlob>           pBytecodeBlob;
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
+	};
+}
