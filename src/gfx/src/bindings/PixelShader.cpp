@@ -13,7 +13,7 @@ gfx::PixelShader::PixelShader(Graphics& gfx, const std::wstring& path)
 }
 
 void
-gfx::PixelShader::Bind(Graphics& gfx) noexcept(!DEBUG)
+gfx::PixelShader::Bind(Graphics& gfx)
 {
 	DX_CALL(GetContext(gfx)->PSSetShader(pPixelShader.Get(), nullptr, 0u));
 }

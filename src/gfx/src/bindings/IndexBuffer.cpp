@@ -17,7 +17,7 @@ gfx::IndexBuffer::IndexBuffer(Graphics& gfx, const std::vector<unsigned short>& 
 }
 
 void
-gfx::IndexBuffer::Bind(Graphics& gfx) noexcept(!DEBUG)
+gfx::IndexBuffer::Bind(Graphics& gfx)
 {
 	DX_CALL(GetContext(gfx)->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u));
 }

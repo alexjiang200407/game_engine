@@ -7,16 +7,18 @@ file(GLOB SOURCES
 
 add_library(graphics STATIC ${SOURCES})
 
+find_package(directxtex CONFIG REQUIRED)
+
 target_link_libraries(graphics
     PUBLIC
         platform
-        spdlog::spdlog
         util
     PRIVATE
         d3d11
         dxgi
         d3dcompiler
         dxguid
+        Microsoft::DirectXTex
 )
 
 target_precompile_headers(graphics PUBLIC "${CMAKE_SOURCE_DIR}/src/PCH.h")

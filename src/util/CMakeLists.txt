@@ -5,7 +5,7 @@ file(GLOB SOURCES
 
 add_library(util STATIC ${SOURCES})
 
-target_link_libraries(util)
+target_link_libraries(util PUBLIC spdlog::spdlog)
 
 target_include_directories(util
     PUBLIC

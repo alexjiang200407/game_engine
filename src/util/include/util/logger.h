@@ -5,5 +5,5 @@ namespace logger
 {
 	using namespace spdlog;
 	void
-	Init();
+	Init(const std::wstring& ws);
 }

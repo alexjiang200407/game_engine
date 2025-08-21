@@ -9,7 +9,7 @@ gfx::TransformCBuffer::TransformCBuffer(Graphics& gfx, const Drawable& parent) :
 }
 
 void
-gfx::TransformCBuffer::Bind(Graphics& gfx) noexcept(!DEBUG)
+gfx::TransformCBuffer::Bind(Graphics& gfx)
 {
 	pVcbuf->Update(gfx, DirectX::XMMatrixTranspose(parent.GetTransformXM() * gfx.GetProjection()));
 	pVcbuf->Bind(gfx);

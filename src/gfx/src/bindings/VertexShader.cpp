@@ -12,7 +12,7 @@ gfx::VertexShader::VertexShader(Graphics& gfx, const std::wstring& path)
 }
 
 void
-gfx::VertexShader::Bind(Graphics& gfx) noexcept(!DEBUG)
+gfx::VertexShader::Bind(Graphics& gfx)
 {
 	DX_CALL(GetContext(gfx)->VSSetShader(pVertexShader.Get(), nullptr, 0u));
 }

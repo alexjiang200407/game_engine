@@ -15,7 +15,7 @@ gfx::InputLayout::InputLayout(
 }
 
 void
-gfx::InputLayout::Bind(Graphics& gfx) noexcept(!DEBUG)
+gfx::InputLayout::Bind(Graphics& gfx)
 {
 	DX_CALL(GetContext(gfx)->IASetInputLayout(pInputLayout.Get()));
 }

@@ -20,18 +20,17 @@ add_subdirectory(gfx)
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        spdlog::spdlog
+        util
         platform
         graphics
 )
 
-set(MY_DEFINITIONS
-    $<$<CONFIG:Debug>:DEBUG>
-    PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
-)
 
 foreach(tgt platform graphics ${PROJECT_NAME})
-    target_compile_definitions(${tgt} PUBLIC ${MY_DEFINITIONS})
+    target_compile_definitions(${tgt} PRIVATE
+        DEBUG=$<$<CONFIG:Debug>:1>$<$<CONFIG:Release>:0>
+        PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+    )
 endforeach()
 
 add_custom_target(CopyShaders ALL
@@ -39,4 +38,16 @@ add_custom_target(CopyShaders ALL
     "${CMAKE_BINARY_DIR}/shaders"
     "$<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders"
     DEPENDS Shaders
+)
+
+set(SRC_ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")
+set(BIN_ASSETS_DIR "$<TARGET_FILE_DIR:game_engine>/assets")
+
+# Copy assets every build
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${SRC_ASSETS_DIR}"
+            "${BIN_ASSETS_DIR}"
+    COMMENT "Copying assets to binary directory"
 )

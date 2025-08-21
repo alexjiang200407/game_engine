@@ -8,7 +8,6 @@ add_library(platform STATIC ${SOURCES})
 target_link_libraries(platform
     PUBLIC
         util
-        spdlog::spdlog
 )
 
 target_include_directories(platform

@@ -11,7 +11,7 @@ namespace gfx
 		PixelShader(Graphics& gfx, const std::wstring& path);
 
 		void
-		Bind(Graphics& gfx) noexcept(!DEBUG) override;
+		Bind(Graphics& gfx) override;
 
 	protected:
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;

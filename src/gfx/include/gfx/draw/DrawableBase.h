@@ -11,12 +11,6 @@ namespace gfx
 	class DrawableBase : public Drawable
 	{
 	protected:
-		static bool
-		IsStaticInitialized() noexcept
-		{
-			return !staticBinds.empty();
-		}
-
 		static void
 		AddStaticBind(std::unique_ptr<Bindable> bind) noexcept(!DEBUG)
 		{
@@ -49,6 +43,12 @@ namespace gfx
 			assert("Failed to find index buffer in static binds" && pIndexBuffer != nullptr);
 		}
 
+		static bool
+		AcquireInitialization()
+		{
+			return !initialized.exchange(true, std::memory_order_acquire);
+		}
+
 	private:
 		const std::vector<std::unique_ptr<Bindable>>&
 		GetStaticBinds() const noexcept override
@@ -57,6 +57,7 @@ namespace gfx
 		}
 
 	private:
+		static inline std::atomic<bool>               initialized{ false };
 		static std::vector<std::unique_ptr<Bindable>> staticBinds;
 	};
 

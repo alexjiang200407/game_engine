@@ -61,7 +61,7 @@ namespace gfx
 	public:
 		using ConstantBuffer<C>::ConstantBuffer;
 		void
-		Bind(Graphics& gfx) noexcept(!DEBUG) override
+		Bind(Graphics& gfx) override
 		{
 			DX_CALL(GetContext(gfx)->VSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf()));
 		}
@@ -76,7 +76,7 @@ namespace gfx
 	public:
 		using ConstantBuffer<C>::ConstantBuffer;
 		void
-		Bind(Graphics& gfx) noexcept(!DEBUG) override
+		Bind(Graphics& gfx) override
 		{
 			DX_CALL(GetContext(gfx)->PSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf()));
 		}

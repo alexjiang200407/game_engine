@@ -11,7 +11,7 @@ namespace gfx
 		Topology(Graphics& gfx, D3D11_PRIMITIVE_TOPOLOGY type);
 
 		void
-		Bind(Graphics& gfx) noexcept(!DEBUG) override;
+		Bind(Graphics& gfx) override;
 
 	protected:
 		D3D11_PRIMITIVE_TOPOLOGY type;

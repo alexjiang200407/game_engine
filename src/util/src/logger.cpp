@@ -1,15 +1,15 @@
+#include "util/logger.h"
 #include <filesystem>
 #include <spdlog/sinks/basic_file_sink.h>
 
 namespace fs = std::filesystem;
 
-void
-logger::Init()
-{
-	wchar_t exePath[MAX_PATH];
-	GetModuleFileNameW(nullptr, exePath, MAX_PATH);
+using namespace std::string_literals;
 
-	fs::path logPath = fs::path(exePath).parent_path() / "logs.txt";
+void
+logger::Init(const std::wstring& ws)
+{
+	fs::path logPath = fs::path(ws).parent_path() / "logs.txt";
 
 	auto sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(logPath.string(), true);
 

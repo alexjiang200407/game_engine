@@ -10,7 +10,7 @@ namespace gfx
 		virtual ~Bindable() noexcept = default;
 
 		virtual void
-		Bind(Graphics& gfx) noexcept(!DEBUG) = 0;
+		Bind(Graphics& gfx) = 0;
 
 	protected:
 		static ID3D11DeviceContext*

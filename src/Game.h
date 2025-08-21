@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gfx/Graphics.h"
+#include "gfx/draw/Drawable.h"
 #include "util/Timer.h"
 #include "window/Window.h"
 
@@ -17,6 +18,9 @@ private:
 	DoFrame();
 
 private:
+	std::vector<std::unique_ptr<class gfx::Drawable>> drawables;
+	static constexpr size_t                           nDrawables = 180;
+
 	util::Timer   timer;
 	wnd::Window   wnd;
 	gfx::Graphics gfx;

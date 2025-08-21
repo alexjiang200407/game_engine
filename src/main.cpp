@@ -12,7 +12,10 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdS
 
 	try
 	{
-		logger::Init();
+		wchar_t exePath[MAX_PATH];
+		GetModuleFileNameW(nullptr, exePath, MAX_PATH);
+
+		logger::Init(exePath);
 		Game{}.Play();
 	}
 	catch (const std::exception& e)

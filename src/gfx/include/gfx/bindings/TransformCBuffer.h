@@ -16,7 +16,7 @@ namespace gfx
 	public:
 		TransformCBuffer(Graphics& gfx, const Drawable& parent);
 		void
-		Bind(Graphics& gfx) noexcept(!DEBUG) override;
+		Bind(Graphics& gfx) override;
 
 	private:
 		static inline std::unique_ptr<VertexConstantBuffer<DirectX::XMMATRIX>> pVcbuf;

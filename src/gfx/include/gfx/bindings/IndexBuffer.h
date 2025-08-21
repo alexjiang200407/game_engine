@@ -12,7 +12,7 @@ namespace gfx
 		IndexBuffer(Graphics& gfx, const std::vector<unsigned short>& indices);
 
 		void
-		Bind(Graphics& gfx) noexcept(!DEBUG) override;
+		Bind(Graphics& gfx) override;
 
 		UINT
 		GetCount() const noexcept;

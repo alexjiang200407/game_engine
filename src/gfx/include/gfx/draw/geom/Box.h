@@ -3,7 +3,7 @@
 #include "gfx/draw/DrawableBase.h"
 #include <random>
 
-namespace gfx
+namespace gfx::geom
 {
 	class Box : public DrawableBase<Box>
 	{
@@ -13,7 +13,8 @@ namespace gfx
 		    std::uniform_real_distribution<float>& adist,
 		    std::uniform_real_distribution<float>& ddist,
 		    std::uniform_real_distribution<float>& odist,
-		    std::uniform_real_distribution<float>& rdist);
+		    std::uniform_real_distribution<float>& rdist,
+		    std::uniform_real_distribution<float>& bdist);
 
 		void
 		Update(float dt) noexcept override;
@@ -36,5 +37,7 @@ namespace gfx
 		float dtheta;
 		float dphi;
 		float dchi;
+
+		DirectX::XMFLOAT3X3 mt;
 	};
 }

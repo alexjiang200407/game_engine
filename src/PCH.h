@@ -27,8 +27,8 @@
 #include <utility>
 #include <vector>
 
-#include "logger.h"
 #include "util/EnumSet.h"
+#include "util/logger.h"
 #include "util/math.h"
 
 #include <DirectXMath.h>

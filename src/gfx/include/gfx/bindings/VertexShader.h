@@ -11,7 +11,7 @@ namespace gfx
 		VertexShader(Graphics& gfx, const std::wstring& path);
 
 		void
-		Bind(Graphics& gfx) noexcept(!DEBUG) override;
+		Bind(Graphics& gfx) override;
 
 		ID3DBlob*
 		GetBytecode() const noexcept;

@@ -23,7 +23,7 @@ namespace gfx
 		ClearBuffer(float red, float green, float blue) const;
 
 		void
-		DrawIndexed(unsigned int count) const noexcept(!DEBUG);
+		DrawIndexed(unsigned int count) const;
 
 		void
 		SetProjection(DirectX::FXMMATRIX proj) noexcept;

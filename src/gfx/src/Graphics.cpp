@@ -20,7 +20,7 @@ gfx::Graphics::ClearBuffer(float red, float green, float blue) const
 }
 
 void
-gfx::Graphics::DrawIndexed(unsigned int count) const noexcept(!DEBUG)
+gfx::Graphics::DrawIndexed(unsigned int count) const
 {
 	DX_CALL(pContext->DrawIndexed(count, 0u, 0u));
 }
