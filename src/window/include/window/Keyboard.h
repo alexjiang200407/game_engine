@@ -9,7 +9,7 @@ namespace wnd
 	{
 		friend class Window;
 
-	private:
+	public:
 		struct KeyEvent
 		{
 			enum class Type

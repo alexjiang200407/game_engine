@@ -20,9 +20,10 @@ gfx::Graphics::ClearBuffer(float red, float green, float blue) const
 }
 
 void
-gfx::Graphics::DrawIndexed(unsigned int count) const
+gfx::Graphics::DrawIndexed() const
 {
-	DX_CALL(pContext->DrawIndexed(count, 0u, 0u));
+	DX_CALL(pContext->DrawIndexed(nextDrawIndexedCount, 0u, 0u));
+	nextDrawIndexedCount = 0;
 }
 
 void
@@ -127,4 +128,10 @@ gfx::Graphics::Graphics(unsigned int a_width, unsigned int a_height) :
 	vp.TopLeftX = 0.0f;
 	vp.TopLeftY = 0.0f;
 	DX_CALL(pContext->RSSetViewports(1u, &vp));
+}
+
+void
+gfx::Graphics::SetNextDrawIndexCount(UINT indexCount) noexcept
+{
+	nextDrawIndexedCount = indexCount;
 }

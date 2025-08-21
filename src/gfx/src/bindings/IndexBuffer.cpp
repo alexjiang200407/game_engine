@@ -1,5 +1,6 @@
 #include "gfx/bindings/IndexBuffer.h"
 #include "gfx/GFXException.h"
+#include "gfx/Graphics.h"
 
 gfx::IndexBuffer::IndexBuffer(Graphics& gfx, const std::vector<unsigned short>& indices) :
 	count((UINT)indices.size())
@@ -20,6 +21,7 @@ void
 gfx::IndexBuffer::Bind(Graphics& gfx)
 {
 	DX_CALL(GetContext(gfx)->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u));
+	gfx.SetNextDrawIndexCount(GetCount());
 }
 
 UINT

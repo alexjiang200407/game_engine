@@ -18,11 +18,10 @@ gfx::geom::Melon::Melon(
 
 	if (AcquireInitialization())
 	{
-		auto pvs   = std::make_unique<VertexShader>(gfx, L"shaders/vs_color_index.cso");
-		auto pvsbc = pvs->GetBytecode();
-		AddStaticBind(std::move(pvs));
+		auto pvs   = AddStaticBind<VertexShader>(gfx, L"shaders/vs_color_index.cso");
+		auto pvsbc = pvs.GetBytecode();
 
-		AddStaticBind(std::make_unique<PixelShader>(gfx, L"shaders/ps_color_index.cso"));
+		AddStaticBind<PixelShader>(gfx, L"shaders/ps_color_index.cso");
 
 		struct PixelShaderConstants
 		{
@@ -44,14 +43,13 @@ gfx::geom::Melon::Melon(
 			{ 0.0f, 1.0f, 1.0f },
 			{ 0.0f, 0.0f, 0.0f },
 		} };
-		AddStaticBind(std::make_unique<PixelConstantBuffer<PixelShaderConstants>>(gfx, cb2));
+		AddStaticBind<PixelConstantBuffer<PixelShaderConstants>>(gfx, cb2);
 
 		const std::vector<D3D11_INPUT_ELEMENT_DESC> ied = {
 			{ "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
-		AddStaticBind(std::make_unique<InputLayout>(gfx, ied, pvsbc));
-
-		AddStaticBind(std::make_unique<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+		AddStaticBind<InputLayout>(gfx, ied, pvsbc);
+		AddStaticBind<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	}
 
 	struct Vertex
@@ -62,11 +60,11 @@ gfx::geom::Melon::Melon(
 	// deform vertices of model by linear transformation
 	model.Transform(dx::XMMatrixScaling(1.0f, 1.0f, 1.2f));
 
-	AddBind(std::make_unique<VertexBuffer>(gfx, model.vertices));
+	AddBind<VertexBuffer>(gfx, model.vertices);
 
-	AddIndexBuffer(std::make_unique<IndexBuffer>(gfx, model.indices));
+	AddBind<IndexBuffer>(gfx, model.indices);
 
-	AddBind(std::make_unique<TransformCBuffer>(gfx, *this));
+	AddBind<TransformCBuffer>(gfx, *this);
 }
 
 void

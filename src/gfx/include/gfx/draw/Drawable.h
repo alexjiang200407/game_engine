@@ -1,5 +1,6 @@
 #pragma once
 #include "gfx/Graphics.h"
+#include "gfx/bindings/IndexBuffer.h"
 #include <DirectXMath.h>
 #include <vector>
 
@@ -27,18 +28,23 @@ namespace gfx
 		Update(float dt) noexcept = 0;
 
 	protected:
-		void
-		AddBind(std::unique_ptr<Bindable> bind) noexcept(!DEBUG);
+		template <typename T, typename... Args>
+		T&
+		AddBind(Args&&... args) noexcept(!DEBUG)
+		{
+			using U = std::decay_t<T>;
 
-		void
-		AddIndexBuffer(std::unique_ptr<class IndexBuffer> ibuf) noexcept(!DEBUG);
+			auto bind = std::make_unique<U>(std::forward<Args>(args)...);
+
+			binds.push_back(std::move(bind));
+			return *static_cast<U*>(binds.back().get());
+		}
 
 	private:
 		virtual const std::vector<std::unique_ptr<Bindable>>&
 		GetStaticBinds() const noexcept = 0;
 
 	private:
-		const class IndexBuffer*               pIndexBuffer = nullptr;
 		std::vector<std::unique_ptr<Bindable>> binds;
 	};
 }

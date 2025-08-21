@@ -52,6 +52,14 @@ Game::Play()
 {
 	while (wnd.Process())
 	{
+		while (auto key = wnd.kbd.ReadKey())
+		{
+			if (key->type == wnd::Keyboard::KeyEvent::Type::kDown)
+			{
+				drawables.clear();
+			}
+		}
+
 		DoFrame();
 	}
 }

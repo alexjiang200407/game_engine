@@ -92,34 +92,7 @@ Window::RegisterInput() const
 bool
 Window::Process() noexcept
 {
-	bool shouldContinue = ProcessMessages();
-
-	if (shouldContinue)
-	{
-		while (const auto key = kbd.ReadKey())
-		{
-			if (key->code == 65 && key->type == Keyboard::KeyEvent::Type::kDown)
-			{
-				logger::info("A down");
-			}
-
-			if (key->code == 65 && key->type == Keyboard::KeyEvent::Type::kUp)
-			{
-				logger::info("A up");
-			}
-		}
-
-		while (const auto mouseEvt = mouse.ReadEvent())
-		{
-			if (mouseEvt->state.all(Mouse::StateFlags::kInsideWindow) &&
-			    mouseEvt->type == Mouse::Event::Type::kMove)
-			{
-				logger::info("Moving Inside Window x: {}, y: {}", mouseEvt->x, mouseEvt->y);
-			}
-		}
-	}
-
-	return shouldContinue;
+	return ProcessMessages();
 }
 
 LRESULT CALLBACK

@@ -23,10 +23,13 @@ namespace gfx
 		ClearBuffer(float red, float green, float blue) const;
 
 		void
-		DrawIndexed(unsigned int count) const;
+		DrawIndexed() const;
 
 		void
 		SetProjection(DirectX::FXMMATRIX proj) noexcept;
+
+		void
+		SetNextDrawIndexCount(UINT count) noexcept;
 
 		DirectX::XMMATRIX
 		GetProjection() const noexcept;
@@ -41,6 +44,7 @@ namespace gfx
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
 		unsigned int                                   width;
 		unsigned int                                   height;
+		mutable unsigned int                           nextDrawIndexedCount = 0;
 		float                                          aspectRatio;
 	};
 }

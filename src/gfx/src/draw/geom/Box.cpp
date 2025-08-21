@@ -24,15 +24,14 @@ gfx::geom::Box::Box(
 		};
 		auto model = Cube::Make<Vertex>();
 
-		AddStaticBind(std::make_unique<VertexBuffer>(gfx, model.vertices));
+		AddStaticBind<VertexBuffer>(gfx, model.vertices);
 
-		auto pvs   = std::make_unique<VertexShader>(gfx, L"shaders/vs_color_index.cso");
-		auto pvsbc = pvs->GetBytecode();
-		AddStaticBind(std::move(pvs));
+		auto pvs   = AddStaticBind<VertexShader>(gfx, L"shaders/vs_color_index.cso");
+		auto pvsbc = pvs.GetBytecode();
 
-		AddStaticBind(std::make_unique<PixelShader>(gfx, L"shaders/ps_color_index.cso"));
+		AddStaticBind<PixelShader>(gfx, L"shaders/ps_color_index.cso");
 
-		AddStaticIndexBuffer(std::make_unique<IndexBuffer>(gfx, model.indices));
+		AddStaticBind<IndexBuffer>(gfx, model.indices);
 
 		{
 			struct ConstantBuffer
@@ -54,21 +53,18 @@ gfx::geom::Box::Box(
 				{ 1.0f, 1.0f, 0.0f },
 				{ 0.0f, 1.0f, 1.0f },
 			} };
-			AddStaticBind(std::make_unique<PixelConstantBuffer<ConstantBuffer>>(gfx, cb));
+			AddStaticBind<PixelConstantBuffer<ConstantBuffer>>(gfx, cb);
 		}
 
 		const std::vector<D3D11_INPUT_ELEMENT_DESC> ied = {
 			{ "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		};
-		AddStaticBind(std::make_unique<InputLayout>(gfx, ied, pvsbc));
+		AddStaticBind<InputLayout>(gfx, ied, pvsbc);
 
-		AddStaticBind(std::make_unique<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
+		AddStaticBind<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	}
-	else
-	{
-		SetIndexFromStatic();
-	}
-	AddBind(std::make_unique<TransformCBuffer>(gfx, *this));
+
+	AddBind<TransformCBuffer>(gfx, *this);
 
 	dx::XMStoreFloat3x3(&mt, dx::XMMatrixScaling(1.0f, 1.0f, bdist(rng)));
 }
