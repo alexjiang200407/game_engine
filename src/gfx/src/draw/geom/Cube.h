@@ -1,5 +1,5 @@
 #pragma once
-#include "gfx/draw/geom/IndexedTriangleList.h"
+#include "draw/geom/IndexedTriangleList.h"
 #include <DirectXMath.h>
 
 namespace gfx::geom

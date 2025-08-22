@@ -1,9 +1,15 @@
-#include "gfx/Graphics.h"
-#include "gfx/GFXException.h"
+#include "Graphics.h"
+#include "GFXException.h"
 #include <DirectXMath.h>
 
 namespace wrl = Microsoft::WRL;
 namespace dx  = DirectX;
+
+std::unique_ptr<gfx::IGraphics>
+gfx::IGraphics::Make(unsigned int width, unsigned int height)
+{
+	return std::make_unique<Graphics>(width, height);
+}
 
 void
 gfx::Graphics::EndFrame() const
@@ -36,6 +42,12 @@ DirectX::XMMATRIX
 gfx::Graphics::GetProjection() const noexcept
 {
 	return projection;
+}
+
+gfx::IGraphics::RenderAPI
+gfx::Graphics::GetRenderAPI() const noexcept
+{
+	return RenderAPI::kDX11;
 }
 
 gfx::Graphics::Graphics(unsigned int a_width, unsigned int a_height) :

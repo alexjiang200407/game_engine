@@ -1,5 +1,5 @@
-#include "gfx/bindings/Bindable.h"
-#include "gfx/Graphics.h"
+#include "bindings/Bindable.h"
+#include "Graphics.h"
 
 ID3D11DeviceContext*
 gfx::Bindable::GetContext(Graphics& gfx) noexcept

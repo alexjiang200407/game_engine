@@ -1,9 +1,9 @@
 #pragma once
 
-#include "gfx/Graphics.h"
-#include "gfx/draw/Drawable.h"
-#include "util/Timer.h"
-#include "window/Window.h"
+#include <gfx/IDrawable.h>
+#include <gfx/IGraphics.h>
+#include <util/Timer.h>
+#include <window/Window.h>
 
 class Game
 {
@@ -18,10 +18,10 @@ private:
 	DoFrame();
 
 private:
-	std::vector<std::unique_ptr<class gfx::Drawable>> drawables;
-	static constexpr size_t                           nDrawables = 180;
+	std::vector<std::unique_ptr<class gfx::IDrawable>> drawables;
+	static constexpr size_t                            nDrawables = 180;
 
-	util::Timer   timer;
-	wnd::Window   wnd;
-	gfx::Graphics gfx;
+	util::Timer                     timer;
+	wnd::Window                     wnd;
+	std::unique_ptr<gfx::IGraphics> gfx;
 };

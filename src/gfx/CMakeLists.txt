@@ -27,6 +27,6 @@ target_include_directories(
     graphics
     PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    PRIVATE
+    PRIVATE_HEADER
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )

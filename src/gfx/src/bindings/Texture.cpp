@@ -1,5 +1,5 @@
-#include "gfx/bindings/Texture.h"
-#include "gfx/GFXException.h"
+#include "bindings/Texture.h"
+#include "GFXException.h"
 #include <DirectXTex.h>
 
 gfx::Texture::Texture(Graphics& gfx, const std::wstring& ws, Format format)

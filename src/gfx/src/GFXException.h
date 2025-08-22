@@ -6,7 +6,7 @@
 #include <utility>
 
 #ifdef DEBUG
-#	include "gfx/DXGIInfoManager.h"
+#	include "DXGIInfoManager.h"
 #endif
 
 namespace gfx

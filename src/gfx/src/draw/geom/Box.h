@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gfx/draw/DrawableBase.h"
+#include "draw/DrawableBase.h"
 #include <random>
 
 namespace gfx::geom

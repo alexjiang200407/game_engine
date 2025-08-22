@@ -1,7 +1,7 @@
-#include "gfx/draw/geom/Box.h"
-#include "gfx/Graphics.h"
-#include "gfx/bindings/Bindings.h"
-#include "gfx/draw/geom/Cube.h"
+#include "draw/geom/Box.h"
+#include "Graphics.h"
+#include "bindings/Bindings.h"
+#include "draw/geom/Cube.h"
 
 namespace dx = DirectX;
 

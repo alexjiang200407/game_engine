@@ -1,5 +1,5 @@
 #pragma once
-#include "gfx/bindings/Bindable.h"
+#include "bindings/Bindable.h"
 #include <vector>
 
 namespace gfx

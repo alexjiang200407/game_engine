@@ -1,5 +1,5 @@
-#include "gfx/bindings/VertexShader.h"
-#include "gfx/GFXException.h"
+#include "bindings/VertexShader.h"
+#include "GFXException.h"
 
 gfx::VertexShader::VertexShader(Graphics& gfx, const std::wstring& path)
 {

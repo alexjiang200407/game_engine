@@ -1,8 +1,8 @@
 #pragma once
 
-#include "gfx/bindings/Bindable.h"
-#include "gfx/bindings/ConstantBuffers.h"
-#include "gfx/draw/Drawable.h"
+#include "bindings/Bindable.h"
+#include "bindings/ConstantBuffers.h"
+#include "draw/Drawable.h"
 #include <DirectXMath.h>
 #include <memory>
 

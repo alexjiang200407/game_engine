@@ -1,5 +1,5 @@
-#include "gfx/bindings/InputLayout.h"
-#include "gfx/GFXException.h"
+#include "bindings/InputLayout.h"
+#include "GFXException.h"
 
 gfx::InputLayout::InputLayout(
 	Graphics&                                    gfx,

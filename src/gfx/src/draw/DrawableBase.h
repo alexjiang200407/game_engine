@@ -1,7 +1,7 @@
 #pragma once
-#include "gfx/bindings/Bindable.h"
-#include "gfx/bindings/IndexBuffer.h"
-#include "gfx/draw/Drawable.h"
+#include "bindings/Bindable.h"
+#include "bindings/IndexBuffer.h"
+#include "draw/Drawable.h"
 #include <memory>
 #include <vector>
 

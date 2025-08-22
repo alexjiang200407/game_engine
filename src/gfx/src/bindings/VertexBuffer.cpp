@@ -1,4 +1,4 @@
-#include "gfx/bindings/VertexBuffer.h"
+#include "bindings/VertexBuffer.h"
 
 void
 gfx::VertexBuffer::Bind(Graphics& gfx)

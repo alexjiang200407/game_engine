@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gfx/draw/geom/IndexedTriangleList.h"
+#include "draw/geom/IndexedTriangleList.h"
 #include <array>
 #include <vector>
 
@@ -44,7 +44,7 @@ namespace gfx::geom
 			}
 
 			std::vector<unsigned short> indices;
-			indices.reserve(sq(divisions_x * divisions_y) * 6);
+			indices.reserve(util::math::sq(divisions_x * divisions_y) * 6);
 			{
 				const auto vxy2i = [nVertices_x](size_t x, size_t y) {
 					return (unsigned short)(y * nVertices_x + x);

@@ -1,5 +1,5 @@
-#include "gfx/DXGIInfoManager.h"
-#include "gfx/GFXException.h"
+#include "DXGIInfoManager.h"
+#include "GFXException.h"
 #include "window/Win32Exception.h"
 #include <dxgidebug.h>
 #include <memory>

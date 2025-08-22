@@ -1,5 +1,5 @@
-#include "gfx/bindings/PixelShader.h"
-#include "gfx/GFXException.h"
+#include "bindings/PixelShader.h"
+#include "GFXException.h"
 
 gfx::PixelShader::PixelShader(Graphics& gfx, const std::wstring& path)
 {

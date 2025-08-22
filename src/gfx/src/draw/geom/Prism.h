@@ -1,5 +1,5 @@
 #pragma once
-#include "gfx/draw/geom/IndexedTriangleList.h"
+#include "draw/geom/IndexedTriangleList.h"
 #include <DirectXMath.h>
 
 namespace gfx::geom
@@ -16,7 +16,7 @@ namespace gfx::geom
 
 			const auto  base           = dx::XMVectorSet(1.0f, 0.0f, -1.0f, 0.0f);
 			const auto  offset         = dx::XMVectorSet(0.0f, 0.0f, 2.0f, 0.0f);
-			const float longitudeAngle = 2.0f * PI / longDiv;
+			const float longitudeAngle = 2.0f * util::math::PI / longDiv;
 
 			// near center
 			std::vector<V> vertices;

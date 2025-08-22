@@ -1,6 +1,6 @@
 #pragma once
-#include "gfx/GFXException.h"
-#include "gfx/bindings/Bindable.h"
+#include "GFXException.h"
+#include "bindings/Bindable.h"
 #include <vector>
 
 namespace gfx

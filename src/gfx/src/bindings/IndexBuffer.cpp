@@ -1,6 +1,6 @@
-#include "gfx/bindings/IndexBuffer.h"
-#include "gfx/GFXException.h"
-#include "gfx/Graphics.h"
+#include "bindings/IndexBuffer.h"
+#include "GFXException.h"
+#include "Graphics.h"
 
 gfx::IndexBuffer::IndexBuffer(Graphics& gfx, const std::vector<unsigned short>& indices) :
 	count((UINT)indices.size())

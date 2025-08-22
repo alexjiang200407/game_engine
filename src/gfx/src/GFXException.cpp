@@ -1,4 +1,4 @@
-#include "gfx/GFXException.h"
+#include "GFXException.h"
 #include <codecvt>
 
 using namespace gfx;

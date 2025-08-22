@@ -1,20 +1,18 @@
 #pragma once
-#include "gfx/draw/DrawableBase.h"
+#include "draw/DrawableBase.h"
 
 namespace gfx::geom
 {
-	class Melon : public DrawableBase<Melon>
+	class Pyramid : public DrawableBase<Pyramid>
 	{
 	public:
-		Melon(
+		Pyramid(
 			Graphics&                              gfx,
 			std::mt19937&                          rng,
 			std::uniform_real_distribution<float>& adist,
 			std::uniform_real_distribution<float>& ddist,
 			std::uniform_real_distribution<float>& odist,
-			std::uniform_real_distribution<float>& rdist,
-			std::uniform_int_distribution<int>&    longdist,
-			std::uniform_int_distribution<int>&    latdist);
+			std::uniform_real_distribution<float>& rdist);
 
 		void
 		Update(float dt) noexcept override;
@@ -23,7 +21,7 @@ namespace gfx::geom
 		GetTransformXM() const noexcept override;
 
 		static void
-		StaticBindingsConstructor(Graphics& gfx, DrawableBase<Melon>& melonBase);
+		StaticBindingsConstructor(gfx::Graphics& gfx, DrawableBase<Pyramid>& pyramidBase);
 
 	private:
 		// positional

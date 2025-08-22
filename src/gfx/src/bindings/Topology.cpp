@@ -1,5 +1,5 @@
-#include "gfx/bindings/Topology.h"
-#include "gfx/GFXException.h"
+#include "bindings/Topology.h"
+#include "GFXException.h"
 
 gfx::Topology::Topology(Graphics&, D3D11_PRIMITIVE_TOPOLOGY type) : type(type) {}
 

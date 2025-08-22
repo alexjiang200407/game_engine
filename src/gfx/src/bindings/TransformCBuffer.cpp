@@ -1,4 +1,4 @@
-#include "gfx/bindings/TransformCBuffer.h"
+#include "bindings/TransformCBuffer.h"
 
 gfx::TransformCBuffer::TransformCBuffer(Graphics& gfx, const Drawable& parent) : parent(parent)
 {

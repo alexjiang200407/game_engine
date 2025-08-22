@@ -1,6 +1,6 @@
-#include "gfx/draw/geom/Pyramid.h"
-#include "gfx/bindings/Bindings.h"
-#include "gfx/draw/geom/Cone.h"
+#include "draw/geom/Pyramid.h"
+#include "bindings/Bindings.h"
+#include "draw/geom/Cone.h"
 
 gfx::geom::Pyramid::Pyramid(
 	Graphics&                              gfx,

@@ -1,11 +1,11 @@
 #pragma once
-#include "gfx/Graphics.h"
+#include "gfx/IGraphics.h"
 
 namespace gfx
 {
 	class Bindable;
 
-	class Graphics
+	class Graphics : public gfx::IGraphics
 	{
 		friend class gfx::Bindable;
 
@@ -17,22 +17,25 @@ namespace gfx
 		operator=(const Graphics&) = delete;
 
 		void
-		EndFrame() const;
+		EndFrame() const override;
 
 		void
-		ClearBuffer(float red, float green, float blue) const;
+		ClearBuffer(float red, float green, float blue) const override;
 
 		void
 		DrawIndexed() const;
 
 		void
-		SetProjection(DirectX::FXMMATRIX proj) noexcept;
+		SetProjection(DirectX::FXMMATRIX proj) noexcept override;
 
 		void
 		SetNextDrawIndexCount(UINT count) noexcept;
 
 		DirectX::XMMATRIX
 		GetProjection() const noexcept;
+
+		RenderAPI
+		GetRenderAPI() const noexcept override;
 
 	private:
 		DirectX::XMMATRIX                              projection;
