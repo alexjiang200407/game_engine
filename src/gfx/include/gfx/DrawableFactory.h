@@ -24,6 +24,6 @@ namespace gfx
 		std::uniform_real_distribution<float> bdist{ 0.4f, 3.0f };
 		std::uniform_int_distribution<int>    latdist{ 5, 20 };
 		std::uniform_int_distribution<int>    longdist{ 10, 40 };
-		std::uniform_int_distribution<int>    typedist{ 0, 2 };
+		std::uniform_int_distribution<int>    typedist{ 0, 3 };
 	};
 }

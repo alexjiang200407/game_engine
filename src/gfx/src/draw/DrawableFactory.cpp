@@ -1,5 +1,6 @@
 #include "gfx/DrawableFactory.h"
 #include "draw/Geometry.h"
+#include "draw/Sheet.h"
 
 gfx::DrawableFactory::DrawableFactory(gfx::IGraphics& gfx) noexcept : gfx(gfx) {}
 
@@ -23,6 +24,8 @@ gfx::DrawableFactory::operator()()
 			case 2:
 				return std::make_unique<
 					geom::Melon>(dxGfx, rng, adist, ddist, odist, rdist, longdist, latdist);
+			case 3:
+				return std::make_unique<Sheet>(dxGfx, rng, adist, ddist, odist, rdist);
 			default:
 				assert(false && "bad drawable type in factory");
 				return {};

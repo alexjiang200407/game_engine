@@ -17,6 +17,8 @@ set(SOURCES
     src/DXGIInfoManager.cpp
     src/GFXException.cpp
     src/Graphics.cpp
+    src/bindings/Sampler.cpp
+    src/draw/Sheet.cpp
 )
 
 add_library(graphics STATIC ${SOURCES})

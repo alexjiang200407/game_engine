@@ -5,7 +5,7 @@ namespace gfx
 {
 	class Graphics;
 
-	class Texture : Bindable
+	class Texture : public Bindable
 	{
 	public:
 		enum class Format
