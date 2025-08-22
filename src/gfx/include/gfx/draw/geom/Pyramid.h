@@ -13,10 +13,15 @@ namespace gfx::geom
 			std::uniform_real_distribution<float>& ddist,
 			std::uniform_real_distribution<float>& odist,
 			std::uniform_real_distribution<float>& rdist);
+
 		void
 		Update(float dt) noexcept override;
+
 		DirectX::XMMATRIX
 		GetTransformXM() const noexcept override;
+
+		static void
+		StaticBindingsConstructor(gfx::Graphics& gfx, DrawableBase<Pyramid>& pyramidBase);
 
 	private:
 		// positional

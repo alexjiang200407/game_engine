@@ -10,7 +10,25 @@ namespace gfx
 	template <class T>
 	class DrawableBase : public Drawable
 	{
-	protected:
+		friend T;
+
+	private:
+		DrawableBase(Graphics& gfx)
+		{
+			if (refCount.fetch_sub(1, std::memory_order_acq_rel) == 0)
+			{
+				T::StaticBindingsConstructor(gfx, *this);
+			}
+		}
+
+		~DrawableBase()
+		{
+			if (refCount.fetch_sub(1, std::memory_order_acq_rel) == 1)
+			{
+				staticBinds.clear();
+			}
+		}
+
 		template <typename T, typename... Args>
 		T&
 		AddStaticBind(Args&&... args)
@@ -22,24 +40,10 @@ namespace gfx
 			return *static_cast<U*>(staticBinds.back().get());
 		}
 
-		static bool
-		AcquireInitialization()
-		{
-			return !initialized.exchange(true, std::memory_order_acquire);
-		}
+		static void
+		StaticBindingsConstructor(Graphics&, DrawableBase<T>&)
+		{}
 
-	public:
-		DrawableBase() { refCount.fetch_add(1); }
-
-		~DrawableBase()
-		{
-			if (refCount.fetch_sub(1, std::memory_order_acq_rel) == 1)
-			{
-				staticBinds.clear();
-			}
-		}
-
-	private:
 		const std::vector<std::unique_ptr<Bindable>>&
 		GetStaticBinds() const noexcept override
 		{

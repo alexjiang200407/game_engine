@@ -13,60 +13,61 @@ gfx::geom::Box::Box(
 	std::uniform_real_distribution<float>& odist,
 	std::uniform_real_distribution<float>& rdist,
 	std::uniform_real_distribution<float>& bdist) :
-	r(rdist(rng)), droll(ddist(rng)), dpitch(ddist(rng)), dyaw(ddist(rng)), dphi(odist(rng)),
-	dtheta(odist(rng)), dchi(odist(rng)), chi(adist(rng)), theta(adist(rng)), phi(adist(rng))
+	DrawableBase<Box>(gfx), r(rdist(rng)), droll(ddist(rng)), dpitch(ddist(rng)), dyaw(ddist(rng)),
+	dphi(odist(rng)), dtheta(odist(rng)), dchi(odist(rng)), chi(adist(rng)), theta(adist(rng)),
+	phi(adist(rng))
 {
-	if (AcquireInitialization())
+	AddBind<TransformCBuffer>(gfx, *this);
+	dx::XMStoreFloat3x3(&mt, dx::XMMatrixScaling(1.0f, 1.0f, bdist(rng)));
+}
+
+void
+gfx::geom::Box::StaticBindingsConstructor(Graphics& gfx, DrawableBase<Box>& boxBase)
+{
+	struct Vertex
 	{
-		struct Vertex
+		dx::XMFLOAT3 pos;
+	};
+	auto model = Cube::Make<Vertex>();
+
+	boxBase.AddStaticBind<VertexBuffer>(gfx, model.vertices);
+
+	auto pvs   = boxBase.AddStaticBind<VertexShader>(gfx, L"shaders/vs_color_index.cso");
+	auto pvsbc = pvs.GetBytecode();
+
+	boxBase.AddStaticBind<PixelShader>(gfx, L"shaders/ps_color_index.cso");
+
+	boxBase.AddStaticBind<IndexBuffer>(gfx, model.indices);
+
+	{
+		struct ConstantBuffer
 		{
-			dx::XMFLOAT3 pos;
-		};
-		auto model = Cube::Make<Vertex>();
-
-		AddStaticBind<VertexBuffer>(gfx, model.vertices);
-
-		auto pvs   = AddStaticBind<VertexShader>(gfx, L"shaders/vs_color_index.cso");
-		auto pvsbc = pvs.GetBytecode();
-
-		AddStaticBind<PixelShader>(gfx, L"shaders/ps_color_index.cso");
-
-		AddStaticBind<IndexBuffer>(gfx, model.indices);
-
-		{
-			struct ConstantBuffer
+			struct
 			{
-				struct
-				{
-					float r;
-					float g;
-					float b;
-					float a;
-				} face_colors[8];
-			};
-			const ConstantBuffer cb = { {
-				{ 1.0f, 0.0f, 1.0f },
-				{ 1.0f, 0.0f, 0.0f },
-				{ 1.0f, 1.0f, 0.0f },
-				{ 0.0f, 1.0f, 0.0f },
-				{ 0.0f, 0.0f, 1.0f },
-				{ 1.0f, 1.0f, 0.0f },
-				{ 0.0f, 1.0f, 1.0f },
-			} };
-			AddStaticBind<PixelConstantBuffer<ConstantBuffer>>(gfx, cb);
-		}
-
-		const std::vector<D3D11_INPUT_ELEMENT_DESC> ied = {
-			{ "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				float r;
+				float g;
+				float b;
+				float a;
+			} face_colors[8];
 		};
-		AddStaticBind<InputLayout>(gfx, ied, pvsbc);
-
-		AddStaticBind<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		const ConstantBuffer cb = { {
+			{ 1.0f, 0.0f, 1.0f },
+			{ 1.0f, 0.0f, 0.0f },
+			{ 1.0f, 1.0f, 0.0f },
+			{ 0.0f, 1.0f, 0.0f },
+			{ 0.0f, 0.0f, 1.0f },
+			{ 1.0f, 1.0f, 0.0f },
+			{ 0.0f, 1.0f, 1.0f },
+		} };
+		boxBase.AddStaticBind<PixelConstantBuffer<ConstantBuffer>>(gfx, cb);
 	}
 
-	AddBind<TransformCBuffer>(gfx, *this);
+	const std::vector<D3D11_INPUT_ELEMENT_DESC> ied = {
+		{ "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+	boxBase.AddStaticBind<InputLayout>(gfx, ied, pvsbc);
 
-	dx::XMStoreFloat3x3(&mt, dx::XMMatrixScaling(1.0f, 1.0f, bdist(rng)));
+	boxBase.AddStaticBind<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void

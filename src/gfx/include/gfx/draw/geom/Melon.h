@@ -22,6 +22,9 @@ namespace gfx::geom
 		DirectX::XMMATRIX
 		GetTransformXM() const noexcept override;
 
+		static void
+		StaticBindingsConstructor(Graphics& gfx, DrawableBase<Melon>& melonBase);
+
 	private:
 		// positional
 		float r;

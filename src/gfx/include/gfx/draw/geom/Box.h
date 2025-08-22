@@ -22,6 +22,9 @@ namespace gfx::geom
 		DirectX::XMMATRIX
 		GetTransformXM() const noexcept override;
 
+		static void
+		StaticBindingsConstructor(Graphics& gfx, DrawableBase<Box>& boxBase);
+
 	private:
 		float r;
 		float roll  = 0.0f;
