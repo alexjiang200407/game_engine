@@ -1,5 +1,5 @@
 #include "Game.h"
-#include "gfx/DrawableFactory.h"
+#include <gfx/DrawableFactory.h>
 
 Game::Game() : wnd(1280u, 720u), gfx(gfx::IGraphics::Make(1280u, 1080u))
 {

@@ -1,5 +1,4 @@
 #include "Game.h"
-#include "window/Window.h"
 #include <stdexcept>
 
 int WINAPI

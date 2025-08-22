@@ -26,7 +26,7 @@ namespace gfx
 	protected:
 		template <typename T, typename... Args>
 		T&
-		AddBind(Args&&... args) noexcept(!DEBUG)
+		AddBind(Args&&... args)
 		{
 			using U = std::decay_t<T>;
 

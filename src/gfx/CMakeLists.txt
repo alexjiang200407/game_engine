@@ -1,8 +1,22 @@
 
-file(GLOB SOURCES
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/bind/*.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/draw/*.cpp"
+set(SOURCES
+    src/bindings/Bindable.cpp
+    src/bindings/IndexBuffer.cpp
+    src/bindings/InputLayout.cpp
+    src/bindings/PixelShader.cpp
+    src/bindings/Texture.cpp
+    src/bindings/Topology.cpp
+    src/bindings/TransformCBuffer.cpp
+    src/bindings/VertexBuffer.cpp
+    src/bindings/VertexShader.cpp
+    src/draw/Drawable.cpp
+    src/draw/DrawableFactory.cpp
+    src/draw/geom/Box.cpp
+    src/draw/geom/Melon.cpp
+    src/draw/geom/Pyramid.cpp
+    src/DXGIInfoManager.cpp
+    src/GFXException.cpp
+    src/Graphics.cpp
 )
 
 add_library(graphics STATIC ${SOURCES})
@@ -21,12 +35,9 @@ target_link_libraries(graphics
         Microsoft::DirectXTex
 )
 
-target_precompile_headers(graphics PUBLIC "${CMAKE_SOURCE_DIR}/src/PCH.h")
+target_precompile_headers(graphics PUBLIC "${CMAKE_SOURCE_DIR}/src/PCH.h" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/PCH.h")
 
-target_include_directories(
-    graphics
-    PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}/include"
-    PRIVATE_HEADER
-        "${CMAKE_CURRENT_SOURCE_DIR}/src"
+target_include_directories(graphics
+    PUBLIC  "${CMAKE_CURRENT_SOURCE_DIR}/include"
+    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )

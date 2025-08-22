@@ -1,5 +1,5 @@
 #include "gfx/DrawableFactory.h"
-#include "Geometry.h"
+#include "draw/Geometry.h"
 
 gfx::DrawableFactory::DrawableFactory(gfx::IGraphics& gfx) noexcept : gfx(gfx) {}
 

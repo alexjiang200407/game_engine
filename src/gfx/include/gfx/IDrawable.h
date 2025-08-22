@@ -19,7 +19,7 @@ namespace gfx
 		GetTransformXM() const noexcept = 0;
 
 		virtual void
-		Draw(IGraphics& gfx) const noexcept(!DEBUG) = 0;
+		Draw(IGraphics& gfx) const = 0;
 
 		virtual void
 		Update(float dt) noexcept = 0;
