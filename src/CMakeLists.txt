@@ -1,7 +1,4 @@
-set(SOURCES
-    ./Game.cpp
-    ./main.cpp
-)
+file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
 add_executable(${PROJECT_NAME} WIN32
     ${SOURCES}

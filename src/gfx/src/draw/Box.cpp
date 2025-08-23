@@ -5,7 +5,7 @@
 
 namespace dx = DirectX;
 
-gfx::geom::Box::Box(
+gfx::Box::Box(
 	Graphics&                              gfx,
 	std::mt19937&                          rng,
 	std::uniform_real_distribution<float>& adist,
@@ -22,13 +22,13 @@ gfx::geom::Box::Box(
 }
 
 void
-gfx::geom::Box::StaticBindingsConstructor(Graphics& gfx, DrawableBase<Box>& boxBase)
+gfx::Box::StaticBindingsConstructor(Graphics& gfx, DrawableBase<Box>& boxBase)
 {
 	struct Vertex
 	{
 		dx::XMFLOAT3 pos;
 	};
-	auto model = Cube::Make<Vertex>();
+	auto model = geom::Cube::Make<Vertex>();
 
 	boxBase.AddStaticBind<VertexBuffer>(gfx, model.vertices);
 
@@ -71,7 +71,7 @@ gfx::geom::Box::StaticBindingsConstructor(Graphics& gfx, DrawableBase<Box>& boxB
 }
 
 void
-gfx::geom::Box::Update(float dt) noexcept
+gfx::Box::Update(float dt) noexcept
 {
 	roll += droll * dt;
 	pitch += dpitch * dt;
@@ -82,7 +82,7 @@ gfx::geom::Box::Update(float dt) noexcept
 }
 
 DirectX::XMMATRIX
-gfx::geom::Box::GetTransformXM() const noexcept
+gfx::Box::GetTransformXM() const noexcept
 {
 	namespace dx = DirectX;
 	return dx::XMLoadFloat3x3(&mt) * dx::XMMatrixRotationRollPitchYaw(pitch, yaw, roll) *

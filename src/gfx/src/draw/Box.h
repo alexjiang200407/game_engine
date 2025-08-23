@@ -3,7 +3,7 @@
 #include "draw/DrawableBase.h"
 #include <random>
 
-namespace gfx::geom
+namespace gfx
 {
 	class Box : public DrawableBase<Box>
 	{

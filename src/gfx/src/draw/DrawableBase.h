@@ -40,10 +40,6 @@ namespace gfx
 			return *static_cast<U*>(staticBinds.back().get());
 		}
 
-		static void
-		StaticBindingsConstructor(Graphics&, DrawableBase<T>&)
-		{}
-
 		const std::vector<std::unique_ptr<Bindable>>&
 		GetStaticBinds() const noexcept override
 		{
@@ -56,3 +52,6 @@ namespace gfx
 		static inline std::vector<std::unique_ptr<Bindable>> staticBinds;
 	};
 }
+
+#define DECLARE_STATIC_BINDINGS_CONSTRUCTOR(Type) \
+	static void StaticBindingsConstructor(Graphics& gfx, DrawableBase<Type>& boxBase)

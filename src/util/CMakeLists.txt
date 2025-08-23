@@ -1,8 +1,4 @@
-
-set(SOURCES
-    src/logger.cpp
-    src/Timer.cpp
-)
+file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
 add_library(util STATIC ${SOURCES})
 

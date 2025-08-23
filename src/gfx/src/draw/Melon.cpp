@@ -2,7 +2,7 @@
 #include "bindings/Bindings.h"
 #include "geom/Sphere.h"
 
-gfx::geom::Melon::Melon(
+gfx::Melon::Melon(
 	Graphics&                              gfx,
 	std::mt19937&                          rng,
 	std::uniform_real_distribution<float>& adist,
@@ -20,7 +20,7 @@ gfx::geom::Melon::Melon(
 	{
 		dx::XMFLOAT3 pos;
 	};
-	auto model = Sphere::MakeTesselated<Vertex>(latdist(rng), longdist(rng));
+	auto model = geom::Sphere::MakeTesselated<Vertex>(latdist(rng), longdist(rng));
 	// deform vertices of model by linear transformation
 	model.Transform(dx::XMMatrixScaling(1.0f, 1.0f, 1.2f));
 
@@ -32,7 +32,7 @@ gfx::geom::Melon::Melon(
 }
 
 void
-gfx::geom::Melon::Update(float dt) noexcept
+gfx::Melon::Update(float dt) noexcept
 {
 	roll += droll * dt;
 	pitch += dpitch * dt;
@@ -43,7 +43,7 @@ gfx::geom::Melon::Update(float dt) noexcept
 }
 
 DirectX::XMMATRIX
-gfx::geom::Melon::GetTransformXM() const noexcept
+gfx::Melon::GetTransformXM() const noexcept
 {
 	namespace dx = DirectX;
 	return dx::XMMatrixRotationRollPitchYaw(pitch, yaw, roll) *
@@ -53,7 +53,7 @@ gfx::geom::Melon::GetTransformXM() const noexcept
 }
 
 void
-gfx::geom::Melon::StaticBindingsConstructor(Graphics& gfx, DrawableBase<Melon>& melonBase)
+gfx::Melon::StaticBindingsConstructor(Graphics& gfx, DrawableBase<Melon>& melonBase)
 {
 	auto pvs   = melonBase.AddStaticBind<VertexShader>(gfx, L"shaders/vs_color_index.cso");
 	auto pvsbc = pvs.GetBytecode();

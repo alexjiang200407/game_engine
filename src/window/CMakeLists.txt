@@ -1,10 +1,5 @@
 
-set(SOURCES
-    src/Keyboard.cpp
-    src/Mouse.cpp
-    src/Win32Exception.cpp
-    src/Window.cpp
-)
+file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
 add_library(platform STATIC ${SOURCES})
 

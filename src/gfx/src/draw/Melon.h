@@ -1,7 +1,7 @@
 #pragma once
 #include "draw/DrawableBase.h"
 
-namespace gfx::geom
+namespace gfx
 {
 	class Melon : public DrawableBase<Melon>
 	{

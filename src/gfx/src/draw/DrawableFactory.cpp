@@ -3,14 +3,13 @@
 #include "draw/Melon.h"
 #include "draw/Pyramid.h"
 #include "draw/Sheet.h"
+#include "draw/SkinnedBox.h"
 
 gfx::DrawableFactory::DrawableFactory(gfx::IGraphics& gfx) noexcept : gfx(gfx) {}
 
 std::unique_ptr<gfx::IDrawable>
 gfx::DrawableFactory::operator()()
 {
-	namespace geom = gfx::geom;
-
 	switch (gfx.GetRenderAPI())
 	{
 	case IGraphics::RenderAPI::kDX11:
@@ -20,14 +19,17 @@ gfx::DrawableFactory::operator()()
 			switch (typedist(rng))
 			{
 			case 0:
-				return std::make_unique<geom::Pyramid>(dxGfx, rng, adist, ddist, odist, rdist);
+				return std::make_unique<Pyramid>(dxGfx, rng, adist, ddist, odist, rdist);
 			case 1:
-				return std::make_unique<geom::Box>(dxGfx, rng, adist, ddist, odist, rdist, bdist);
+				return std::make_unique<Box>(dxGfx, rng, adist, ddist, odist, rdist, bdist);
 			case 2:
 				return std::make_unique<
-					geom::Melon>(dxGfx, rng, adist, ddist, odist, rdist, longdist, latdist);
+					Melon>(dxGfx, rng, adist, ddist, odist, rdist, longdist, latdist);
 			case 3:
 				return std::make_unique<Sheet>(dxGfx, rng, adist, ddist, odist, rdist);
+			case 4:
+				return std::make_unique<SkinnedBox>(dxGfx, rng, adist, ddist, odist, rdist);
+
 			default:
 				assert(false && "bad drawable type in factory");
 				return {};

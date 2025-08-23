@@ -2,7 +2,7 @@
 #include "bindings/Bindings.h"
 #include "geom/Cone.h"
 
-gfx::geom::Pyramid::Pyramid(
+gfx::Pyramid::Pyramid(
 	Graphics&                              gfx,
 	std::mt19937&                          rng,
 	std::uniform_real_distribution<float>& adist,
@@ -17,7 +17,7 @@ gfx::geom::Pyramid::Pyramid(
 }
 
 void
-gfx::geom::Pyramid::Update(float dt) noexcept
+gfx::Pyramid::Update(float dt) noexcept
 {
 	roll += droll * dt;
 	pitch += dpitch * dt;
@@ -28,7 +28,7 @@ gfx::geom::Pyramid::Update(float dt) noexcept
 }
 
 DirectX::XMMATRIX
-gfx::geom::Pyramid::GetTransformXM() const noexcept
+gfx::Pyramid::GetTransformXM() const noexcept
 {
 	namespace dx = DirectX;
 	return dx::XMMatrixRotationRollPitchYaw(pitch, yaw, roll) *
@@ -38,7 +38,7 @@ gfx::geom::Pyramid::GetTransformXM() const noexcept
 }
 
 void
-gfx::geom::Pyramid::StaticBindingsConstructor(Graphics& gfx, DrawableBase<Pyramid>& pyramidBase)
+gfx::Pyramid::StaticBindingsConstructor(Graphics& gfx, DrawableBase<Pyramid>& pyramidBase)
 {
 	namespace dx = DirectX;
 	struct Vertex
@@ -52,7 +52,7 @@ gfx::geom::Pyramid::StaticBindingsConstructor(Graphics& gfx, DrawableBase<Pyrami
 			unsigned char a;
 		} color;
 	};
-	auto model = Cone::MakeTesselated<Vertex>(4);
+	auto model = geom::Cone::MakeTesselated<Vertex>(4);
 	// set vertex colors for mesh
 	model.vertices[0].color = { 255, 255, 0 };
 	model.vertices[1].color = { 255, 255, 0 };
