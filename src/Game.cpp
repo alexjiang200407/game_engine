@@ -1,7 +1,7 @@
 #include "Game.h"
 #include <gfx/DrawableFactory.h>
 
-Game::Game() : wnd(1280u, 720u), gfx(gfx::IGraphics::Make(1280u, 1080u))
+Game::Game() : wnd(1440, 900), gfx(gfx::IGraphics::Make(1440, 900))
 {
 	drawables.reserve(nDrawables);
 	std::generate_n(std::back_inserter(drawables), nDrawables, gfx::DrawableFactory{ *gfx });
@@ -28,6 +28,10 @@ Game::Play()
 void
 Game::DoFrame()
 {
+	gfx->StartFrame();
+
+	ImGui::NewFrame();
+
 	const auto dt = timer.Mark();
 	gfx->ClearBuffer(0.07f, 0.0f, 0.12f);
 	for (auto& d : drawables)
@@ -35,5 +39,7 @@ Game::DoFrame()
 		d->Update(dt);
 		d->Draw(*gfx);
 	}
+	ImGui::ShowDemoWindow();
+
 	gfx->EndFrame();
 }

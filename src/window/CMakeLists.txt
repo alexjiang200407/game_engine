@@ -3,8 +3,11 @@ file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
 add_library(platform STATIC ${SOURCES})
 
+find_package(imgui CONFIG REQUIRED)
+
 target_link_libraries(platform
     PUBLIC
+        imgui::imgui
         util
 )
 

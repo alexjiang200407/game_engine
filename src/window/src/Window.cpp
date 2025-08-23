@@ -2,8 +2,12 @@
 #include "window/Win32Exception.h"
 #include <array>
 #include <cassert>
+#include <imgui_impl_win32.h>
 #include <limits>
 #include <span>
+
+extern IMGUI_IMPL_API LRESULT
+ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 using namespace wnd;
 
@@ -40,6 +44,7 @@ Window::~Window() noexcept
 	if (hWnd)
 	{
 		assert(DestroyWindow(hWnd) != 0);
+		ImGui_ImplWin32_Shutdown();
 		hWnd = nullptr;
 	}
 	assert(UnregisterClass(CLASS_NAME, hInstance) != 0);
@@ -66,6 +71,10 @@ Window::CreateAppWindow(HINSTANCE a_hInstance, int width, int height, const wcha
 		this));
 
 	WIN32_ERR_TEST_AND_THROW(ShowWindow(hWnd, SW_SHOW));
+
+	if (!ImGui_ImplWin32_Init(hWnd))
+		throw std::runtime_error("Failed to start ImGui");
+
 	WIN32_ERR_TEST_AND_THROW(UpdateWindow(hWnd));
 }
 
@@ -92,6 +101,7 @@ Window::RegisterInput() const
 bool
 Window::Process() noexcept
 {
+	ImGui_ImplWin32_NewFrame();
 	return ProcessMessages();
 }
 
@@ -150,6 +160,11 @@ namespace
 LRESULT
 Window::HandleMessage(HWND a_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept
 {
+	if (ImGui_ImplWin32_WndProcHandler(a_hWnd, uMsg, wParam, lParam))
+	{
+		return true;
+	}
+
 	switch (uMsg)
 	{
 	case WM_CLOSE:

@@ -20,6 +20,9 @@ namespace gfx
 		operator=(const IGraphics&) = delete;
 
 		virtual void
+		StartFrame() const = 0;
+
+		virtual void
 		EndFrame() const = 0;
 
 		virtual void

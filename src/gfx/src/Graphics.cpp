@@ -1,6 +1,7 @@
 #include "Graphics.h"
 #include "GFXException.h"
 #include <DirectXMath.h>
+#include <imgui_impl_dx11.h>
 
 namespace wrl = Microsoft::WRL;
 namespace dx  = DirectX;
@@ -12,8 +13,16 @@ gfx::IGraphics::Make(unsigned int width, unsigned int height)
 }
 
 void
+gfx::Graphics::StartFrame() const
+{
+	ImGui_ImplDX11_NewFrame();
+}
+
+void
 gfx::Graphics::EndFrame() const
 {
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 	pSwap->Present(1u, 0);
 }
 
@@ -51,8 +60,7 @@ gfx::Graphics::GetRenderAPI() const noexcept
 }
 
 gfx::Graphics::Graphics(unsigned int a_width, unsigned int a_height) :
-	width(a_width), height(a_height),
-	aspectRatio(width ? static_cast<float>(height) / static_cast<float>(width) : 0.0f)
+	width(a_width), height(a_height)
 {
 	DXGI_SWAP_CHAIN_DESC sd               = {};
 	sd.BufferDesc.Width                   = static_cast<UINT>(width);
@@ -140,7 +148,14 @@ gfx::Graphics::Graphics(unsigned int a_width, unsigned int a_height) :
 	vp.TopLeftX = 0.0f;
 	vp.TopLeftY = 0.0f;
 	DX_CALL(pContext->RSSetViewports(1u, &vp));
+
+	if (!ImGui_ImplDX11_Init(pDevice.Get(), pContext.Get()))
+	{
+		throw std::runtime_error("ImGui DX11 failed to initialize");
+	}
 }
+
+gfx::Graphics::~Graphics() noexcept { ImGui_ImplDX11_Shutdown(); }
 
 void
 gfx::Graphics::SetNextDrawIndexCount(UINT indexCount) noexcept

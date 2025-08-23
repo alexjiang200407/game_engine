@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ImGuiManager.h"
 #include <gfx/IDrawable.h>
 #include <gfx/IGraphics.h>
 #include <util/Timer.h>
@@ -21,7 +22,8 @@ private:
 	std::vector<std::unique_ptr<class gfx::IDrawable>> drawables;
 	static constexpr size_t                            nDrawables = 180;
 
-	util::Timer                     timer;
+	ImGuiManager                    imgui;  // Must be before window and graphics
 	wnd::Window                     wnd;
 	std::unique_ptr<gfx::IGraphics> gfx;
+	util::Timer                     timer;
 };

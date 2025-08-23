@@ -12,9 +12,13 @@ namespace gfx
 	public:
 		Graphics(unsigned int width, unsigned int height);
 		Graphics(const Graphics&) = delete;
+		~Graphics() noexcept override;
 
 		Graphics&
 		operator=(const Graphics&) = delete;
+
+		void
+		StartFrame() const override;
 
 		void
 		EndFrame() const override;
@@ -48,6 +52,5 @@ namespace gfx
 		unsigned int                                   width;
 		unsigned int                                   height;
 		mutable unsigned int                           nextDrawIndexedCount = 0;
-		float                                          aspectRatio;
 	};
 }

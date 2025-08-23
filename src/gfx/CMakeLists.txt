@@ -3,11 +3,13 @@ file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 add_library(graphics STATIC ${SOURCES})
 
 find_package(directxtex CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 
 target_link_libraries(graphics
     PUBLIC
         platform
         util
+        imgui::imgui
     PRIVATE
         d3d11
         dxgi

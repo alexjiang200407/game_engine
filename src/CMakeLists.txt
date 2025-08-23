@@ -6,12 +6,15 @@ add_executable(${PROJECT_NAME} WIN32
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE PCH.h)
 
+find_package(imgui CONFIG REQUIRED)
 
 add_subdirectory(util)
 add_subdirectory(window)
 add_subdirectory(gfx)
 
 target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+        imgui::imgui
     PRIVATE
         util
         platform
