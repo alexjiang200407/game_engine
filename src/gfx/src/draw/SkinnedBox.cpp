@@ -56,10 +56,12 @@ gfx::SkinnedBox::StaticBindingsConstructor(Graphics& gfx, DrawableBase<SkinnedBo
 
 	boxBase.AddStaticBind<Texture>(gfx, L"assets/textures/cube.png", Texture::Format::kPNG);
 
-	auto pvs   = boxBase.AddStaticBind<VertexShader>(gfx, L"shaders/vs_texture.cso");
-	auto pvsbc = pvs.GetBytecode();
+	auto& pvs   = boxBase.AddStaticBind<VertexShader>(gfx, L"shaders/vs_texture.cso");
+	auto  pvsbc = pvs.GetBytecode();
 
 	boxBase.AddStaticBind<PixelShader>(gfx, L"shaders/ps_texture.cso");
+
+	boxBase.AddStaticBind<Sampler>(gfx);
 
 	boxBase.AddStaticBind<IndexBuffer>(gfx, model.indices);
 
