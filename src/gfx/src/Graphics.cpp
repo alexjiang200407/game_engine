@@ -59,6 +59,18 @@ gfx::Graphics::GetRenderAPI() const noexcept
 	return RenderAPI::kDX11;
 }
 
+DirectX::XMMATRIX
+gfx::Graphics::GetCamera() const noexcept
+{
+	return camera;
+}
+
+void
+gfx::Graphics::SetCamera(DirectX::XMMATRIX a_camera) noexcept
+{
+	camera = a_camera;
+}
+
 gfx::Graphics::Graphics(unsigned int a_width, unsigned int a_height) :
 	width(a_width), height(a_height)
 {

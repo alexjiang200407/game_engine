@@ -37,7 +37,10 @@ namespace gfx
 		virtual RenderAPI
 		GetRenderAPI() const noexcept = 0;
 
-	private:
-		RenderAPI api;
+		virtual DirectX::XMMATRIX
+		GetCamera() const noexcept = 0;
+
+		virtual void
+		SetCamera(DirectX::XMMATRIX camera) noexcept = 0;
 	};
 }

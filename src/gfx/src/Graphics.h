@@ -41,8 +41,15 @@ namespace gfx
 		RenderAPI
 		GetRenderAPI() const noexcept override;
 
+		DirectX::XMMATRIX
+		GetCamera() const noexcept override;
+
+		void
+		SetCamera(DirectX::XMMATRIX a_camera) noexcept override;
+
 	private:
-		DirectX::XMMATRIX                              projection;
+		DirectX::XMMATRIX                              projection{};
+		DirectX::XMMATRIX                              camera{};
 		D3D_FEATURE_LEVEL                              featureLevel;
 		Microsoft::WRL::ComPtr<ID3D11Device>           pDevice;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext>    pContext;

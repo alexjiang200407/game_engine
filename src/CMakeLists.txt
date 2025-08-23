@@ -11,6 +11,9 @@ find_package(imgui CONFIG REQUIRED)
 add_subdirectory(util)
 add_subdirectory(window)
 add_subdirectory(gfx)
+add_subdirectory(scene)
+
+target_include_directories(${PROJECT_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
@@ -19,6 +22,7 @@ target_link_libraries(${PROJECT_NAME}
         util
         platform
         graphics
+        scene
 )
 
 

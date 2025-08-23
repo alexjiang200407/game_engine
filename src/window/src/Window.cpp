@@ -176,6 +176,11 @@ Window::HandleMessage(HWND a_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noex
 
 	case WM_INPUT:
 		{
+			// stifle window input if ImGui want input
+			if (const auto& imio = ImGui::GetIO();
+			    imio.WantCaptureKeyboard || imio.WantCaptureMouse)
+				break;
+
 			UINT dwSize = 0;
 			GetRawInputData(
 				reinterpret_cast<HRAWINPUT>(lParam),

@@ -3,6 +3,7 @@
 #include "ImGuiManager.h"
 #include <gfx/IDrawable.h>
 #include <gfx/IGraphics.h>
+#include <scene/Camera.h>
 #include <util/Timer.h>
 #include <window/Window.h>
 
@@ -26,4 +27,5 @@ private:
 	wnd::Window                     wnd;
 	std::unique_ptr<gfx::IGraphics> gfx;
 	util::Timer                     timer;
+	scene::Camera                   camera;
 };
