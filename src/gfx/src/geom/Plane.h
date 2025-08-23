@@ -1,6 +1,6 @@
 #pragma once
 
-#include "draw/geom/IndexedTriangleList.h"
+#include "geom/IndexedTriangleList.h"
 #include <array>
 #include <vector>
 

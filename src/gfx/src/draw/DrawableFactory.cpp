@@ -1,5 +1,7 @@
 #include "gfx/DrawableFactory.h"
-#include "draw/Geometry.h"
+#include "draw/Box.h"
+#include "draw/Melon.h"
+#include "draw/Pyramid.h"
 #include "draw/Sheet.h"
 
 gfx::DrawableFactory::DrawableFactory(gfx::IGraphics& gfx) noexcept : gfx(gfx) {}

@@ -1,6 +1,6 @@
 #include "draw/Sheet.h"
 #include "bindings/Bindings.h"
-#include "draw/Geometry.h"
+#include "geom/Geometry.h"
 
 gfx::Sheet::Sheet(
 	Graphics&                              gfx,

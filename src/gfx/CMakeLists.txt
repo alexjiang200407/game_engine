@@ -4,21 +4,21 @@ set(SOURCES
     src/bindings/IndexBuffer.cpp
     src/bindings/InputLayout.cpp
     src/bindings/PixelShader.cpp
+    src/bindings/Sampler.cpp
     src/bindings/Texture.cpp
     src/bindings/Topology.cpp
     src/bindings/TransformCBuffer.cpp
     src/bindings/VertexBuffer.cpp
     src/bindings/VertexShader.cpp
+    src/draw/Box.cpp
     src/draw/Drawable.cpp
     src/draw/DrawableFactory.cpp
-    src/draw/geom/Box.cpp
-    src/draw/geom/Melon.cpp
-    src/draw/geom/Pyramid.cpp
+    src/draw/Melon.cpp
+    src/draw/Pyramid.cpp
+    src/draw/Sheet.cpp
     src/DXGIInfoManager.cpp
     src/GFXException.cpp
     src/Graphics.cpp
-    src/bindings/Sampler.cpp
-    src/draw/Sheet.cpp
 )
 
 add_library(graphics STATIC ${SOURCES})

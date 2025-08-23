@@ -1,6 +1,6 @@
-#include "draw/geom/Melon.h"
+#include "draw/Melon.h"
 #include "bindings/Bindings.h"
-#include "draw/geom/Sphere.h"
+#include "geom/Sphere.h"
 
 gfx::geom::Melon::Melon(
 	Graphics&                              gfx,
