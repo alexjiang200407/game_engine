@@ -16,7 +16,6 @@ gfx::PointLight::DrawControlWindow() noexcept
 		ImGui::SliderFloat("Intensity", &cbData.diffuseIntensity, 0.01f, 2.0f);
 		ImGui::ColorEdit3("Diffuse Color", &cbData.diffuseColor.x);
 		ImGui::ColorEdit3("Ambient", &cbData.ambient.x);
-		ImGui::ColorEdit3("Material", &cbData.materialColor.x);
 
 		ImGui::Text("Falloff");
 		ImGui::SliderFloat("Constant", &cbData.attConst, 0.05f, 10.0f);
@@ -36,7 +35,6 @@ gfx::PointLight::Reset() noexcept
 {
 	cbData = {
 		{ 0.0f, 0.0f, 0.0f },
-		{ 0.7f, 0.7f, 0.9f },
 		{ 0.05f, 0.05f, 0.05f },
 		{ 1.0f, 1.0f, 1.0f },
 		1.0f,
@@ -54,12 +52,16 @@ gfx::PointLight::Draw(IGraphics& gfx) const
 }
 
 void
-gfx::PointLight::Bind(IGraphics& gfx) const
+gfx::PointLight::Bind(IGraphics& gfx, DirectX::FXMMATRIX view) const
 {
 	if (gfx.GetRenderAPI() != IGraphics::RenderAPI::kDX11)
 		throw std::runtime_error("Render API has to be directx 11");
 
+	auto       dataCopy = cbData;
+	const auto pos      = DirectX::XMLoadFloat3(&cbData.pos);
+	DirectX::XMStoreFloat3(&dataCopy.pos, DirectX::XMVector3Transform(pos, view));
+
 	auto& dxGfx = static_cast<Graphics&>(gfx);
-	cbuf.Update(dxGfx, cbData);
+	cbuf.Update(dxGfx, dataCopy);
 	cbuf.Bind(dxGfx);
 }

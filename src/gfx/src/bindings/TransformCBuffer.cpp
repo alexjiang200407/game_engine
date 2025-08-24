@@ -1,20 +1,20 @@
 #include "bindings/TransformCBuffer.h"
 
-gfx::TransformCBuffer::TransformCBuffer(Graphics& gfx, const Drawable& parent) : parent(parent)
+gfx::TransformCBuffer::TransformCBuffer(Graphics& gfx, const Drawable& parent, unsigned int slot) :
+	parent(parent)
 {
 	if (!pVcbuf)
 	{
-		pVcbuf = std::make_unique<VertexConstantBuffer<Transforms>>(gfx);
+		pVcbuf = std::make_unique<VertexConstantBuffer<Transforms>>(gfx, slot);
 	}
 }
 
 void
 gfx::TransformCBuffer::Bind(Graphics& gfx)
 {
-	const auto       model = parent.GetTransformXM();
-	const Transforms tf    = { DirectX::XMMatrixTranspose(model),
-		                       DirectX::XMMatrixTranspose(
-                                model * gfx.GetCamera() * gfx.GetProjection()) };
+	const auto       modelView = parent.GetTransformXM() * gfx.GetCamera();
+	const Transforms tf        = { DirectX::XMMatrixTranspose(modelView),
+		                           DirectX::XMMatrixTranspose(modelView * gfx.GetProjection()) };
 
 	pVcbuf->Update(gfx, tf);
 	pVcbuf->Bind(gfx);

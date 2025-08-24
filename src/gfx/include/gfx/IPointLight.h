@@ -19,6 +19,6 @@ namespace gfx
 		Draw(IGraphics& gfx) const = 0;
 
 		virtual void
-		Bind(IGraphics& gfx) const = 0;
+		Bind(IGraphics& gfx, DirectX::FXMMATRIX view) const = 0;
 	};
 }

@@ -12,12 +12,25 @@ gfx::Box::Box(
 	std::uniform_real_distribution<float>& ddist,
 	std::uniform_real_distribution<float>& odist,
 	std::uniform_real_distribution<float>& rdist,
-	std::uniform_real_distribution<float>& bdist) :
+	std::uniform_real_distribution<float>& bdist,
+	DirectX::XMFLOAT3                      material) :
 	DrawableBase<Box>(gfx), r(rdist(rng)), droll(ddist(rng)), dpitch(ddist(rng)), dyaw(ddist(rng)),
 	dphi(odist(rng)), dtheta(odist(rng)), dchi(odist(rng)), chi(adist(rng)), theta(adist(rng)),
 	phi(adist(rng))
 {
 	AddBind<TransformCBuffer>(gfx, *this);
+
+	struct PSMaterialConstant
+	{
+		dx::XMFLOAT3 color;
+		float        specularIntensity = 0.6f;
+		float        specularPower     = 30.0f;
+		float        pad[3];
+	} colorConst{};
+
+	colorConst.color = material;
+	AddBind<PixelConstantBuffer<PSMaterialConstant>>(gfx, colorConst, 1u);
+
 	dx::XMStoreFloat3x3(&mt, dx::XMMatrixScaling(1.0f, 1.0f, bdist(rng)));
 }
 

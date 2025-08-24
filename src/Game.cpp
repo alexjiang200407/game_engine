@@ -31,7 +31,7 @@ Game::DoFrame()
 
 	ImGui::NewFrame();
 
-	light->Bind(*gfx);
+	light->Bind(*gfx, camera.GetMatrix());
 
 	static float speed = 1.0f;
 

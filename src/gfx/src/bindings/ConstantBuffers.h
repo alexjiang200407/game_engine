@@ -10,9 +10,9 @@ namespace gfx
 	class ConstantBuffer : public Bindable
 	{
 	public:
-		ConstantBuffer(Graphics& gfx)
+		ConstantBuffer(Graphics& gfx, unsigned int slot = 0u) : slot(slot)
 		{
-			D3D11_BUFFER_DESC cbd;
+			D3D11_BUFFER_DESC cbd{};
 			cbd.BindFlags           = D3D11_BIND_CONSTANT_BUFFER;
 			cbd.Usage               = D3D11_USAGE_DYNAMIC;
 			cbd.CPUAccessFlags      = D3D11_CPU_ACCESS_WRITE;
@@ -23,7 +23,7 @@ namespace gfx
 				GetDevice(gfx)->CreateBuffer(&cbd, nullptr, &pConstantBuffer));
 		}
 
-		ConstantBuffer(Graphics& gfx, const C& consts)
+		ConstantBuffer(Graphics& gfx, const C& consts, unsigned int slot = 0u) : slot(slot)
 		{
 			D3D11_BUFFER_DESC cbd;
 			cbd.BindFlags           = D3D11_BIND_CONSTANT_BUFFER;
@@ -49,6 +49,7 @@ namespace gfx
 		}
 
 	protected:
+		unsigned int                         slot;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> pConstantBuffer;
 	};
 
@@ -56,6 +57,7 @@ namespace gfx
 	class VertexConstantBuffer : public ConstantBuffer<C>
 	{
 		using ConstantBuffer<C>::pConstantBuffer;
+		using ConstantBuffer<C>::slot;
 		using Bindable::GetContext;
 
 	public:
@@ -63,7 +65,8 @@ namespace gfx
 		void
 		Bind(Graphics& gfx) override
 		{
-			DX_CALL(GetContext(gfx)->VSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf()));
+			DX_CALL(
+				GetContext(gfx)->VSSetConstantBuffers(slot, 1u, pConstantBuffer.GetAddressOf()));
 		}
 	};
 
@@ -71,6 +74,7 @@ namespace gfx
 	class PixelConstantBuffer : public ConstantBuffer<C>
 	{
 		using ConstantBuffer<C>::pConstantBuffer;
+		using ConstantBuffer<C>::slot;
 		using Bindable::GetContext;
 
 	public:
@@ -78,7 +82,8 @@ namespace gfx
 		void
 		Bind(Graphics& gfx) override
 		{
-			DX_CALL(GetContext(gfx)->PSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf()));
+			DX_CALL(
+				GetContext(gfx)->PSSetConstantBuffers(slot, 1u, pConstantBuffer.GetAddressOf()));
 		}
 	};
 }

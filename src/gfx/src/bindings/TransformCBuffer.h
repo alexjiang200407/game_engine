@@ -21,7 +21,7 @@ namespace gfx
 		};
 
 	public:
-		TransformCBuffer(Graphics& gfx, const Drawable& parent);
+		TransformCBuffer(Graphics& gfx, const Drawable& parent, unsigned int slot = 0u);
 		void
 		Bind(Graphics& gfx) override;
 
