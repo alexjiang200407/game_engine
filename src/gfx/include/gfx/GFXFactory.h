@@ -18,6 +18,9 @@ namespace gfx
 		std::unique_ptr<gfx::IPointLight>
 		CreatePointLight(Graphics& gfx);
 
+		std::unique_ptr<gfx::IDrawable>
+		CreateSkinnedBox(Graphics& gfx);
+
 	private:
 		std::mt19937                          rng{ std::random_device{}() };
 		std::uniform_real_distribution<float> adist{ 0.0f, util::math::PI * 2.0f };

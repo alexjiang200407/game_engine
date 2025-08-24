@@ -1,6 +1,5 @@
 #include "gfx/GFXFactory.h"
 #include "draw/Box.h"
-#include "draw/Pyramid.h"
 #include "draw/SkinnedBox.h"
 #include "lighting/PointLight.h"
 
@@ -18,4 +17,10 @@ gfx::GFXFactory::CreatePointLight(Graphics& gfx)
 {
 	const DirectX::XMFLOAT3 mat = { cdist(rng), cdist(rng), cdist(rng) };
 	return std::make_unique<PointLight>(*gfx);
+}
+
+std::unique_ptr<gfx::IDrawable>
+gfx::GFXFactory::CreateSkinnedBox(Graphics& gfx)
+{
+	return std::make_unique<SkinnedBox>(*gfx, rng, adist, ddist, odist, rdist);
 }

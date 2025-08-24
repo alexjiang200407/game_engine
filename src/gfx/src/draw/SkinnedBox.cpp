@@ -43,22 +43,20 @@ gfx::SkinnedBox::StaticBindingsConstructor(DX11Graphics& gfx, DrawableBase<Skinn
 	struct Vertex
 	{
 		dx::XMFLOAT3 pos;
-		struct
-		{
-			float u;
-			float v;
-		} tex;
+		dx::XMFLOAT3 n;
+		dx::XMFLOAT2 tc;
 	};
-	const auto model = geom::Cube::MakeSkinned<Vertex>();
+	auto model = geom::Cube::MakeIndependentTextured<Vertex>();
+	model.SetNormalsIndependentFlat();
 
 	boxBase.AddStaticBind<VertexBuffer>(gfx, model.vertices);
 
 	boxBase.AddStaticBind<Texture>(gfx, L"assets/textures/cube.png", Texture::Format::kPNG);
 
-	auto& pvs   = boxBase.AddStaticBind<VertexShader>(gfx, L"shaders/vs_texture.cso");
+	auto& pvs   = boxBase.AddStaticBind<VertexShader>(gfx, L"shaders/vs_textured_phong.cso");
 	auto  pvsbc = pvs.GetBytecode();
 
-	boxBase.AddStaticBind<PixelShader>(gfx, L"shaders/ps_texture.cso");
+	boxBase.AddStaticBind<PixelShader>(gfx, L"shaders/ps_textured_phong.cso");
 
 	boxBase.AddStaticBind<Sampler>(gfx);
 
@@ -66,9 +64,31 @@ gfx::SkinnedBox::StaticBindingsConstructor(DX11Graphics& gfx, DrawableBase<Skinn
 
 	const std::vector<D3D11_INPUT_ELEMENT_DESC> ied = {
 		{ "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TexCoord", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "Normal",
+		  0,
+		  DXGI_FORMAT_R32G32B32_FLOAT,
+		  0,
+		  D3D11_APPEND_ALIGNED_ELEMENT,
+		  D3D11_INPUT_PER_VERTEX_DATA,
+		  0 },
+		{ "TexCoord",
+		  0,
+		  DXGI_FORMAT_R32G32_FLOAT,
+		  0,
+		  D3D11_APPEND_ALIGNED_ELEMENT,
+		  D3D11_INPUT_PER_VERTEX_DATA,
+		  0 },
 	};
 	boxBase.AddStaticBind<InputLayout>(gfx, ied, pvsbc);
 
 	boxBase.AddStaticBind<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	struct PSMaterialConstant
+	{
+		float specularIntensity = 0.6f;
+		float specularPower     = 30.0f;
+		float padding[2];
+	} colorConst;
+
+	boxBase.AddStaticBind<PixelConstantBuffer<PSMaterialConstant>>(gfx, colorConst, 1u);
 }
