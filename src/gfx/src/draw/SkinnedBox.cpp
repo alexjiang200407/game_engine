@@ -3,7 +3,7 @@
 #include "geom/Geometry.h"
 
 gfx::SkinnedBox::SkinnedBox(
-	Graphics&                              gfx,
+	DX11Graphics&                          gfx,
 	std::mt19937&                          rng,
 	std::uniform_real_distribution<float>& adist,
 	std::uniform_real_distribution<float>& ddist,
@@ -37,7 +37,7 @@ gfx::SkinnedBox::GetTransformXM() const noexcept
 }
 
 void
-gfx::SkinnedBox::StaticBindingsConstructor(Graphics& gfx, DrawableBase<SkinnedBox>& boxBase)
+gfx::SkinnedBox::StaticBindingsConstructor(DX11Graphics& gfx, DrawableBase<SkinnedBox>& boxBase)
 {
 	namespace dx = DirectX;
 	struct Vertex

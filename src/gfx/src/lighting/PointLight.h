@@ -10,12 +10,12 @@
 
 namespace gfx
 {
-	class Graphics;
+	class DX11Graphics;
 
 	class PointLight : public IPointLight
 	{
 	public:
-		PointLight(Graphics& gfx, float radius = 0.5f);
+		PointLight(DX11Graphics& gfx, float radius = 0.5f);
 
 		void
 		DrawControlWindow() noexcept override;
@@ -24,10 +24,10 @@ namespace gfx
 		Reset() noexcept override;
 
 		void
-		Draw(IGraphics& gfx) const override;
+		Draw(Graphics& gfx) const override;
 
 		void
-		Bind(IGraphics& gfx, DirectX::FXMMATRIX view) const override;
+		Bind(Graphics& gfx, DirectX::FXMMATRIX view) const override;
 
 	private:
 		struct PointLightCBuf

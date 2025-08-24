@@ -4,15 +4,15 @@
 
 namespace gfx
 {
-	class Graphics;
+	class DX11Graphics;
 
 	class IndexBuffer : public Bindable
 	{
 	public:
-		IndexBuffer(Graphics& gfx, const std::vector<unsigned short>& indices);
+		IndexBuffer(DX11Graphics& gfx, const std::vector<unsigned short>& indices);
 
 		void
-		Bind(Graphics& gfx) override;
+		Bind(DX11Graphics& gfx) override;
 
 		UINT
 		GetCount() const noexcept;

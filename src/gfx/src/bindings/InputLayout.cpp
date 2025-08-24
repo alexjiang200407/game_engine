@@ -1,8 +1,7 @@
 #include "bindings/InputLayout.h"
-#include "GFXException.h"
 
 gfx::InputLayout::InputLayout(
-	Graphics&                                    gfx,
+	DX11Graphics&                                gfx,
 	const std::vector<D3D11_INPUT_ELEMENT_DESC>& layout,
 	ID3DBlob*                                    pVertexShaderBytecode)
 {
@@ -15,7 +14,7 @@ gfx::InputLayout::InputLayout(
 }
 
 void
-gfx::InputLayout::Bind(Graphics& gfx)
+gfx::InputLayout::Bind(DX11Graphics& gfx)
 {
 	DX_CALL(GetContext(gfx)->IASetInputLayout(pInputLayout.Get()));
 }

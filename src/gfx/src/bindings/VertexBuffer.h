@@ -1,17 +1,16 @@
 #pragma once
-#include "GFXException.h"
 #include "bindings/Bindable.h"
 #include <vector>
 
 namespace gfx
 {
-	class Graphics;
+	class DX11Graphics;
 
 	class VertexBuffer : public Bindable
 	{
 	public:
 		template <class V>
-		VertexBuffer(Graphics& gfx, const std::vector<V>& vertices) : stride(sizeof(V))
+		VertexBuffer(DX11Graphics& gfx, const std::vector<V>& vertices) : stride(sizeof(V))
 		{
 			D3D11_BUFFER_DESC bd      = {};
 			bd.BindFlags              = D3D11_BIND_VERTEX_BUFFER;
@@ -25,7 +24,7 @@ namespace gfx
 			DX_HR_ERROR_TEST_AND_THROW(GetDevice(gfx)->CreateBuffer(&bd, &sd, &pVertexBuffer));
 		}
 		void
-		Bind(Graphics& gfx) override;
+		Bind(DX11Graphics& gfx) override;
 
 	protected:
 		UINT                                 stride;

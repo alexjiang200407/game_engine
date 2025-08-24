@@ -1,6 +1,9 @@
 #include "lighting/PointLight.h"
 
-gfx::PointLight::PointLight(Graphics& gfx, float radius) : mesh(gfx, radius), cbuf(gfx) { Reset(); }
+gfx::PointLight::PointLight(DX11Graphics& gfx, float radius) : mesh(gfx, radius), cbuf(gfx)
+{
+	Reset();
+}
 
 void
 gfx::PointLight::DrawControlWindow() noexcept
@@ -45,23 +48,19 @@ gfx::PointLight::Reset() noexcept
 }
 
 void
-gfx::PointLight::Draw(IGraphics& gfx) const
+gfx::PointLight::Draw(Graphics& gfx) const
 {
 	mesh.SetPos(cbData.pos);
 	mesh.Draw(gfx);
 }
 
 void
-gfx::PointLight::Bind(IGraphics& gfx, DirectX::FXMMATRIX view) const
+gfx::PointLight::Bind(Graphics& gfx, DirectX::FXMMATRIX view) const
 {
-	if (gfx.GetRenderAPI() != IGraphics::RenderAPI::kDX11)
-		throw std::runtime_error("Render API has to be directx 11");
-
 	auto       dataCopy = cbData;
 	const auto pos      = DirectX::XMLoadFloat3(&cbData.pos);
 	DirectX::XMStoreFloat3(&dataCopy.pos, DirectX::XMVector3Transform(pos, view));
 
-	auto& dxGfx = static_cast<Graphics&>(gfx);
-	cbuf.Update(dxGfx, dataCopy);
-	cbuf.Bind(dxGfx);
+	cbuf.Update(*gfx, dataCopy);
+	cbuf.Bind(*gfx);
 }

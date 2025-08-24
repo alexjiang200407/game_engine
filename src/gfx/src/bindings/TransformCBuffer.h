@@ -8,7 +8,7 @@
 
 namespace gfx
 {
-	class Graphics;
+	class DX11Graphics;
 	class Drawable;
 
 	class TransformCBuffer : public Bindable
@@ -21,9 +21,9 @@ namespace gfx
 		};
 
 	public:
-		TransformCBuffer(Graphics& gfx, const Drawable& parent, unsigned int slot = 0u);
+		TransformCBuffer(DX11Graphics& gfx, const Drawable& parent, unsigned int slot = 0u);
 		void
-		Bind(Graphics& gfx) override;
+		Bind(DX11Graphics& gfx) override;
 
 	private:
 		static inline std::unique_ptr<VertexConstantBuffer<Transforms>> pVcbuf;

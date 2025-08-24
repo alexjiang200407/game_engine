@@ -2,7 +2,7 @@
 
 namespace gfx
 {
-	class Graphics;
+	class DX11Graphics;
 
 	class Bindable
 	{
@@ -10,13 +10,13 @@ namespace gfx
 		virtual ~Bindable() noexcept = default;
 
 		virtual void
-		Bind(Graphics& gfx) = 0;
+		Bind(DX11Graphics& gfx) = 0;
 
 	protected:
 		static ID3D11DeviceContext*
-		GetContext(Graphics& gfx) noexcept;
+		GetContext(DX11Graphics& gfx) noexcept;
 
 		static ID3D11Device*
-		GetDevice(Graphics& gfx) noexcept;
+		GetDevice(DX11Graphics& gfx) noexcept;
 	};
 }

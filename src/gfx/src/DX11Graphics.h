@@ -1,36 +1,36 @@
 #pragma once
-#include "gfx/IGraphics.h"
+#include <gfx/Graphics.h>
 
 namespace gfx
 {
 	class Bindable;
 
-	class Graphics : public gfx::IGraphics
+	class DX11Graphics
 	{
 		friend class gfx::Bindable;
 
 	public:
-		Graphics(unsigned int width, unsigned int height);
-		Graphics(const Graphics&) = delete;
-		~Graphics() noexcept override;
+		DX11Graphics(unsigned int width, unsigned int height);
+		DX11Graphics(const DX11Graphics&) = delete;
+		~DX11Graphics() noexcept;
 
-		Graphics&
-		operator=(const Graphics&) = delete;
-
-		void
-		StartFrame() const override;
+		DX11Graphics&
+		operator=(const DX11Graphics&) = delete;
 
 		void
-		EndFrame() const override;
+		StartFrame() const;
 
 		void
-		ClearBuffer(float red, float green, float blue) const override;
+		EndFrame() const;
+
+		void
+		ClearBuffer(float red, float green, float blue) const;
 
 		void
 		DrawIndexed() const;
 
 		void
-		SetProjection(DirectX::FXMMATRIX proj) noexcept override;
+		SetProjection(DirectX::FXMMATRIX proj) noexcept;
 
 		void
 		SetNextDrawIndexCount(UINT count) noexcept;
@@ -38,14 +38,11 @@ namespace gfx
 		DirectX::XMMATRIX
 		GetProjection() const noexcept;
 
-		RenderAPI
-		GetRenderAPI() const noexcept override;
-
 		DirectX::XMMATRIX
-		GetCamera() const noexcept override;
+		GetCamera() const noexcept;
 
 		void
-		SetCamera(DirectX::XMMATRIX a_camera) noexcept override;
+		SetCamera(DirectX::XMMATRIX a_camera) noexcept;
 
 	private:
 		DirectX::XMMATRIX                              projection{};

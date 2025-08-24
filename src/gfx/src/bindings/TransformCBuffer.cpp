@@ -1,7 +1,9 @@
 #include "bindings/TransformCBuffer.h"
 
-gfx::TransformCBuffer::TransformCBuffer(Graphics& gfx, const Drawable& parent, unsigned int slot) :
-	parent(parent)
+gfx::TransformCBuffer::TransformCBuffer(
+	DX11Graphics&   gfx,
+	const Drawable& parent,
+	unsigned int    slot) : parent(parent)
 {
 	if (!pVcbuf)
 	{
@@ -10,7 +12,7 @@ gfx::TransformCBuffer::TransformCBuffer(Graphics& gfx, const Drawable& parent, u
 }
 
 void
-gfx::TransformCBuffer::Bind(Graphics& gfx)
+gfx::TransformCBuffer::Bind(DX11Graphics& gfx)
 {
 	const auto       modelView = parent.GetTransformXM() * gfx.GetCamera();
 	const Transforms tf        = { DirectX::XMMatrixTranspose(modelView),

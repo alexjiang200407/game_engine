@@ -1,18 +1,15 @@
 #include "Game.h"
 
-Game::Game() :
-	wnd(1440, 900), gfx(gfx::IGraphics::Make(1440, 900)),
-	light(std::move(factory.CreatePointLight(*gfx)))
+Game::Game() : wnd(1440, 900), gfx(1440, 900), light(std::move(factory.CreatePointLight(gfx)))
 {
-	assert(gfx);
 	drawables.reserve(nDrawables);
 
 	std::generate_n(std::back_inserter(drawables), nDrawables, [&]() {
-		return factory.CreateBox(*gfx);
+		return factory.CreateBox(gfx);
 	});
 
-	gfx->SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
-	gfx->SetCamera(DirectX::XMMatrixTranslation(0.0f, 0.0f, 20.0f));
+	gfx.SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
+	gfx.SetCamera(DirectX::XMMatrixTranslation(0.0f, 0.0f, 20.0f));
 }
 
 void
@@ -27,11 +24,11 @@ Game::Play()
 void
 Game::DoFrame()
 {
-	gfx->StartFrame();
+	gfx.StartFrame();
 
 	ImGui::NewFrame();
 
-	light->Bind(*gfx, camera.GetMatrix());
+	light->Bind(gfx, camera.GetMatrix());
 
 	static float speed = 1.0f;
 
@@ -52,18 +49,18 @@ Game::DoFrame()
 
 	if (camera.DrawControlWindow())
 	{
-		gfx->SetCamera(camera.GetMatrix());
+		gfx.SetCamera(camera.GetMatrix());
 	}
 
 	const auto dt = timer.Mark() * speed;
-	gfx->ClearBuffer(0.0f, 0.0f, 0.0f);
+	gfx.ClearBuffer(0.0f, 0.0f, 0.0f);
 	for (auto& d : drawables)
 	{
 		d->Update(dt);
-		d->Draw(*gfx);
+		d->Draw(gfx);
 	}
-	light->Draw(*gfx);
+	light->Draw(gfx);
 	//ImGui::ShowDemoWindow();
 
-	gfx->EndFrame();
+	gfx.EndFrame();
 }

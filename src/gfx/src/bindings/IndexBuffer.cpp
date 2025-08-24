@@ -1,8 +1,7 @@
 #include "bindings/IndexBuffer.h"
-#include "GFXException.h"
-#include "Graphics.h"
+#include "DX11Graphics.h"
 
-gfx::IndexBuffer::IndexBuffer(Graphics& gfx, const std::vector<unsigned short>& indices) :
+gfx::IndexBuffer::IndexBuffer(DX11Graphics& gfx, const std::vector<unsigned short>& indices) :
 	count((UINT)indices.size())
 {
 	D3D11_BUFFER_DESC ibd      = {};
@@ -18,7 +17,7 @@ gfx::IndexBuffer::IndexBuffer(Graphics& gfx, const std::vector<unsigned short>& 
 }
 
 void
-gfx::IndexBuffer::Bind(Graphics& gfx)
+gfx::IndexBuffer::Bind(DX11Graphics& gfx)
 {
 	DX_CALL(GetContext(gfx)->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u));
 	gfx.SetNextDrawIndexCount(GetCount());

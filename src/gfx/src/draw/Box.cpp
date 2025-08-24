@@ -1,12 +1,12 @@
 #include "draw/Box.h"
-#include "Graphics.h"
+#include "DX11Graphics.h"
 #include "bindings/Bindings.h"
 #include "geom/Cube.h"
 
 namespace dx = DirectX;
 
 gfx::Box::Box(
-	Graphics&                              gfx,
+	DX11Graphics&                          gfx,
 	std::mt19937&                          rng,
 	std::uniform_real_distribution<float>& adist,
 	std::uniform_real_distribution<float>& ddist,
@@ -35,7 +35,7 @@ gfx::Box::Box(
 }
 
 void
-gfx::Box::StaticBindingsConstructor(Graphics& gfx, DrawableBase<Box>& boxBase)
+gfx::Box::StaticBindingsConstructor(DX11Graphics& gfx, DrawableBase<Box>& boxBase)
 {
 	struct Vertex
 	{

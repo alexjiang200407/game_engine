@@ -7,7 +7,7 @@ namespace gfx
 	{
 	public:
 		SkinnedBox(
-			Graphics&                              gfx,
+			DX11Graphics&                          gfx,
 			std::mt19937&                          rng,
 			std::uniform_real_distribution<float>& adist,
 			std::uniform_real_distribution<float>& ddist,
@@ -21,7 +21,7 @@ namespace gfx
 		GetTransformXM() const noexcept override;
 
 		static void
-		StaticBindingsConstructor(Graphics& gfx, DrawableBase<SkinnedBox>& boxBase);
+		StaticBindingsConstructor(DX11Graphics& gfx, DrawableBase<SkinnedBox>& boxBase);
 
 	private:
 		// positional

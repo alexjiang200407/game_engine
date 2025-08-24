@@ -3,15 +3,15 @@
 
 namespace gfx
 {
-	class Graphics;
+	class DX11Graphics;
 
 	class Sampler : public Bindable
 	{
 	public:
-		Sampler(Graphics& gfx);
+		Sampler(DX11Graphics& gfx);
 
 		void
-		Bind(Graphics& gfx) override;
+		Bind(DX11Graphics& gfx) override;
 
 	protected:
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> pSampler;

@@ -1,7 +1,6 @@
 #include "bindings/VertexShader.h"
-#include "GFXException.h"
 
-gfx::VertexShader::VertexShader(Graphics& gfx, const std::wstring& path)
+gfx::VertexShader::VertexShader(DX11Graphics& gfx, const std::wstring& path)
 {
 	DX_HR_ERROR_TEST_AND_THROW(D3DReadFileToBlob(path.c_str(), &pBytecodeBlob));
 	DX_HR_ERROR_TEST_AND_THROW(GetDevice(gfx)->CreateVertexShader(
@@ -12,7 +11,7 @@ gfx::VertexShader::VertexShader(Graphics& gfx, const std::wstring& path)
 }
 
 void
-gfx::VertexShader::Bind(Graphics& gfx)
+gfx::VertexShader::Bind(DX11Graphics& gfx)
 {
 	DX_CALL(GetContext(gfx)->VSSetShader(pVertexShader.Get(), nullptr, 0u));
 }

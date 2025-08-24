@@ -1,16 +1,15 @@
 #pragma once
-#include "GFXException.h"
 #include "bindings/Bindable.h"
 
 namespace gfx
 {
-	class Graphics;
+	class DX11Graphics;
 
 	template <typename C>
 	class ConstantBuffer : public Bindable
 	{
 	public:
-		ConstantBuffer(Graphics& gfx, unsigned int slot = 0u) : slot(slot)
+		ConstantBuffer(DX11Graphics& gfx, unsigned int slot = 0u) : slot(slot)
 		{
 			D3D11_BUFFER_DESC cbd{};
 			cbd.BindFlags           = D3D11_BIND_CONSTANT_BUFFER;
@@ -23,7 +22,7 @@ namespace gfx
 				GetDevice(gfx)->CreateBuffer(&cbd, nullptr, &pConstantBuffer));
 		}
 
-		ConstantBuffer(Graphics& gfx, const C& consts, unsigned int slot = 0u) : slot(slot)
+		ConstantBuffer(DX11Graphics& gfx, const C& consts, unsigned int slot = 0u) : slot(slot)
 		{
 			D3D11_BUFFER_DESC cbd;
 			cbd.BindFlags           = D3D11_BIND_CONSTANT_BUFFER;
@@ -39,7 +38,7 @@ namespace gfx
 		}
 
 		void
-		Update(Graphics& gfx, const C& consts)
+		Update(DX11Graphics& gfx, const C& consts)
 		{
 			D3D11_MAPPED_SUBRESOURCE msr;
 			DX_HR_ERROR_TEST_AND_EXIT(
@@ -63,7 +62,7 @@ namespace gfx
 	public:
 		using ConstantBuffer<C>::ConstantBuffer;
 		void
-		Bind(Graphics& gfx) override
+		Bind(DX11Graphics& gfx) override
 		{
 			DX_CALL(
 				GetContext(gfx)->VSSetConstantBuffers(slot, 1u, pConstantBuffer.GetAddressOf()));
@@ -80,7 +79,7 @@ namespace gfx
 	public:
 		using ConstantBuffer<C>::ConstantBuffer;
 		void
-		Bind(Graphics& gfx) override
+		Bind(DX11Graphics& gfx) override
 		{
 			DX_CALL(
 				GetContext(gfx)->PSSetConstantBuffers(slot, 1u, pConstantBuffer.GetAddressOf()));

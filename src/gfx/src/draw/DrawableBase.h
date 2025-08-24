@@ -13,7 +13,7 @@ namespace gfx
 		friend T;
 
 	private:
-		DrawableBase(Graphics& gfx)
+		DrawableBase(DX11Graphics& gfx)
 		{
 			if (refCount.fetch_sub(1, std::memory_order_acq_rel) == 0)
 			{
@@ -54,4 +54,4 @@ namespace gfx
 }
 
 #define DECLARE_STATIC_BINDINGS_CONSTRUCTOR(Type) \
-	static void StaticBindingsConstructor(Graphics& gfx, DrawableBase<Type>& boxBase)
+	static void StaticBindingsConstructor(DX11Graphics& gfx, DrawableBase<Type>& boxBase)

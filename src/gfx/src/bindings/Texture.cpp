@@ -1,8 +1,7 @@
 #include "bindings/Texture.h"
-#include "GFXException.h"
 #include <DirectXTex.h>
 
-gfx::Texture::Texture(Graphics& gfx, const std::wstring& ws, Format format)
+gfx::Texture::Texture(DX11Graphics& gfx, const std::wstring& ws, Format format)
 {
 	namespace dx  = DirectX;
 	namespace wrl = Microsoft::WRL;
@@ -38,7 +37,7 @@ gfx::Texture::Texture(Graphics& gfx, const std::wstring& ws, Format format)
 }
 
 void
-gfx::Texture::Bind(Graphics& gfx)
+gfx::Texture::Bind(DX11Graphics& gfx)
 {
 	DX_CALL(GetContext(gfx)->PSSetShaderResources(0u, 1u, pTextureSRV.GetAddressOf()));
 }

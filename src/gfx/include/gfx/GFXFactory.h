@@ -1,6 +1,6 @@
 #pragma once
+#include <gfx/Graphics.h>
 #include <gfx/IDrawable.h>
-#include <gfx/IGraphics.h>
 #include <gfx/IPointLight.h>
 
 namespace gfx
@@ -13,10 +13,10 @@ namespace gfx
 		GFXFactory() noexcept;
 
 		std::unique_ptr<gfx::IDrawable>
-		CreateBox(IGraphics& gfx);
+		CreateBox(Graphics& gfx);
 
 		std::unique_ptr<gfx::IPointLight>
-		CreatePointLight(IGraphics& gfx);
+		CreatePointLight(Graphics& gfx);
 
 	private:
 		std::mt19937                          rng{ std::random_device{}() };

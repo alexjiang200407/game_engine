@@ -1,7 +1,6 @@
 #include "bindings/PixelShader.h"
-#include "GFXException.h"
 
-gfx::PixelShader::PixelShader(Graphics& gfx, const std::wstring& path)
+gfx::PixelShader::PixelShader(DX11Graphics& gfx, const std::wstring& path)
 {
 	Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
 	DX_HR_ERROR_TEST_AND_THROW(D3DReadFileToBlob(path.c_str(), &pBlob));
@@ -13,7 +12,7 @@ gfx::PixelShader::PixelShader(Graphics& gfx, const std::wstring& path)
 }
 
 void
-gfx::PixelShader::Bind(Graphics& gfx)
+gfx::PixelShader::Bind(DX11Graphics& gfx)
 {
 	DX_CALL(GetContext(gfx)->PSSetShader(pPixelShader.Get(), nullptr, 0u));
 }

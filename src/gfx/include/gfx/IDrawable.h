@@ -1,5 +1,5 @@
 #pragma once
-#include <gfx/IGraphics.h>
+#include <gfx/Graphics.h>
 
 namespace gfx
 {
@@ -19,7 +19,7 @@ namespace gfx
 		GetTransformXM() const noexcept = 0;
 
 		virtual void
-		Draw(IGraphics& gfx) const = 0;
+		Draw(Graphics& gfx) const = 0;
 
 		virtual void
 		Update(float dt) noexcept = 0;

@@ -1,6 +1,6 @@
 #include "bindings/Sampler.h"
 
-gfx::Sampler::Sampler(Graphics& gfx)
+gfx::Sampler::Sampler(DX11Graphics& gfx)
 {
 	D3D11_SAMPLER_DESC samplerDesc = {};
 	samplerDesc.Filter             = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -12,7 +12,7 @@ gfx::Sampler::Sampler(Graphics& gfx)
 }
 
 void
-gfx::Sampler::Bind(Graphics& gfx)
+gfx::Sampler::Bind(DX11Graphics& gfx)
 {
 	GetContext(gfx)->PSSetSamplers(0, 1, pSampler.GetAddressOf());
 }

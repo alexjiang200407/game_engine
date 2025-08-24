@@ -6,7 +6,7 @@ namespace gfx
 	class SolidSphere : public DrawableBase<SolidSphere>
 	{
 	public:
-		SolidSphere(Graphics& gfx, float radius);
+		SolidSphere(DX11Graphics& gfx, float radius);
 
 		void
 		Update(float dt) noexcept override;
@@ -18,7 +18,7 @@ namespace gfx
 		GetTransformXM() const noexcept override;
 
 		static void
-		StaticBindingsConstructor(Graphics& gfx, DrawableBase<SolidSphere>& solidSphereBase);
+		StaticBindingsConstructor(DX11Graphics& gfx, DrawableBase<SolidSphere>& solidSphereBase);
 
 	private:
 		DirectX::XMFLOAT3 pos = { 1.0f, 1.0f, 1.0f };

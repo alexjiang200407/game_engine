@@ -2,7 +2,7 @@
 #include "bindings/Bindings.h"
 #include "geom/Geometry.h"
 
-gfx::SolidSphere::SolidSphere(Graphics& gfx, float radius) : DrawableBase<SolidSphere>(gfx)
+gfx::SolidSphere::SolidSphere(DX11Graphics& gfx, float radius) : DrawableBase<SolidSphere>(gfx)
 {
 	namespace dx = DirectX;
 	struct Vertex
@@ -35,7 +35,7 @@ gfx::SolidSphere::GetTransformXM() const noexcept
 
 void
 gfx::SolidSphere::StaticBindingsConstructor(
-	Graphics&                  gfx,
+	DX11Graphics&              gfx,
 	DrawableBase<SolidSphere>& solidSphereBase)
 {
 	namespace dx = DirectX;

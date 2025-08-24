@@ -3,15 +3,15 @@
 
 namespace gfx
 {
-	class Graphics;
+	class DX11Graphics;
 
 	class PixelShader : public Bindable
 	{
 	public:
-		PixelShader(Graphics& gfx, const std::wstring& path);
+		PixelShader(DX11Graphics& gfx, const std::wstring& path);
 
 		void
-		Bind(Graphics& gfx) override;
+		Bind(DX11Graphics& gfx) override;
 
 	protected:
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;

@@ -3,15 +3,15 @@
 
 namespace gfx
 {
-	class Graphics;
+	class DX11Graphics;
 
 	class Topology : public Bindable
 	{
 	public:
-		Topology(Graphics& gfx, D3D11_PRIMITIVE_TOPOLOGY type);
+		Topology(DX11Graphics& gfx, D3D11_PRIMITIVE_TOPOLOGY type);
 
 		void
-		Bind(Graphics& gfx) override;
+		Bind(DX11Graphics& gfx) override;
 
 	protected:
 		D3D11_PRIMITIVE_TOPOLOGY type;

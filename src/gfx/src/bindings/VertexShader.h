@@ -3,15 +3,15 @@
 
 namespace gfx
 {
-	class Graphics;
+	class DX11Graphics;
 
 	class VertexShader : public Bindable
 	{
 	public:
-		VertexShader(Graphics& gfx, const std::wstring& path);
+		VertexShader(DX11Graphics& gfx, const std::wstring& path);
 
 		void
-		Bind(Graphics& gfx) override;
+		Bind(DX11Graphics& gfx) override;
 
 		ID3DBlob*
 		GetBytecode() const noexcept;

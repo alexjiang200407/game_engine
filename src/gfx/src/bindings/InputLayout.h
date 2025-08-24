@@ -3,17 +3,17 @@
 
 namespace gfx
 {
-	class Graphics;
+	class DX11Graphics;
 
 	class InputLayout : public Bindable
 	{
 	public:
 		InputLayout(
-			Graphics&                                    gfx,
+			DX11Graphics&                                gfx,
 			const std::vector<D3D11_INPUT_ELEMENT_DESC>& layout,
 			ID3DBlob*                                    pVertexShaderBytecode);
 		void
-		Bind(Graphics& gfx) override;
+		Bind(DX11Graphics& gfx) override;
 
 	protected:
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout;

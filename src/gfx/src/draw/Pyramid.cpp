@@ -3,7 +3,7 @@
 #include "geom/Cone.h"
 
 gfx::Pyramid::Pyramid(
-	Graphics&                              gfx,
+	DX11Graphics&                          gfx,
 	std::mt19937&                          rng,
 	std::uniform_real_distribution<float>& adist,
 	std::uniform_real_distribution<float>& ddist,
@@ -37,7 +37,7 @@ gfx::Pyramid::GetTransformXM() const noexcept
 }
 
 void
-gfx::Pyramid::StaticBindingsConstructor(Graphics& gfx, DrawableBase<Pyramid>& pyramidBase)
+gfx::Pyramid::StaticBindingsConstructor(DX11Graphics& gfx, DrawableBase<Pyramid>& pyramidBase)
 {
 	namespace dx = DirectX;
 	struct Vertex

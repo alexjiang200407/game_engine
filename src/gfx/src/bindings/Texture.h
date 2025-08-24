@@ -3,7 +3,7 @@
 
 namespace gfx
 {
-	class Graphics;
+	class DX11Graphics;
 
 	class Texture : public Bindable
 	{
@@ -16,10 +16,10 @@ namespace gfx
 		};
 
 	public:
-		Texture(Graphics& gfx, const std::wstring& ws, Format format);
+		Texture(DX11Graphics& gfx, const std::wstring& ws, Format format);
 
 		void
-		Bind(Graphics& gfx) override;
+		Bind(DX11Graphics& gfx) override;
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pTextureSRV;

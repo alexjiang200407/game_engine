@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics.h"
+#include "DX11Graphics.h"
 #include "gfx/IDrawable.h"
 #include <DirectXMath.h>
 #include <vector>
@@ -21,7 +21,7 @@ namespace gfx
 		operator=(const Drawable&) = delete;
 
 		void
-		Draw(IGraphics& gfx) const override;
+		Draw(Graphics& gfx) const override;
 
 	protected:
 		template <typename T, typename... Args>
