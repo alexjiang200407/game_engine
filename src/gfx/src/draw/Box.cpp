@@ -27,43 +27,29 @@ gfx::Box::StaticBindingsConstructor(Graphics& gfx, DrawableBase<Box>& boxBase)
 	struct Vertex
 	{
 		dx::XMFLOAT3 pos;
+		dx::XMFLOAT3 n;
 	};
-	auto model = geom::Cube::Make<Vertex>();
+	auto model = geom::Cube::MakeIndependent<Vertex>();
+	model.SetNormalsIndependentFlat();
 
 	boxBase.AddStaticBind<VertexBuffer>(gfx, model.vertices);
 
-	auto pvs   = boxBase.AddStaticBind<VertexShader>(gfx, L"shaders/vs_color_index.cso");
-	auto pvsbc = pvs.GetBytecode();
+	auto& pvs   = boxBase.AddStaticBind<VertexShader>(gfx, L"shaders/vs_phong.cso");
+	auto  pvsbc = pvs.GetBytecode();
 
-	boxBase.AddStaticBind<PixelShader>(gfx, L"shaders/ps_color_index.cso");
+	boxBase.AddStaticBind<PixelShader>(gfx, L"shaders/ps_phong.cso");
 
 	boxBase.AddStaticBind<IndexBuffer>(gfx, model.indices);
 
-	{
-		struct ConstantBuffer
-		{
-			struct
-			{
-				float r;
-				float g;
-				float b;
-				float a;
-			} face_colors[8];
-		};
-		const ConstantBuffer cb = { {
-			{ 1.0f, 0.0f, 1.0f },
-			{ 1.0f, 0.0f, 0.0f },
-			{ 1.0f, 1.0f, 0.0f },
-			{ 0.0f, 1.0f, 0.0f },
-			{ 0.0f, 0.0f, 1.0f },
-			{ 1.0f, 1.0f, 0.0f },
-			{ 0.0f, 1.0f, 1.0f },
-		} };
-		boxBase.AddStaticBind<PixelConstantBuffer<ConstantBuffer>>(gfx, cb);
-	}
-
 	const std::vector<D3D11_INPUT_ELEMENT_DESC> ied = {
 		{ "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "Normal",
+		  0,
+		  DXGI_FORMAT_R32G32B32_FLOAT,
+		  0,
+		  D3D11_APPEND_ALIGNED_ELEMENT,
+		  D3D11_INPUT_PER_VERTEX_DATA,
+		  0 },
 	};
 	boxBase.AddStaticBind<InputLayout>(gfx, ied, pvsbc);
 

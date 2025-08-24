@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ImGuiManager.h"
+#include <gfx/GFXFactory.h>
 #include <gfx/IDrawable.h>
 #include <gfx/IGraphics.h>
 #include <scene/Camera.h>
@@ -23,9 +24,11 @@ private:
 	std::vector<std::unique_ptr<class gfx::IDrawable>> drawables;
 	static constexpr size_t                            nDrawables = 180;
 
-	ImGuiManager                    imgui;  // Must be before window and graphics
-	wnd::Window                     wnd;
-	std::unique_ptr<gfx::IGraphics> gfx;
-	util::Timer                     timer;
-	scene::Camera                   camera;
+	gfx::GFXFactory                   factory;
+	ImGuiManager                      imgui;  // Must be before window and graphics
+	wnd::Window                       wnd;
+	std::unique_ptr<gfx::IGraphics>   gfx;
+	util::Timer                       timer;
+	scene::Camera                     camera;
+	std::unique_ptr<gfx::IPointLight> light;
 };

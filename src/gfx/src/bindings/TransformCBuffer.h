@@ -13,13 +13,20 @@ namespace gfx
 
 	class TransformCBuffer : public Bindable
 	{
+	private:
+		struct Transforms
+		{
+			DirectX::XMMATRIX modelViewProj;
+			DirectX::XMMATRIX model;
+		};
+
 	public:
 		TransformCBuffer(Graphics& gfx, const Drawable& parent);
 		void
 		Bind(Graphics& gfx) override;
 
 	private:
-		static inline std::unique_ptr<VertexConstantBuffer<DirectX::XMMATRIX>> pVcbuf;
-		const Drawable&                                                        parent;
+		static inline std::unique_ptr<VertexConstantBuffer<Transforms>> pVcbuf;
+		const Drawable&                                                 parent;
 	};
 }

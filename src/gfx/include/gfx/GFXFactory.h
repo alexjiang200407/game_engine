@@ -1,21 +1,24 @@
 #pragma once
-#include "gfx/IDrawable.h"
+#include <gfx/IDrawable.h>
 #include <gfx/IGraphics.h>
+#include <gfx/IPointLight.h>
 
 namespace gfx
 {
 	class Graphics;
 
-	class DrawableFactory
+	class GFXFactory
 	{
 	public:
-		DrawableFactory(IGraphics& gfx) noexcept;
+		GFXFactory() noexcept;
 
 		std::unique_ptr<gfx::IDrawable>
-		operator()();
+		CreateBox(IGraphics& gfx);
+
+		std::unique_ptr<gfx::IPointLight>
+		CreatePointLight(IGraphics& gfx);
 
 	private:
-		gfx::IGraphics&                       gfx;
 		std::mt19937                          rng{ std::random_device{}() };
 		std::uniform_real_distribution<float> adist{ 0.0f, util::math::PI * 2.0f };
 		std::uniform_real_distribution<float> ddist{ 0.0f, util::math::PI * 0.5f };
