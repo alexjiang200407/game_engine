@@ -1,16 +1,18 @@
 #include "Game.h"
 
-Game::Game() : wnd(1440, 900), gfx(1440, 900), light(std::move(factory.CreatePointLight(gfx)))
+Game::Game() :
+	wnd(1440, 900), gfx(1440, 900), light(std::move(factory.CreatePointLight(gfx))),
+	pMesh(std::move(factory.CreateMesh(gfx, "assets/meshes/david.glb", 0.05f)))
 {
-	drawables.reserve(nDrawables);
+	//drawables.reserve(nDrawables);
 
-	std::generate_n(std::back_inserter(drawables), nDrawables / 2, [&]() {
-		return factory.CreateBox(gfx);
-	});
+	//std::generate_n(std::back_inserter(drawables), nDrawables / 2, [&]() {
+	//	return factory.CreateBox(gfx);
+	//});
 
-	std::generate_n(std::back_inserter(drawables), nDrawables / 2, [&]() {
-		return factory.CreateSkinnedBox(gfx);
-	});
+	//std::generate_n(std::back_inserter(drawables), nDrawables / 2, [&]() {
+	//	return factory.CreateSkinnedBox(gfx);
+	//});
 
 	gfx.SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
 	gfx.SetCamera(DirectX::XMMatrixTranslation(0.0f, 0.0f, 20.0f));
@@ -63,6 +65,9 @@ Game::DoFrame()
 		d->Update(dt);
 		d->Draw(gfx);
 	}
+	pMesh->Update(dt);
+	pMesh->Draw(gfx);
+
 	light->Draw(gfx);
 	//ImGui::ShowDemoWindow();
 

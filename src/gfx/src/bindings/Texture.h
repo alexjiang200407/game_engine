@@ -11,12 +11,14 @@ namespace gfx
 		enum class Format
 		{
 			kPNG,
+			kJPG,
 			kDDS,
 			kInvalid
 		};
 
 	public:
 		Texture(DX11Graphics& gfx, const std::wstring& ws, Format format);
+		Texture(DX11Graphics& gfx, std::span<const unsigned char> bytes, Format format);
 
 		void
 		Bind(DX11Graphics& gfx) override;

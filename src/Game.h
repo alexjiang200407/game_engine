@@ -21,14 +21,15 @@ private:
 	DoFrame();
 
 private:
+	gfx::GFXFactory factory;
+	ImGuiManager    imgui;  // Must be before window and graphics
+	wnd::Window     wnd;
+	gfx::Graphics   gfx;
+	util::Timer     timer;
+	scene::Camera   camera;
+
+	std::unique_ptr<gfx::IPointLight>                  light;
+	std::unique_ptr<gfx::IDrawable>                    pMesh;
 	std::vector<std::unique_ptr<class gfx::IDrawable>> drawables;
 	static constexpr size_t                            nDrawables = 180;
-
-	gfx::GFXFactory                   factory;
-	ImGuiManager                      imgui;  // Must be before window and graphics
-	wnd::Window                       wnd;
-	gfx::Graphics                     gfx;
-	util::Timer                       timer;
-	scene::Camera                     camera;
-	std::unique_ptr<gfx::IPointLight> light;
 };

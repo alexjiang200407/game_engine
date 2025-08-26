@@ -4,6 +4,7 @@ add_library(graphics STATIC ${SOURCES})
 
 find_package(directxtex CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
+find_package(assimp CONFIG REQUIRED)
 
 target_link_libraries(graphics
     PUBLIC
@@ -16,6 +17,7 @@ target_link_libraries(graphics
         d3dcompiler
         dxguid
         Microsoft::DirectXTex
+        assimp::assimp
 )
 
 target_precompile_headers(graphics PUBLIC "${CMAKE_SOURCE_DIR}/src/PCH.h" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/src/PCH.h")

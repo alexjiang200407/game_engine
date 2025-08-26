@@ -21,6 +21,9 @@ namespace gfx
 		std::unique_ptr<gfx::IDrawable>
 		CreateSkinnedBox(Graphics& gfx);
 
+		std::unique_ptr<gfx::IDrawable>
+		CreateMesh(Graphics& gfx, const std::string& path, float scale = 1.0f);
+
 	private:
 		std::mt19937                          rng{ std::random_device{}() };
 		std::uniform_real_distribution<float> adist{ 0.0f, util::math::PI * 2.0f };
