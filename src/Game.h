@@ -3,7 +3,7 @@
 #include "ImGuiManager.h"
 #include <gfx/GFXFactory.h>
 #include <gfx/Graphics.h>
-#include <gfx/IDrawable.h>
+#include <gfx/IModel.h>
 #include <scene/Camera.h>
 #include <util/Timer.h>
 #include <window/Window.h>
@@ -28,8 +28,9 @@ private:
 	util::Timer     timer;
 	scene::Camera   camera;
 
-	std::unique_ptr<gfx::IPointLight>                  light;
-	std::unique_ptr<gfx::IDrawable>                    pMesh;
-	std::vector<std::unique_ptr<class gfx::IDrawable>> drawables;
-	static constexpr size_t                            nDrawables = 180;
+	bool drawDebugUI = true;
+
+	std::unique_ptr<gfx::IPointLight> light;
+	std::unique_ptr<gfx::IModel>      pModel;
+	static constexpr size_t           nDrawables = 180;
 };

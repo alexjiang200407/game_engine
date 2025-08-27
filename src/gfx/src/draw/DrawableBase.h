@@ -29,6 +29,9 @@ namespace gfx
 			}
 		}
 
+		void
+		Update(float) noexcept override {};
+
 		template <typename T, typename... Args>
 		T&
 		AddStaticBind(Args&&... args)

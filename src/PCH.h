@@ -22,6 +22,7 @@
 #include <queue>
 #include <random>
 #include <span>
+#include <stack>
 #include <stdexcept>
 #include <string>
 #include <string_view>

@@ -32,51 +32,51 @@ namespace gfx::geom
 		template <>
 		struct Map<ElementType::Position2D>
 		{
-			using SysType          = DirectX::XMFLOAT2;
-			DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32_FLOAT;
-			const char* semantic   = "Position";
+			using SysType                           = DirectX::XMFLOAT2;
+			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32_FLOAT;
+			static constexpr const char* semantic   = "Position";
 		};
 		template <>
 		struct Map<ElementType::Position3D>
 		{
-			using SysType          = DirectX::XMFLOAT3;
-			DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;
-			const char* semantic   = "Position";
+			using SysType                           = DirectX::XMFLOAT3;
+			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;
+			static constexpr const char* semantic   = "Position";
 		};
 		template <>
 		struct Map<ElementType::Texture2D>
 		{
-			using SysType          = DirectX::XMFLOAT2;
-			DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32_FLOAT;
-			const char* semantic   = "Texcoord";
+			using SysType                           = DirectX::XMFLOAT2;
+			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32_FLOAT;
+			static constexpr const char* semantic   = "Texcoord";
 		};
 		template <>
 		struct Map<ElementType::Normal>
 		{
-			using SysType          = DirectX::XMFLOAT3;
-			DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;
-			const char* semantic   = "Normal";
+			using SysType                           = DirectX::XMFLOAT3;
+			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;
+			static constexpr const char* semantic   = "Normal";
 		};
 		template <>
 		struct Map<ElementType::Float3Color>
 		{
-			using SysType          = DirectX::XMFLOAT3;
-			DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;
-			const char* semantic   = "Color";
+			using SysType                           = DirectX::XMFLOAT3;
+			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;
+			static constexpr const char* semantic   = "Color";
 		};
 		template <>
 		struct Map<ElementType::Float4Color>
 		{
-			using SysType          = DirectX::XMFLOAT4;
-			DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
-			const char* semantic   = "Color";
+			using SysType                           = DirectX::XMFLOAT4;
+			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
+			static constexpr const char* semantic   = "Color";
 		};
 		template <>
 		struct Map<ElementType::RGBAColor>
 		{
-			using SysType          = RGBAColor;
-			DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
-			const char* semantic   = "Color";
+			using SysType                           = RGBAColor;
+			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+			static constexpr const char* semantic   = "Color";
 		};
 
 		class Element
@@ -133,6 +133,40 @@ namespace gfx::geom
 				return type;
 			}
 
+			D3D11_INPUT_ELEMENT_DESC
+			GetDesc() const noexcept
+			{
+				using ElementType = VertexLayout::ElementType;
+				switch (type)
+				{
+				case ElementType::Position2D:
+					return GenerateDesc<ElementType::Position2D>(GetOffset());
+				case ElementType::Position3D:
+					return GenerateDesc<ElementType::Position3D>(GetOffset());
+				case ElementType::Texture2D:
+					return GenerateDesc<ElementType::Texture2D>(GetOffset());
+				case ElementType::Normal:
+					return GenerateDesc<ElementType::Normal>(GetOffset());
+				case ElementType::Float3Color:
+					return GenerateDesc<ElementType::Float3Color>(GetOffset());
+				case ElementType::Float4Color:
+					return GenerateDesc<ElementType::Float4Color>(GetOffset());
+				case ElementType::RGBAColor:
+					return GenerateDesc<ElementType::RGBAColor>(GetOffset());
+				}
+				assert("Invalid element type" && false);
+				return { "INVALID", 0, DXGI_FORMAT_UNKNOWN, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+			}
+
+		private:
+			template <ElementType type>
+			static constexpr D3D11_INPUT_ELEMENT_DESC
+			GenerateDesc(size_t offset) noexcept
+			{
+				return { Map<type>::semantic,         0, Map<type>::dxgiFormat, 0, (UINT)offset,
+					     D3D11_INPUT_PER_VERTEX_DATA, 0 };
+			}
+
 		private:
 			ElementType type;
 			size_t      offset;
@@ -177,6 +211,18 @@ namespace gfx::geom
 		GetElementCount() const noexcept
 		{
 			return elements.size();
+		}
+
+		std::vector<D3D11_INPUT_ELEMENT_DESC>
+		GetD3DLayout() const
+		{
+			std::vector<D3D11_INPUT_ELEMENT_DESC> desc;
+			desc.reserve(GetElementCount());
+			for (const auto& e : elements)
+			{
+				desc.push_back(e.GetDesc());
+			}
+			return desc;
 		}
 
 	private:
