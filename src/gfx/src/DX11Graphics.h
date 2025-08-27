@@ -27,6 +27,9 @@ namespace gfx
 		ClearBuffer(float red, float green, float blue) const;
 
 		void
+		ResizeBuffers(unsigned int width, unsigned int height);
+
+		void
 		DrawIndexed() const;
 
 		void

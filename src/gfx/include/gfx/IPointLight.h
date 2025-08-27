@@ -7,7 +7,7 @@ namespace gfx
 	class IPointLight
 	{
 	public:
-		virtual ~IPointLight() = default;
+		virtual ~IPointLight() noexcept = default;
 
 		virtual void
 		DrawControlWindow() noexcept = 0;

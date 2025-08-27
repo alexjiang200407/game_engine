@@ -275,6 +275,12 @@ Window::HandleMouse(RAWMOUSE& rawMouse)
 }
 
 void
+Window::ResizeWindow(unsigned int width, unsigned int height) const noexcept
+{
+	SetWindowPos(hWnd, nullptr, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE);
+}
+
+void
 Window::HandleKeyboard(RAWKEYBOARD& kb)
 {
 	bool keyDown = !(kb.Flags & RI_KEY_BREAK);
