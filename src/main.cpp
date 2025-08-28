@@ -11,6 +11,8 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdS
 
 	try
 	{
+		util::Settings::GetSingleton()->ReadAllSettings();
+
 		wchar_t exePath[MAX_PATH];
 		GetModuleFileNameW(nullptr, exePath, MAX_PATH);
 

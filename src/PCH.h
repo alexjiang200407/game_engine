@@ -20,6 +20,7 @@
 #include <optional>
 #include <queue>
 #include <random>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -30,6 +31,7 @@
 #include "util/EnumSet.h"
 #include "util/logger.h"
 #include "util/math.h"
+#include "util/Settings.h"
 
 #include <DirectXMath.h>
 
