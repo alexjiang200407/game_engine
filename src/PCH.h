@@ -29,9 +29,9 @@
 #include <vector>
 
 #include "util/EnumSet.h"
+#include "util/Settings.h"
 #include "util/logger.h"
 #include "util/math.h"
-#include "util/Settings.h"
 
 #include <DirectXMath.h>
 

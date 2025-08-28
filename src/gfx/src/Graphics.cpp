@@ -1,12 +1,7 @@
 #include "DX11Graphics.h"
 #include <gfx/Graphics.h>
 
-gfx::Graphics::Graphics(unsigned int width, unsigned int height) :
-	pImpl(std::make_unique<DX11Graphics>(width, height))
-{
-	assert(pImpl);
-}
-
+gfx::Graphics::Graphics() : pImpl(std::make_unique<DX11Graphics>()) { assert(pImpl); }
 gfx::Graphics::~Graphics() {}
 
 void

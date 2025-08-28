@@ -50,7 +50,7 @@ namespace util
 		static Settings*
 		GetSingleton();
 
-        class Module
+		class Module
 		{
 		public:
 			Module(std::string_view section) : sectionName(section) {}

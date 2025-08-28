@@ -1,6 +1,7 @@
 #pragma once
 #include "window/Keyboard.h"
 #include "window/Mouse.h"
+#include <util/Settings.h>
 
 namespace gfx
 {
@@ -12,7 +13,7 @@ namespace wnd
 	class Window
 	{
 	public:
-		Window(unsigned int width, unsigned int height);
+		Window();
 		~Window() noexcept;
 		Window(const Window&) = delete;
 
@@ -55,5 +56,6 @@ namespace wnd
 		HWND                     hWnd         = nullptr;
 		HINSTANCE                hInstance    = nullptr;
 		static constexpr wchar_t CLASS_NAME[] = L"GameEngineWindow";
+		util::Settings::Module   wndSettings;
 	};
 }

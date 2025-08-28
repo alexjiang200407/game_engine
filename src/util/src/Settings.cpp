@@ -48,7 +48,7 @@ util::Settings::ReadSettings(std::string_view filePath, Data& a_data)
 
 		for (const auto& keyValue : *keys)
 		{
-			const char* key = keyValue.first.pItem;
+			const char* key        = keyValue.first.pItem;
 			const char* valueAsStr = keyValue.second;
 
 			if (!key || key[0] == 0)

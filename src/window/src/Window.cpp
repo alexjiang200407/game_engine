@@ -11,8 +11,12 @@ ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 using namespace wnd;
 
-Window::Window(unsigned int width, unsigned int height) : hInstance(GetModuleHandle(nullptr))
+Window::Window() :
+	hInstance(GetModuleHandle(nullptr)), wndSettings(util::Settings::module("Window"))
 {
+	unsigned int width  = wndSettings.get("uWidth", 800u);
+	unsigned int height = wndSettings.get("uHeight", 600u);
+
 	assert(
 		width < static_cast<unsigned int>(std::numeric_limits<int>::max()) &&
 		height < static_cast<unsigned int>(std::numeric_limits<int>::max()));
@@ -24,11 +28,11 @@ Window::Window(unsigned int width, unsigned int height) : hInstance(GetModuleHan
 	wc.lpszClassName = CLASS_NAME;
 
 	WIN32_ERR_TEST_AND_THROW(RegisterClassEx(&wc));
-	CreateAppWindow(
-		hInstance,
-		static_cast<int>(width),
-		static_cast<int>(height),
-		L"Game Engine");  // TODO: Settings to get Window Name
+
+	auto nameStr  = wndSettings.get("sWindowName", "Game Engine"s);
+	auto nameWStr = std::wstring(nameStr.begin(), nameStr.end());
+
+	CreateAppWindow(hInstance, static_cast<int>(width), static_cast<int>(height), nameWStr.c_str());
 
 	{
 		POINT pt;
@@ -53,14 +57,53 @@ Window::~Window() noexcept
 void
 Window::CreateAppWindow(HINSTANCE a_hInstance, int width, int height, const wchar_t* title)
 {
-	RECT rect = { 0, 0, width, height };
+	enum class WindowFormat
+	{
+		Windowed,
+		BorderlessWindowed,
+		BorderlessFullscreen
+	};
+
+	WindowFormat format  = static_cast<WindowFormat>(wndSettings.get("uWindowFormat", 0u));
+	DWORD        style   = 0;
+	DWORD        exStyle = 0;
+	RECT         rect    = { 0, 0, width, height };
+
+	switch (format)
+	{
+	case WindowFormat::Windowed:
+		style   = WS_OVERLAPPEDWINDOW;
+		exStyle = 0;
+		break;
+
+	case WindowFormat::BorderlessWindowed:
+		style   = WS_POPUP | WS_VISIBLE;
+		exStyle = WS_EX_APPWINDOW;
+		break;
+
+	case WindowFormat::BorderlessFullscreen:
+		{
+			DEVMODE dm = {};
+			ChangeDisplaySettings(&dm, CDS_FULLSCREEN);
+
+			style   = WS_POPUP;
+			exStyle = WS_EX_APPWINDOW;
+
+			rect.left   = 0;
+			rect.top    = 0;
+			rect.right  = GetSystemMetrics(SM_CXSCREEN);
+			rect.bottom = GetSystemMetrics(SM_CYSCREEN);
+		}
+		break;
+	}
+
 	WIN32_ERR_TEST_AND_THROW(AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE));
 
 	hWnd = WIN32_ERR_TEST_AND_THROW(CreateWindowEx(
-		0,
+		exStyle,
 		CLASS_NAME,
 		title,
-		WS_OVERLAPPEDWINDOW,
+		style,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
 		rect.right - rect.left,
