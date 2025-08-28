@@ -62,3 +62,9 @@ gfx::Graphics::operator*() const noexcept
 {
 	return *pImpl;
 }
+
+void
+gfx::Graphics::ResizeBuffers(unsigned int width, unsigned int height)
+{
+	pImpl->ResizeBuffers(width, height);
+}

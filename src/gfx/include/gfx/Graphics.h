@@ -41,6 +41,9 @@ namespace gfx
 		const DX11Graphics&
 		operator*() const noexcept;
 
+		void
+		ResizeBuffers(unsigned int width, unsigned int height);
+
 	private:
 		std::unique_ptr<gfx::DX11Graphics> pImpl;
 	};

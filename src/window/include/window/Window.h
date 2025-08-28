@@ -22,6 +22,9 @@ namespace wnd
 		[[nodiscard]] bool
 		Process() noexcept;
 
+		void
+		ResizeWindow(unsigned int width, unsigned int height) const noexcept;
+
 	private:
 		static LRESULT CALLBACK
 		WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
