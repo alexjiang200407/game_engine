@@ -17,7 +17,7 @@ gfx::Node::ParseNode(
 		dx::XMLoadFloat4x4(reinterpret_cast<const dx::XMFLOAT4X4*>(&root.mTransformation)));
 
 	auto pRoot =
-		std::make_unique<gfx::Node>(root.mName.C_Str(), std::vector<gfx::Mesh*>{}, rootTransform);
+		std::make_unique<gfx::Node>(0u, root.mName.C_Str(), std::vector<gfx::Mesh*>{}, rootTransform);
 
 	if (root.mNumMeshes > 0)
 	{
@@ -33,12 +33,12 @@ gfx::Node::ParseNode(
 	std::stack<std::pair<const aiNode*, gfx::Node*>> stack;
 	stack.push({ &root, pRoot.get() });
 
-	while (!stack.empty())
+	for (size_t idx = 1u; !stack.empty();)
 	{
-		auto [aiParent, gfxParent] = stack.top();
+		auto [aiParent, gfxParent] = std::move(stack.top());
 		stack.pop();
 
-		for (size_t i = 0; i < aiParent->mNumChildren; i++)
+		for (size_t i = 0; i < aiParent->mNumChildren; ++i, ++idx)
 		{
 			const aiNode* aiChild = aiParent->mChildren[i];
 
@@ -53,7 +53,7 @@ gfx::Node::ParseNode(
 			}
 
 			auto pChildNode =
-				std::make_unique<Node>(aiChild->mName.C_Str(), childMeshes, childTransform);
+				std::make_unique<Node>(idx, aiChild->mName.C_Str(), childMeshes, childTransform);
 			Node* childRaw = pChildNode.get();
 
 			gfxParent->AddChild(std::move(pChildNode));
@@ -66,19 +66,19 @@ gfx::Node::ParseNode(
 }
 
 void
-gfx::Node::DrawNodeHierarchyPanel(std::optional<size_t>& selectedIndex, Node*& pSelectedNode) const
+gfx::Node::DrawNodeHierarchyPanel(Node*& pSelectedNode) const
 {
 	std::stack<std::tuple<const Node*, size_t>> stack;
 	stack.push({ this, 0 });
-	size_t currentNode = 0u;
-	while (!stack.empty())
+
+	for (size_t currentNode = 0u; !stack.empty(); ++currentNode)
 	{
-		auto [node, popParent] = stack.top();
+		auto [node, popParent] = std::move(stack.top());
 		stack.pop();
 
-		currentNode++;
+		const auto selectedIdx = pSelectedNode ? pSelectedNode->idx : std::numeric_limits<size_t>::max();
 		const auto nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow |
-		                       ((selectedIndex == currentNode) ? ImGuiTreeNodeFlags_Selected : 0) |
+		                       ((selectedIdx == currentNode) ? ImGuiTreeNodeFlags_Selected : 0) |
 		                       ((node->childPtrs.size() == 0) ? ImGuiTreeNodeFlags_Leaf : 0);
 
 		if (ImGui::TreeNodeEx(node->name.c_str(), nodeFlags))
@@ -114,7 +114,6 @@ gfx::Node::DrawNodeHierarchyPanel(std::optional<size_t>& selectedIndex, Node*& p
 
 		if (ImGui::IsItemClicked())
 		{
-			selectedIndex = currentNode;
 			pSelectedNode = const_cast<Node*>(node);
 		}
 	}
@@ -128,11 +127,11 @@ gfx::Model::DrawControlPanel() noexcept
 	{
 		ImGui::Columns(2, "", true);
 
-		pRoot->DrawNodeHierarchyPanel(selectedIndex, pSelectedNode);
+		pRoot->DrawNodeHierarchyPanel(pSelectedNode);
 
 		if (pSelectedNode)
 		{
-			auto& transform = transforms[*selectedIndex];
+			auto& transform = transforms[pSelectedNode->idx];
 			ImGui::NextColumn();
 			ImGui::Text("Orientation");
 			ImGui::SliderAngle("Roll", &transform.roll, -180.0f, 180.0f);
@@ -160,9 +159,10 @@ gfx::Node::AddChild(std::unique_ptr<Node> pChild)
 }
 
 gfx::Node::Node(
+	std::size_t              a_idx,
 	std::string_view         a_name,
 	std::vector<Mesh*>       meshPtrs,
-	const DirectX::XMMATRIX& transform) noexcept : name(a_name), meshPtrs(std::move(meshPtrs))
+	const DirectX::XMMATRIX& transform) noexcept : idx(a_idx), name(a_name), meshPtrs(std::move(meshPtrs))
 {
 	namespace dx = DirectX;
 	dx::XMStoreFloat4x4(&baseTransform, transform);
@@ -227,7 +227,7 @@ DirectX::XMMATRIX
 gfx::Model::GetTransform() const noexcept
 {
 	namespace dx          = DirectX;
-	const auto& transform = transforms.at(*selectedIndex);
+	const auto& transform = transforms.at(pSelectedNode->idx);
 	return dx::XMMatrixRotationRollPitchYaw(transform.roll, transform.pitch, transform.yaw) *
 	       dx::XMMatrixTranslation(transform.x, transform.y, transform.z);
 }

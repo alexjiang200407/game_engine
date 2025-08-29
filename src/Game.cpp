@@ -6,6 +6,8 @@ Game::Game() :
 {
 	gfx.SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
 	gfx.SetCamera(DirectX::XMMatrixTranslation(0.0f, 0.0f, 20.0f));
+	camera = wnd.kbd.RegisterConsumer<scene::Camera>();
+	wnd.mouse.RegisterConsumer(camera);
 }
 
 void
@@ -13,15 +15,22 @@ Game::Play()
 {
 	while (wnd.Process())
 	{
-		while (auto key = wnd.kbd.ReadKey())
+		if (ImGui::IsKeyPressed(ImGuiKey_GraveAccent, false))
 		{
-			using Type = wnd::Keyboard::KeyEvent::Type;
-
-			if (key->type == Type::kDown && key->code == 192)
-			{
-				drawDebugUI = !drawDebugUI;
-			}
+			imgui.ToggleVisibility();
 		}
+
+		if (!imgui.IsShowing())
+		{
+			wnd.kbd.DispatchInputEvents();
+			wnd.mouse.DispatchInputEvents();
+		}
+		else
+		{
+			wnd.kbd.Clear();
+			wnd.mouse.Clear();
+		}
+
 		DoFrame();
 	}
 }
@@ -33,9 +42,13 @@ Game::DoFrame()
 
 	ImGui::NewFrame();
 
-	light->Bind(gfx, camera.GetMatrix());
+	gfx.ClearBuffer(0.0f, 0.0f, 0.0f);
 
-	if (drawDebugUI)
+	gfx.SetCamera(camera->GetMatrix());
+
+	light->Bind(gfx, camera->GetMatrix());
+
+	if (imgui.IsShowing())
 	{
 		if (ImGui::Begin("Framerate"))
 		{
@@ -47,13 +60,8 @@ Game::DoFrame()
 		ImGui::End();
 		light->DrawControlWindow();
 
-		if (camera.DrawControlWindow())
-			gfx.SetCamera(camera.GetMatrix());
 		pModel->DrawControlPanel();
 	}
-
-	gfx.ClearBuffer(0.0f, 0.0f, 0.0f);
-
 	pModel->Draw(gfx);
 
 	light->Draw(gfx);

@@ -11,38 +11,41 @@ Keyboard::IsKeyPressed(uint32_t keycode) const noexcept
 }
 
 [[nodiscard]]
-std::optional<Keyboard::KeyEvent>
+std::optional<KeyEvent>
 Keyboard::ReadKey() noexcept
 {
 	if (keyBuffer.empty())
 		return std::nullopt;
-	auto e = keyBuffer.front();
+	auto e = std::move(keyBuffer.front());
 	keyBuffer.pop();
 	return e;
 }
 
 [[nodiscard]]
-std::optional<Keyboard::CharEvent>
+std::optional<CharEvent>
 Keyboard::ReadChar() noexcept
 {
 	if (charBuffer.empty())
 		return std::nullopt;
-	auto e = charBuffer.front();
+	auto e = std::move(charBuffer.front());
 	charBuffer.pop();
 	return e;
-}
-
-[[nodiscard]]
-bool
-Keyboard::Empty() const noexcept
-{
-	return keyBuffer.empty();
 }
 
 void
 Keyboard::Clear() noexcept
 {
 	keyBuffer.clear();
+	charBuffer.clear();
+}
+
+void
+wnd::Keyboard::DispatchInputEvents()
+{
+	while (auto keyEvt = ReadKey())
+	{
+		Produce(*keyEvt);
+	}
 }
 
 void

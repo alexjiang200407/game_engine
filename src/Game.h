@@ -26,10 +26,10 @@ private:
 	wnd::Window     wnd;
 	gfx::Graphics   gfx;
 	util::Timer     timer;
-	scene::Camera   camera;
 
 	bool drawDebugUI = true;
 
+	std::shared_ptr<scene::Camera>    camera;
 	std::unique_ptr<gfx::IPointLight> light;
 	std::unique_ptr<gfx::IModel>      pModel;
 	static constexpr size_t           nDrawables = 180;

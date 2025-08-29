@@ -1,49 +1,49 @@
 #pragma once
 #include "util/RingQueue.h"
+#include <util/events/Producer.h>
 
 namespace wnd
 {
 	class Window;
 
-	class Keyboard
+	struct KeyEvent
+	{
+		enum class Type
+		{
+			kUp,
+			kDown,
+			kInvalid,
+		} type;
+		uint32_t code;
+	};
+
+	struct CharEvent
+	{
+		char32_t ch;
+	};
+
+	class Keyboard : public util::Producer<KeyEvent>
 	{
 		friend class Window;
 
 	public:
-		struct KeyEvent
-		{
-			enum class Type
-			{
-				kUp,
-				kDown,
-				kInvalid,
-			} type;
-			uint32_t code;
-		};
-
-		struct CharEvent
-		{
-			char32_t ch;
-		};
-
-	public:
 		[[nodiscard]] bool
 		IsKeyPressed(uint32_t keycode) const noexcept;
+
+		void
+		Clear() noexcept;
+
+		void
+		DispatchInputEvents();
+
+	private:
+		Keyboard() = default;
 
 		[[nodiscard]] std::optional<KeyEvent>
 		ReadKey() noexcept;
 
 		[[nodiscard]] std::optional<CharEvent>
 		ReadChar() noexcept;
-
-		[[nodiscard]] bool
-		Empty() const noexcept;
-
-		void
-		Clear() noexcept;
-
-	private:
-		Keyboard() = default;
 
 		void
 		OnKeyDown(uint32_t keycode) noexcept;
