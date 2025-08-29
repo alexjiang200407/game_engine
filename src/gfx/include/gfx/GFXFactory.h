@@ -1,6 +1,6 @@
 #pragma once
 #include <gfx/Graphics.h>
-#include <gfx/IDrawable.h>
+#include <gfx/IModel.h>
 #include <gfx/IPointLight.h>
 
 namespace gfx
@@ -12,14 +12,11 @@ namespace gfx
 	public:
 		GFXFactory() noexcept;
 
-		std::unique_ptr<gfx::IDrawable>
-		CreateBox(Graphics& gfx);
-
 		std::unique_ptr<gfx::IPointLight>
 		CreatePointLight(Graphics& gfx);
 
-		std::unique_ptr<gfx::IDrawable>
-		CreateSkinnedBox(Graphics& gfx);
+		std::unique_ptr<IModel>
+		CreateModel(Graphics& gfx, const std::string& path);
 
 	private:
 		std::mt19937                          rng{ std::random_device{}() };

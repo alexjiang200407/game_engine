@@ -1,6 +1,5 @@
 #pragma once
 #include "DX11Graphics.h"
-#include "gfx/IDrawable.h"
 #include <DirectXMath.h>
 #include <vector>
 
@@ -8,7 +7,7 @@ namespace gfx
 {
 	class Bindable;
 
-	class Drawable : public IDrawable
+	class Drawable
 	{
 		template <class T>
 		friend class DrawableBase;
@@ -16,12 +15,19 @@ namespace gfx
 	public:
 		Drawable()                = default;
 		Drawable(const Drawable&) = delete;
+		virtual ~Drawable()       = default;
 
 		Drawable&
 		operator=(const Drawable&) = delete;
 
-		void
-		Draw(Graphics& gfx) const override;
+		virtual void
+		Draw(Graphics& gfx) const;
+
+		virtual DirectX::XMMATRIX
+		GetTransformXM() const noexcept = 0;
+
+		virtual void
+		Update(float dt) noexcept = 0;
 
 	protected:
 		template <typename T, typename... Args>
