@@ -40,6 +40,13 @@ add_custom_target(CopyShaders ALL
     DEPENDS Shaders
 )
 
+add_custom_command(
+    TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_SOURCE_DIR}/config"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>/config"
+)
+
 set(SRC_ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")
 set(BIN_ASSETS_DIR "$<TARGET_FILE_DIR:game_engine>/assets")
 

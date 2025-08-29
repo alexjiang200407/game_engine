@@ -1,5 +1,6 @@
 #pragma once
 #include <gfx/Graphics.h>
+#include <util/Settings.h>
 
 namespace gfx
 {
@@ -10,7 +11,7 @@ namespace gfx
 		friend class gfx::Bindable;
 
 	public:
-		DX11Graphics(unsigned int width, unsigned int height);
+		DX11Graphics();
 		DX11Graphics(const DX11Graphics&) = delete;
 		~DX11Graphics() noexcept;
 
@@ -59,5 +60,6 @@ namespace gfx
 		unsigned int                                   width;
 		unsigned int                                   height;
 		mutable unsigned int                           nextDrawIndexedCount = 0;
+		util::Settings::ConfigModule                   gfxSettings;
 	};
 }
