@@ -1,7 +1,6 @@
 #include "Game.h"
 
-Game::Game() :
-	settings(util::Settings::module("Window")), light(std::move(factory.CreatePointLight(gfx)))
+Game::Game() : light(std::move(factory.CreatePointLight(gfx)))
 {
 	drawables.reserve(nDrawables);
 

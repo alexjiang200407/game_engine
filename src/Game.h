@@ -26,7 +26,6 @@ private:
 
 	gfx::GFXFactory                   factory;
 	ImGuiManager                      imgui;  // Must be before window and graphics
-	util::Settings::Module            settings;
 	wnd::Window                       wnd;
 	gfx::Graphics                     gfx;
 	util::Timer                       timer;

@@ -50,14 +50,14 @@ namespace util
 		static Settings*
 		GetSingleton();
 
-		class Module
+		class ConfigModule
 		{
 		public:
-			Module(std::string_view section) : sectionName(section) {}
+			ConfigModule(std::string_view section) : sectionName(section) {}
 
 			template <typename T>
 			T
-			get(std::string_view key, T defaultVal) const
+			Get(std::string_view key, T defaultVal) const
 			{
 				return Settings::GetOrDefault<T>(sectionName, key, defaultVal);
 			}
@@ -66,18 +66,22 @@ namespace util
 			std::string sectionName;
 		};
 
-		static Module
-		module(std::string_view section)
+		static ConfigModule
+		Module(std::string_view section)
 		{
-			return Module(section);
+			return ConfigModule(section);
 		}
 
 		template <typename T>
 		static T
 		GetOrDefault(std::string_view mod, std::string_view key, T defaultVal)
 		{
-			std::string fullKey = std::string(mod) + "#" + std::string(key);
-			auto&       map     = GetSingleton()->GetMap<T>();
+			std::string fullKey;
+			fullKey.reserve(mod.size() + 1 + key.size());
+			fullKey.append(mod).push_back('#');
+			fullKey.append(key);
+
+			auto& map = GetSingleton()->GetMap<T>();
 
 			if (auto it = map.find(fullKey); it != map.end())
 			{

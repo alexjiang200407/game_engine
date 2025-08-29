@@ -57,6 +57,6 @@ namespace gfx
 		unsigned int                                   width;
 		unsigned int                                   height;
 		mutable unsigned int                           nextDrawIndexedCount = 0;
-		util::Settings::Module                         gfxSettings;
+		util::Settings::ConfigModule                   gfxSettings;
 	};
 }

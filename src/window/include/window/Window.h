@@ -53,9 +53,9 @@ namespace wnd
 		Mouse    mouse;
 
 	private:
-		HWND                     hWnd         = nullptr;
-		HINSTANCE                hInstance    = nullptr;
-		static constexpr wchar_t CLASS_NAME[] = L"GameEngineWindow";
-		util::Settings::Module   wndSettings;
+		HWND                         hWnd         = nullptr;
+		HINSTANCE                    hInstance    = nullptr;
+		static constexpr wchar_t     CLASS_NAME[] = L"GameEngineWindow";
+		util::Settings::ConfigModule wndSettings;
 	};
 }

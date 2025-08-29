@@ -12,10 +12,10 @@ ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 using namespace wnd;
 
 Window::Window() :
-	hInstance(GetModuleHandle(nullptr)), wndSettings(util::Settings::module("Window"))
+	hInstance(GetModuleHandle(nullptr)), wndSettings(util::Settings::Module("Window"))
 {
-	unsigned int width  = wndSettings.get("uWidth", 800u);
-	unsigned int height = wndSettings.get("uHeight", 600u);
+	unsigned int width  = wndSettings.Get("uWidth", 800u);
+	unsigned int height = wndSettings.Get("uHeight", 600u);
 
 	assert(
 		width < static_cast<unsigned int>(std::numeric_limits<int>::max()) &&
@@ -29,7 +29,7 @@ Window::Window() :
 
 	WIN32_ERR_TEST_AND_THROW(RegisterClassEx(&wc));
 
-	auto nameStr  = wndSettings.get("sWindowName", "Game Engine"s);
+	auto nameStr  = wndSettings.Get("sWindowName", "Game Engine"s);
 	auto nameWStr = std::wstring(nameStr.begin(), nameStr.end());
 
 	CreateAppWindow(hInstance, static_cast<int>(width), static_cast<int>(height), nameWStr.c_str());
@@ -64,7 +64,7 @@ Window::CreateAppWindow(HINSTANCE a_hInstance, int width, int height, const wcha
 		BorderlessFullscreen
 	};
 
-	WindowFormat format  = static_cast<WindowFormat>(wndSettings.get("uWindowFormat", 0u));
+	WindowFormat format  = static_cast<WindowFormat>(wndSettings.Get("uWindowFormat", 0u));
 	DWORD        style   = 0;
 	DWORD        exStyle = 0;
 	RECT         rect    = { 0, 0, width, height };

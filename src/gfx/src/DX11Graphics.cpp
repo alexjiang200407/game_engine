@@ -58,10 +58,10 @@ gfx::DX11Graphics::SetCamera(DirectX::XMMATRIX a_camera) noexcept
 	camera = a_camera;
 }
 
-gfx::DX11Graphics::DX11Graphics() : gfxSettings(util::Settings::module("Graphics"))
+gfx::DX11Graphics::DX11Graphics() : gfxSettings(util::Settings::Module("Graphics"))
 {
-	width                                 = gfxSettings.get("uBufferWidth", 800u);
-	height                                = gfxSettings.get("uBufferHeight", 600u);
+	width                                 = gfxSettings.Get("uBufferWidth", 800u);
+	height                                = gfxSettings.Get("uBufferHeight", 600u);
 	DXGI_SWAP_CHAIN_DESC sd               = {};
 	sd.BufferDesc.Width                   = static_cast<UINT>(width);
 	sd.BufferDesc.Height                  = static_cast<UINT>(height);
