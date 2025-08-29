@@ -22,15 +22,18 @@
 #include <queue>
 #include <random>
 #include <span>
+#include <sstream>
 #include <stack>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <unordered_map>
 #include <utility>
 #include <vector>
 
 #include "util/EnumSet.h"
+#include "util/Settings.h"
 #include "util/logger.h"
 #include "util/math.h"
 

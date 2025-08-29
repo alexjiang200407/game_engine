@@ -7,7 +7,7 @@ namespace gfx
 	class Graphics
 	{
 	public:
-		Graphics(unsigned int width, unsigned int height);
+		Graphics();
 		Graphics(const Graphics&) = delete;
 		~Graphics() noexcept;
 
