@@ -35,12 +35,19 @@ Window::Window() :
 	CreateAppWindow(hInstance, static_cast<int>(width), static_cast<int>(height), nameWStr.c_str());
 
 	{
-		POINT pt;
+		POINT pt{};
 		WIN32_ERR_TEST_AND_THROW(GetCursorPos(&pt));
 		WIN32_ERR_TEST_AND_THROW(ScreenToClient(hWnd, &pt));
-		mouse.SetPos(pt.x, pt.y);
+
+		RECT rc{};
+		if (GetClientRect(hWnd, &rc) && PtInRect(&rc, pt))
+		{
+			mouse.state.set(MouseEvent::StateFlags::kInsideWindow);
+		}
 	}
 	RegisterInput();
+
+	while (::ShowCursor(FALSE) >= 0);
 }
 
 Window::~Window() noexcept
@@ -57,31 +64,24 @@ Window::~Window() noexcept
 void
 Window::CreateAppWindow(HINSTANCE a_hInstance, int width, int height, const wchar_t* title)
 {
-	enum class WindowFormat
-	{
-		Windowed,
-		BorderlessWindowed,
-		BorderlessFullscreen
-	};
-
-	WindowFormat format  = static_cast<WindowFormat>(wndSettings.Get("uWindowFormat", 0u));
-	DWORD        style   = 0;
-	DWORD        exStyle = 0;
-	RECT         rect    = { 0, 0, width, height };
+	format        = static_cast<Format>(wndSettings.Get("uWindowFormat", 0u));
+	DWORD style   = 0;
+	DWORD exStyle = 0;
+	RECT  rect    = { 0, 0, width, height };
 
 	switch (format)
 	{
-	case WindowFormat::Windowed:
+	case Format::Windowed:
 		style   = WS_OVERLAPPEDWINDOW;
 		exStyle = 0;
 		break;
 
-	case WindowFormat::BorderlessWindowed:
+	case Format::BorderlessWindowed:
 		style   = WS_POPUP | WS_VISIBLE;
 		exStyle = WS_EX_APPWINDOW;
 		break;
 
-	case WindowFormat::BorderlessFullscreen:
+	case Format::BorderlessFullscreen:
 		{
 			DEVMODE dm = {};
 			ChangeDisplaySettings(&dm, CDS_FULLSCREEN);
@@ -112,6 +112,12 @@ Window::CreateAppWindow(HINSTANCE a_hInstance, int width, int height, const wcha
 		nullptr,
 		a_hInstance,
 		this));
+
+	// Has to be after window CreateWindowEx
+	if (format == Format::BorderlessWindowed)
+	{
+		ClipCursor(&rect);
+	}
 
 	WIN32_ERR_TEST_AND_THROW(ShowWindow(hWnd, SW_SHOW));
 
@@ -146,6 +152,20 @@ Window::Process() noexcept
 {
 	ImGui_ImplWin32_NewFrame();
 	return ProcessMessages();
+}
+
+void
+wnd::Window::EnableCursor() noexcept
+{
+	cursorEnabled = true;
+	ShowCursor();
+}
+
+void
+wnd::Window::DisableCursor() noexcept
+{
+	cursorEnabled = false;
+	HideCursor();
 }
 
 LRESULT CALLBACK
@@ -232,7 +252,10 @@ Window::HandleMessage(HWND a_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noex
 				&dwSize,
 				sizeof(RAWINPUTHEADER));
 			if (dwSize == 0 || dwSize == static_cast<UINT>(-1))
+			{
+				logger::error("Failed to GetRawInputData");
 				break;
+			}
 
 			std::vector<BYTE> lpb(dwSize);
 			if (const auto copied = GetRawInputData(
@@ -243,6 +266,7 @@ Window::HandleMessage(HWND a_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noex
 					sizeof(RAWINPUTHEADER));
 			    copied != dwSize || copied == static_cast<UINT>(-1))
 			{
+				logger::error("Failed to GetRawInputData");
 				break;
 			}
 
@@ -307,11 +331,11 @@ Window::HandleMouse(RAWMOUSE& rawMouse)
 		return;
 
 	bool inside = PtInRect(&rc, pt);
-	if (inside && !mouse.HasStateFlag(Mouse::StateFlags::kInsideWindow))
+	if (inside && !mouse.HasStateFlag(MouseEvent::StateFlags::kInsideWindow))
 	{
 		mouse.OnMouseEnter();
 	}
-	else if (!inside && mouse.HasStateFlag(Mouse::StateFlags::kInsideWindow))
+	else if (!inside && mouse.HasStateFlag(MouseEvent::StateFlags::kInsideWindow))
 	{
 		mouse.OnMouseLeave();
 	}
@@ -321,6 +345,12 @@ void
 Window::ResizeWindow(unsigned int width, unsigned int height) const noexcept
 {
 	SetWindowPos(hWnd, nullptr, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE);
+
+	if (format == Format::BorderlessWindowed)
+	{
+		RECT rc{ 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
+		ClipCursor(&rc);
+	}
 }
 
 void
@@ -369,4 +399,16 @@ Window::ProcessMessages() noexcept
 		DispatchMessage(&msg);
 	}
 	return true;
+}
+
+void
+Window::HideCursor() noexcept
+{
+	while (::ShowCursor(FALSE) >= 0);
+}
+
+void
+Window::ShowCursor() noexcept
+{
+	while (::ShowCursor(TRUE) < 0);
 }

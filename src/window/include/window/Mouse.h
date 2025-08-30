@@ -1,46 +1,51 @@
 #pragma once
 #include "util/RingQueue.h"
+#include "util/events/Producer.h"
 
 namespace wnd
 {
 	class Window;
 
-	class Mouse
+	struct MouseEvent
 	{
-		friend class Window;
-
-	public:
 		enum class StateFlags
 		{
 			kLeftDown     = 1 << 0,
 			kRightDown    = 1 << 1,
 			kMiddleDown   = 1 << 2,
+			kButtonDown   = kLeftDown | kRightDown | kMiddleDown,
 			kInsideWindow = 1 << 3,
 		};
 
 		using State = util::EnumSet<StateFlags, uint8_t>;
 
-		struct Event
+		enum class Type
 		{
-			enum class Type
-			{
-				kLPress,
-				kLRelease,
-				kRPress,
-				kRRelease,
-				kMPress,
-				kMRelease,
-				kWheel,
-				kMove,
-				kEnter,
-				kLeave,
-				kInvalid,
-			} type;
+			kLPress,
+			kLRelease,
+			kLHeld,
+			kRPress,
+			kRRelease,
+			kRHeld,
+			kMPress,
+			kMRelease,
+			kMHeld,
+			kWheel,
+			kMove,
+			kEnter,
+			kLeave,
+			kInvalid,
+		} type;
 
-			State state;
-			int   x, y;
-			int   wheelDelta = 0;
-		};
+		State state;
+		int   x, y;
+		int   wheelDelta = 0;
+		int   dx = 0, dy = 0;
+	};
+
+	class Mouse : public util::Producer<MouseEvent>
+	{
+		friend class Window;
 
 	public:
 		[[nodiscard]] bool
@@ -52,20 +57,20 @@ namespace wnd
 		[[nodiscard]] std::pair<int, int>
 		GetPoint() const noexcept;
 
-		[[nodiscard]] std::optional<Event>
+		[[nodiscard]] std::optional<MouseEvent>
 		ReadEvent() noexcept;
 
 		[[nodiscard]] bool
-		HasStateFlag(StateFlags flag) const noexcept;
+		HasStateFlag(MouseEvent::StateFlags flag) const noexcept;
 
 		[[nodiscard]] int
 		GetWheelOffset() const noexcept;
 
+		void
+		DispatchInputEvents();
+
 	private:
 		Mouse() noexcept = default;
-
-		void
-		SetPos(int newX, int newY) noexcept;
 
 		void
 		OnMouseMove(int dx, int dy) noexcept;
@@ -98,10 +103,10 @@ namespace wnd
 		OnMouseEnter() noexcept;
 
 	private:
-		static constexpr auto                  mouseBufferLen = 256u;
-		util::RingQueue<Event, mouseBufferLen> mouseBuffer{};
-		State                                  state{};
-		int                                    wheelOffset = 0;
-		int                                    x = 0, y = 0;
+		static constexpr auto                       mouseBufferLen = 256u;
+		util::RingQueue<MouseEvent, mouseBufferLen> mouseBuffer{};
+		MouseEvent::State                           state{};
+		int                                         wheelOffset = 0;
+		int                                         x = 0, y = 0;
 	};
 }

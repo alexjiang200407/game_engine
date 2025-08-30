@@ -21,19 +21,19 @@ Mouse::GetPoint() const noexcept
 	return std::make_pair(x, y);
 }
 
-std::optional<Mouse::Event>
+std::optional<MouseEvent>
 Mouse::ReadEvent() noexcept
 {
 	if (Empty())
 		return std::nullopt;
 
-	auto ret = mouseBuffer.front();
+	auto ret = std::move(mouseBuffer.front());
 	mouseBuffer.pop();
 	return ret;
 }
 
 bool
-Mouse::HasStateFlag(StateFlags flag) const noexcept
+Mouse::HasStateFlag(MouseEvent::StateFlags flag) const noexcept
 {
 	return state.all(flag);
 }
@@ -45,79 +45,111 @@ wnd::Mouse::GetWheelOffset() const noexcept
 }
 
 void
-Mouse::SetPos(int newX, int newY) noexcept
-{
-	x = newX;
-	y = newY;
-}
-
-void
 Mouse::OnMouseMove(int dx, int dy) noexcept
 {
 	x += dx;
 	y += dy;
-	mouseBuffer.emplace(Event::Type::kMove, state, x, y);
+	mouseBuffer.emplace(MouseEvent::Type::kMove, state, x, y, 0, dx, dy);
 }
 
 void
 Mouse::OnLeftDown() noexcept
 {
-	state.set(StateFlags::kLeftDown);
-	mouseBuffer.emplace(Event::Type::kLPress, state, x, y);
+	state.set(MouseEvent::StateFlags::kLeftDown);
+	mouseBuffer.emplace(MouseEvent::Type::kLPress, state, x, y);
 }
 
 void
 Mouse::OnRightDown() noexcept
 {
-	state.set(StateFlags::kRightDown);
-	mouseBuffer.emplace(Event::Type::kRPress, state, x, y);
+	state.set(MouseEvent::StateFlags::kRightDown);
+	mouseBuffer.emplace(MouseEvent::Type::kRPress, state, x, y);
 }
 
 void
 Mouse::OnMiddleDown() noexcept
 {
-	state.set(StateFlags::kMiddleDown);
-	mouseBuffer.emplace(Event::Type::kMPress, state, x, y);
+	state.set(MouseEvent::StateFlags::kMiddleDown);
+	mouseBuffer.emplace(MouseEvent::Type::kMPress, state, x, y);
 }
 
 void
 Mouse::OnLeftUp() noexcept
 {
-	state.reset(StateFlags::kLeftDown);
-	mouseBuffer.emplace(Event::Type::kLRelease, state, x, y);
+	state.reset(MouseEvent::StateFlags::kLeftDown);
+	mouseBuffer.emplace(MouseEvent::Type::kLRelease, state, x, y);
 }
 
 void
 Mouse::OnRightUp() noexcept
 {
-	state.reset(StateFlags::kRightDown);
-	mouseBuffer.emplace(Event::Type::kRRelease, state, x, y);
+	state.reset(MouseEvent::StateFlags::kRightDown);
+	mouseBuffer.emplace(MouseEvent::Type::kRRelease, state, x, y);
 }
 
 void
 Mouse::OnMiddleUp() noexcept
 {
-	state.reset(StateFlags::kMiddleDown);
-	mouseBuffer.emplace(Event::Type::kMRelease, state, x, y);
+	state.reset(MouseEvent::StateFlags::kMiddleDown);
+	mouseBuffer.emplace(MouseEvent::Type::kMRelease, state, x, y);
 }
 
 void
 Mouse::OnWheel(int wheelDelta) noexcept
 {
-	mouseBuffer.emplace(Event::Type::kWheel, state, x, y, wheelDelta);
+	mouseBuffer.emplace(MouseEvent::Type::kWheel, state, x, y, wheelDelta);
 	util::math::safe_add_assign(wheelOffset, wheelDelta);
 }
 
 void
 Mouse::OnMouseLeave() noexcept
 {
-	state.reset(StateFlags::kInsideWindow);
-	mouseBuffer.emplace(Event::Type::kLeave, state, x, y);
+	state.reset(MouseEvent::StateFlags::kInsideWindow);
+	mouseBuffer.emplace(MouseEvent::Type::kLeave, state, x, y);
 }
 
 void
 Mouse::OnMouseEnter() noexcept
 {
-	state.set(StateFlags::kInsideWindow);
-	mouseBuffer.emplace(Event::Type::kEnter, state, x, y);
+	state.set(MouseEvent::StateFlags::kInsideWindow);
+	mouseBuffer.emplace(MouseEvent::Type::kEnter, state, x, y);
+}
+
+void
+wnd::Mouse::DispatchInputEvents()
+{
+	while (auto mouseEvt = ReadEvent())
+	{
+		Produce(*mouseEvt);
+	}
+
+	if (HasStateFlag(MouseEvent::StateFlags::kLeftDown))
+	{
+		MouseEvent evt{};
+		evt.type  = MouseEvent::Type::kLHeld;
+		evt.state = state;
+		evt.x     = x;
+		evt.y     = y;
+		Produce(evt);
+	}
+
+	if (HasStateFlag(MouseEvent::StateFlags::kRightDown))
+	{
+		MouseEvent evt{};
+		evt.type  = MouseEvent::Type::kRHeld;
+		evt.state = state;
+		evt.x     = x;
+		evt.y     = y;
+		Produce(evt);
+	}
+
+	if (HasStateFlag(MouseEvent::StateFlags::kMiddleDown))
+	{
+		MouseEvent evt{};
+		evt.type  = MouseEvent::Type::kMHeld;
+		evt.state = state;
+		evt.x     = x;
+		evt.y     = y;
+		Produce(evt);
+	}
 }

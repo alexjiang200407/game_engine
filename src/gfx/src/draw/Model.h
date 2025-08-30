@@ -13,6 +13,7 @@ namespace gfx
 
 	public:
 		Node(
+			std::size_t              idx,
 			std::string_view         name,
 			std::vector<Mesh*>       meshPtrs,
 			const DirectX::XMMATRIX& transform) noexcept;
@@ -27,7 +28,7 @@ namespace gfx
 			const aiNode&                                  node) noexcept;
 
 		void
-		DrawNodeHierarchyPanel(std::optional<size_t>& selectedIndex, Node*& pSelectedNode) const;
+		DrawNodeHierarchyPanel(Node*& pSelectedNode) const;
 
 		void
 		SetAppliedTransform(DirectX::FXMMATRIX transform) noexcept;
@@ -46,6 +47,7 @@ namespace gfx
 			float z     = 0.0f;
 		} pos;
 
+		size_t                             idx;
 		std::string                        name;
 		std::vector<std::unique_ptr<Node>> childPtrs;
 		std::vector<Mesh*>                 meshPtrs;
@@ -72,7 +74,6 @@ namespace gfx
 		std::string                        imguiID;
 		std::unique_ptr<Node>              pRoot;
 		Node*                              pSelectedNode = nullptr;
-		std::optional<size_t>              selectedIndex = std::nullopt;
 		std::vector<std::unique_ptr<Mesh>> allMeshes;
 		struct TransformParameters
 		{

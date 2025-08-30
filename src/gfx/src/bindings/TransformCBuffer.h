@@ -21,7 +21,7 @@ namespace gfx
 		};
 
 	public:
-		TransformCBuffer(DX11Graphics& gfx, const Drawable& parent, unsigned int slot = 0u);
+		TransformCBuffer(DX11Graphics& gfx, const Drawable& parent);
 		void
 		Bind(DX11Graphics& gfx) override;
 

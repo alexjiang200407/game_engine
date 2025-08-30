@@ -5,6 +5,7 @@ add_library(scene STATIC ${SOURCES})
 target_link_libraries(scene
     PUBLIC
         util
+        platform
         imgui::imgui
 )
 

@@ -24,6 +24,12 @@ namespace wnd
 		Process() noexcept;
 
 		void
+		EnableCursor() noexcept;
+
+		void
+		DisableCursor() noexcept;
+
+		void
 		ResizeWindow(unsigned int width, unsigned int height) const noexcept;
 
 	private:
@@ -51,14 +57,30 @@ namespace wnd
 		[[nodiscard]] bool
 		ProcessMessages() noexcept;
 
+		void
+		HideCursor() noexcept;
+
+		void
+		ShowCursor() noexcept;
+
 	public:
 		Keyboard kbd;
 		Mouse    mouse;
 
 	private:
-		HWND                         hWnd         = nullptr;
-		HINSTANCE                    hInstance    = nullptr;
-		static constexpr wchar_t     CLASS_NAME[] = L"GameEngineWindow";
+		enum class Format
+		{
+			Windowed,
+			BorderlessWindowed,
+			BorderlessFullscreen
+		};
+
+	private:
+		HWND                         hWnd          = nullptr;
+		HINSTANCE                    hInstance     = nullptr;
+		static constexpr wchar_t     CLASS_NAME[]  = L"GameEngineWindow";
+		bool                         cursorEnabled = false;
 		util::Settings::ConfigModule wndSettings;
+		Format                       format = Format::Windowed;
 	};
 }
