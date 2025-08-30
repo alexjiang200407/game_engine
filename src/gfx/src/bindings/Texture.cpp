@@ -1,9 +1,15 @@
 #include "bindings/Texture.h"
 #include <DirectXTex.h>
+#include <util/str.h>
 
 namespace wrl = Microsoft::WRL;
 
-gfx::Texture::Texture(DX11Graphics& gfx, const std::wstring& ws, Format format)
+gfx::Texture::Texture(DX11Graphics& gfx, const std::string& str, Format format, Slot a_slot) :
+	Texture(gfx, util::wtos(str), format, a_slot)
+{}
+
+gfx::Texture::Texture(DX11Graphics& gfx, const std::wstring& ws, Format format, Slot a_slot) :
+	slot(a_slot)
 {
 	namespace dx = DirectX;
 
@@ -20,10 +26,22 @@ gfx::Texture::Texture(DX11Graphics& gfx, const std::wstring& ws, Format format)
 		case Format::kPNG:
 		case Format::kJPG:
 			DX_HR_ERROR_TEST_AND_THROW(
-				dx::LoadFromWICFile(ws.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, image));
+				dx::LoadFromWICFile(ws.c_str(), DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image));
 			break;
 		default:
 			throw std::runtime_error("Invalid format");
+		}
+
+		if (image.GetImage(0, 0, 0)->format != DXGI_FORMAT_B8G8R8A8_UNORM)
+		{
+			dx::ScratchImage converted;
+			DX_HR_ERROR_TEST_AND_THROW(dx::Convert(
+				*image.GetImage(0, 0, 0),
+				DXGI_FORMAT_B8G8R8A8_UNORM,
+				DirectX::TEX_FILTER_DEFAULT,
+				DirectX::TEX_THRESHOLD_DEFAULT,
+				converted));
+			image = std::move(converted);
 		}
 
 		DX_HR_ERROR_TEST_AND_THROW(dx::CreateTexture(
@@ -38,7 +56,12 @@ gfx::Texture::Texture(DX11Graphics& gfx, const std::wstring& ws, Format format)
 		GetDevice(gfx)->CreateShaderResourceView(texture.Get(), nullptr, &pTextureSRV));
 }
 
-gfx::Texture::Texture(DX11Graphics& gfx, std::span<const unsigned char> bytes, Format format)
+gfx::Texture::Texture(
+	DX11Graphics&        gfx,
+	const unsigned char* bytes,
+	size_t               size,
+	Format               format,
+	Slot                 a_slot) : slot(a_slot)
 {
 	namespace dx = DirectX;
 
@@ -48,21 +71,13 @@ gfx::Texture::Texture(DX11Graphics& gfx, std::span<const unsigned char> bytes, F
 		switch (format)
 		{
 		case Format::kDDS:
-			DX_HR_ERROR_TEST_AND_THROW(dx::LoadFromDDSMemory(
-				bytes.data(),
-				bytes.size(),
-				DirectX::DDS_FLAGS_NONE,
-				nullptr,
-				image));
+			DX_HR_ERROR_TEST_AND_THROW(
+				dx::LoadFromDDSMemory(bytes, size, DirectX::DDS_FLAGS_NONE, nullptr, image));
 			break;
 		case Format::kPNG:
 		case Format::kJPG:
-			DX_HR_ERROR_TEST_AND_THROW(dx::LoadFromWICMemory(
-				bytes.data(),
-				bytes.size(),
-				DirectX::WIC_FLAGS_NONE,
-				nullptr,
-				image));
+			DX_HR_ERROR_TEST_AND_THROW(
+				dx::LoadFromWICMemory(bytes, size, DirectX::WIC_FLAGS_NONE, nullptr, image));
 			break;
 		default:
 			throw std::runtime_error("Invalid format");
@@ -83,5 +98,6 @@ gfx::Texture::Texture(DX11Graphics& gfx, std::span<const unsigned char> bytes, F
 void
 gfx::Texture::Bind(DX11Graphics& gfx)
 {
-	DX_CALL(GetContext(gfx)->PSSetShaderResources(0u, 1u, pTextureSRV.GetAddressOf()));
+	DX_CALL(GetContext(gfx)
+	            ->PSSetShaderResources(static_cast<UINT>(slot), 1u, pTextureSRV.GetAddressOf()));
 }

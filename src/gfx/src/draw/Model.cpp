@@ -209,9 +209,18 @@ gfx::Model::Model(Graphics& gfx, std::string_view a_fileName) :
 	if (!pScene)
 		throw std::runtime_error("Could not load scene "s + imp.GetErrorString());
 
-	for (size_t i = 0; i < pScene->mNumMeshes; i++)
 	{
-		allMeshes.push_back(std::make_unique<Mesh>(*gfx, *pScene->mMeshes[i]));
+		auto fileNameSv = std::string_view(fileName);
+		for (size_t i = 0; i < pScene->mNumMeshes; i++)
+		{
+			auto idx = pScene->mMeshes[i]->mMaterialIndex;
+			allMeshes.push_back(std::make_unique<Mesh>(
+				*gfx,
+				fileNameSv,
+				*pScene->mMeshes[i],
+				idx >= 0 ? pScene->mMaterials[idx] : nullptr,
+				pScene->mTextures));
+		}
 	}
 
 	pRoot = Node::ParseNode(allMeshes, *pScene->mRootNode);

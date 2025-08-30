@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <bitset>
 #include <cassert>
+#include <filesystem>
 #include <format>
 #include <limits>
 #include <memory>

@@ -9,6 +9,7 @@ void
 gfx::DX11Graphics::StartFrame() const
 {
 	ImGui_ImplDX11_NewFrame();
+	pContext->OMSetRenderTargets(1u, pTarget.GetAddressOf(), pDSV.Get());
 }
 
 void
@@ -140,10 +141,10 @@ gfx::DX11Graphics::DX11Graphics() : gfxSettings(util::Settings::Module("Graphics
 	sd.SampleDesc.Count                   = 1;
 	sd.SampleDesc.Quality                 = 0;
 	sd.BufferUsage                        = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.BufferCount                        = 1;
+	sd.BufferCount                        = 2;
 	sd.OutputWindow                       = GetActiveWindow();
 	sd.Windowed                           = TRUE;
-	sd.SwapEffect                         = DXGI_SWAP_EFFECT_DISCARD;
+	sd.SwapEffect                         = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 	sd.Flags                              = 0;
 
 	UINT swapCreateFlags = 0u;
@@ -205,7 +206,6 @@ gfx::DX11Graphics::DX11Graphics() : gfxSettings(util::Settings::Module("Graphics
 		DX_HR_ERROR_TEST_AND_THROW(
 			pDevice->CreateDepthStencilView(pDepthStencil.Get(), &descDSV, &pDSV));
 	}
-	DX_CALL(pContext->OMSetRenderTargets(1u, pTarget.GetAddressOf(), pDSV.Get()));
 
 	D3D11_VIEWPORT vp{};
 	vp.Width    = static_cast<FLOAT>(width);

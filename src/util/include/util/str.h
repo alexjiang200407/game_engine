@@ -13,6 +13,7 @@ namespace util
 		return success;
 	}
 
-#define JOIN_V(arr) join_array<sizeof(arr) / sizeof(const std::string_view), arr>::value
+	std::wstring
+	wtos(const std::string& value);
 
 }

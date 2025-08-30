@@ -1,4 +1,5 @@
 #pragma once
+#include "bindings/Texture.h"
 #include "draw/DrawableBase.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -9,7 +10,12 @@ namespace gfx
 	class Mesh : public DrawableBase<Mesh>
 	{
 	public:
-		Mesh(DX11Graphics& gfx, const aiMesh& mesh);
+		Mesh(
+			DX11Graphics&           gfx,
+			std::string_view        modelPath,
+			const aiMesh&           mesh,
+			const aiMaterial*       material,
+			const aiTexture* const* textureArray);
 
 		void
 		Draw(Graphics& gfx, DirectX::FXMMATRIX accumulatedTransform) const noexcept;
@@ -19,6 +25,16 @@ namespace gfx
 
 		static void
 		StaticBindingsConstructor(DX11Graphics& gfx, DrawableBase<Mesh>& meshBase);
+
+	private:
+		bool
+		AddTexture(
+			std::string_view        modelPath,
+			DX11Graphics&           gfx,
+			aiTextureType           type,
+			Texture::Slot           slot,
+			const aiMaterial*       material,
+			const aiTexture* const* textureArray);
 
 	private:
 		mutable DirectX::XMFLOAT4X4 transform{};

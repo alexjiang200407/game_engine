@@ -16,14 +16,27 @@ namespace gfx
 			kInvalid
 		};
 
+		enum class Slot : unsigned int
+		{
+			kDiffuse = 0u,
+			kSpecular
+		};
+
 	public:
-		Texture(DX11Graphics& gfx, const std::wstring& ws, Format format);
-		Texture(DX11Graphics& gfx, std::span<const unsigned char> bytes, Format format);
+		Texture(DX11Graphics& gfx, const std::string& str, Format format, Slot slot);
+		Texture(DX11Graphics& gfx, const std::wstring& ws, Format format, Slot slot);
+		Texture(
+			DX11Graphics&        gfx,
+			const unsigned char* bytes,
+			size_t               size,
+			Format               format,
+			Slot                 slot);
 
 		void
 		Bind(DX11Graphics& gfx) override;
 
 	private:
+		Slot                                             slot;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pTextureSRV;
 	};
 }
