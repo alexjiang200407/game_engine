@@ -5,7 +5,7 @@ ImGuiManager::ImGuiManager() noexcept
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
-	show                        = util::Settings::Module("Debug UI").Get("bInitialShown", false);
+	show                           = util::Settings::Module("Debug UI").Get("bInitialShown", false);
 	ImGui::GetIO().MouseDrawCursor = show;
 }
 
@@ -20,6 +20,6 @@ ImGuiManager::IsShowing() const noexcept
 void
 ImGuiManager::ToggleVisibility() noexcept
 {
-	show = !show;
+	show                           = !show;
 	ImGui::GetIO().MouseDrawCursor = show;
 }

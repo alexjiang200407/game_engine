@@ -122,4 +122,34 @@ wnd::Mouse::DispatchInputEvents()
 	{
 		Produce(*mouseEvt);
 	}
+
+	if (HasStateFlag(MouseEvent::StateFlags::kLeftDown))
+	{
+		MouseEvent evt{};
+		evt.type  = MouseEvent::Type::kLHeld;
+		evt.state = state;
+		evt.x     = x;
+		evt.y     = y;
+		Produce(evt);
+	}
+
+	if (HasStateFlag(MouseEvent::StateFlags::kRightDown))
+	{
+		MouseEvent evt{};
+		evt.type  = MouseEvent::Type::kRHeld;
+		evt.state = state;
+		evt.x     = x;
+		evt.y     = y;
+		Produce(evt);
+	}
+
+	if (HasStateFlag(MouseEvent::StateFlags::kMiddleDown))
+	{
+		MouseEvent evt{};
+		evt.type  = MouseEvent::Type::kMHeld;
+		evt.state = state;
+		evt.x     = x;
+		evt.y     = y;
+		Produce(evt);
+	}
 }

@@ -11,6 +11,7 @@ namespace wnd
 		enum class Type
 		{
 			kUp,
+			kPressed,
 			kDown,
 			kInvalid,
 		} type;

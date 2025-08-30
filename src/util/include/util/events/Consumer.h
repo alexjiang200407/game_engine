@@ -10,6 +10,7 @@ namespace util
 	class Consumer
 	{
 		friend class Producer<Event>;
+
 	private:
 		virtual void
 		Consume(const Event& event, const Producer<Event>& producer) = 0;

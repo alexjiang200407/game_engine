@@ -13,6 +13,7 @@ namespace wnd
 			kLeftDown     = 1 << 0,
 			kRightDown    = 1 << 1,
 			kMiddleDown   = 1 << 2,
+			kButtonDown   = kLeftDown | kRightDown | kMiddleDown,
 			kInsideWindow = 1 << 3,
 		};
 
@@ -22,10 +23,13 @@ namespace wnd
 		{
 			kLPress,
 			kLRelease,
+			kLHeld,
 			kRPress,
 			kRRelease,
+			kRHeld,
 			kMPress,
 			kMRelease,
+			kMHeld,
 			kWheel,
 			kMove,
 			kEnter,

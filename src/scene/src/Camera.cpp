@@ -1,5 +1,8 @@
 #include "scene/Camera.h"
 
+static constexpr float travelSpeed   = 0.4f;
+static constexpr float rotationSpeed = 0.004f;
+
 scene::Camera::Camera() noexcept { Reset(); }
 
 DirectX::XMMATRIX
@@ -17,26 +20,6 @@ scene::Camera::GetMatrix() const noexcept
 }
 
 void
-scene::Camera::DrawControlWindow() noexcept
-{
-	if (ImGui::Begin("Camera"))
-	{
-		ImGui::Text("Position");
-		ImGui::SliderFloat("X", &pos.x, -80.0f, 80.0f, "%.1f");
-		ImGui::SliderFloat("Y", &pos.y, -80.0f, 80.0f, "%.1f");
-		ImGui::SliderFloat("Z", &pos.z, -80.0f, 80.0f, "%.1f");
-		ImGui::Text("Orientation");
-		ImGui::SliderAngle("Pitch", &pitch, -180.0f, 180.0f);
-		ImGui::SliderAngle("Yaw", &yaw, -180.0f, 180.0f);
-		if (ImGui::Button("Reset"))
-		{
-			Reset();
-		}
-	}
-	ImGui::End();
-}
-
-void
 scene::Camera::Reset() noexcept
 {
 	pos   = { 0.0f, 7.5f, -18.0f };
@@ -48,7 +31,10 @@ void
 scene::Camera::Rotate(float dx, float dy) noexcept
 {
 	yaw   = util::math::wrap_angle(yaw + dx * rotationSpeed);
-	pitch = std::clamp(pitch + dy * rotationSpeed, -util::math::PI / 2.0f, util::math::PI / 2.0f);
+	pitch = std::clamp(
+		pitch + dy * rotationSpeed,
+		0.995f * -util::math::PI / 2.0f,
+		0.995f * util::math::PI / 2.0f);
 }
 
 void
@@ -74,7 +60,7 @@ scene::Camera::Consume(const wnd::KeyEvent& event, const util::Producer<wnd::Key
 
 	logger::info("{}", event.code);
 
-	if (event.type != wnd::KeyEvent::Type::kDown)
+	if (event.type != wnd::KeyEvent::Type::kPressed)
 		return;
 
 	switch (event.code)
@@ -101,20 +87,22 @@ scene::Camera::Consume(const wnd::KeyEvent& event, const util::Producer<wnd::Key
 void
 scene::Camera::Consume(const wnd::MouseEvent& event, const util::Producer<wnd::MouseEvent>&)
 {
-	using Type = wnd::MouseEvent::Type;
+	using Type   = wnd::MouseEvent::Type;
 	namespace dx = DirectX;
-	
+
 	auto translation = dx::XMFLOAT3{};
+
+	using Flags = wnd::MouseEvent::StateFlags;
 
 	switch (event.type)
 	{
 	case Type::kMove:
 		Rotate(static_cast<float>(event.dx), static_cast<float>(event.dy));
 		break;
-	case Type::kLPress:
+	case Type::kLHeld:
 		translation.y = travelSpeed;
 		break;
-	case Type::kRPress:
+	case Type::kRHeld:
 		translation.y = -travelSpeed;
 		break;
 	default:

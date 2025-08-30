@@ -16,8 +16,11 @@ gfx::Node::ParseNode(
 	const auto rootTransform = dx::XMMatrixTranspose(
 		dx::XMLoadFloat4x4(reinterpret_cast<const dx::XMFLOAT4X4*>(&root.mTransformation)));
 
-	auto pRoot =
-		std::make_unique<gfx::Node>(0u, root.mName.C_Str(), std::vector<gfx::Mesh*>{}, rootTransform);
+	auto pRoot = std::make_unique<gfx::Node>(
+		0u,
+		root.mName.C_Str(),
+		std::vector<gfx::Mesh*>{},
+		rootTransform);
 
 	if (root.mNumMeshes > 0)
 	{
@@ -76,7 +79,8 @@ gfx::Node::DrawNodeHierarchyPanel(Node*& pSelectedNode) const
 		auto [node, popParent] = std::move(stack.top());
 		stack.pop();
 
-		const auto selectedIdx = pSelectedNode ? pSelectedNode->idx : std::numeric_limits<size_t>::max();
+		const auto selectedIdx =
+			pSelectedNode ? pSelectedNode->idx : std::numeric_limits<size_t>::max();
 		const auto nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow |
 		                       ((selectedIdx == currentNode) ? ImGuiTreeNodeFlags_Selected : 0) |
 		                       ((node->childPtrs.size() == 0) ? ImGuiTreeNodeFlags_Leaf : 0);
@@ -162,7 +166,8 @@ gfx::Node::Node(
 	std::size_t              a_idx,
 	std::string_view         a_name,
 	std::vector<Mesh*>       meshPtrs,
-	const DirectX::XMMATRIX& transform) noexcept : idx(a_idx), name(a_name), meshPtrs(std::move(meshPtrs))
+	const DirectX::XMMATRIX& transform) noexcept :
+	idx(a_idx), name(a_name), meshPtrs(std::move(meshPtrs))
 {
 	namespace dx = DirectX;
 	dx::XMStoreFloat4x4(&baseTransform, transform);

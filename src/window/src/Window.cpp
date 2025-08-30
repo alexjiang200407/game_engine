@@ -64,10 +64,10 @@ Window::~Window() noexcept
 void
 Window::CreateAppWindow(HINSTANCE a_hInstance, int width, int height, const wchar_t* title)
 {
-	format               = static_cast<Format>(wndSettings.Get("uWindowFormat", 0u));
-	DWORD        style   = 0;
-	DWORD        exStyle = 0;
-	RECT         rect    = { 0, 0, width, height };
+	format        = static_cast<Format>(wndSettings.Get("uWindowFormat", 0u));
+	DWORD style   = 0;
+	DWORD exStyle = 0;
+	RECT  rect    = { 0, 0, width, height };
 
 	switch (format)
 	{
@@ -358,7 +358,7 @@ Window::HandleKeyboard(RAWKEYBOARD& kb)
 {
 	bool keyDown = !(kb.Flags & RI_KEY_BREAK);
 	UINT vkey    = kb.VKey;
-	
+
 	if (keyDown)
 	{
 		kbd.OnKeyDown(vkey);

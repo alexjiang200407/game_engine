@@ -15,13 +15,13 @@ namespace gfx
 	private:
 		DrawableBase(DX11Graphics& gfx)
 		{
-			if (refCount.fetch_sub(1, std::memory_order_acq_rel) == 0)
+			if (refCount.fetch_add(1, std::memory_order_acq_rel) == 0)
 			{
 				T::StaticBindingsConstructor(gfx, *this);
 			}
 		}
 
-		~DrawableBase()
+		~DrawableBase() noexcept override
 		{
 			if (refCount.fetch_sub(1, std::memory_order_acq_rel) == 1)
 			{

@@ -35,6 +35,7 @@ Keyboard::ReadChar() noexcept
 void
 Keyboard::Clear() noexcept
 {
+	keyStates.reset();
 	keyBuffer.clear();
 	charBuffer.clear();
 }
@@ -45,6 +46,14 @@ wnd::Keyboard::DispatchInputEvents()
 	while (auto keyEvt = ReadKey())
 	{
 		Produce(*keyEvt);
+	}
+
+	for (uint32_t i = 0; i < nKeys; ++i)
+	{
+		if (keyStates.test(i))
+		{
+			Produce(KeyEvent(KeyEvent::Type::kPressed, i));
+		}
 	}
 }
 

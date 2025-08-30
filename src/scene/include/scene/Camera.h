@@ -14,9 +14,6 @@ namespace scene
 		GetMatrix() const noexcept;
 
 		void
-		DrawControlWindow() noexcept;
-
-		void
 		Reset() noexcept;
 
 		void
@@ -38,8 +35,5 @@ namespace scene
 
 		float pitch = 0.0f;
 		float yaw   = 0.0f;
-
-		static constexpr float travelSpeed   = 1.3f;
-		static constexpr float rotationSpeed = 0.004f;
 	};
 }
