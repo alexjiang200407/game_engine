@@ -1,5 +1,4 @@
 #pragma once
-#include "CommandRegister.h"
 #include <string>
 
 namespace ImGui
@@ -16,9 +15,8 @@ namespace ImGui
 		ProcessPending() noexcept;
 
 	private:
-		friend class ::CommandRegister;
-
-		std::string              buf;
-		std::vector<std::string> history;
+		std::string                               buf;
+		std::vector<std::pair<std::string, bool>> history;
+		int                                       historyIdx = -1;
 	};
 }

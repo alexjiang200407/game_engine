@@ -1,14 +1,7 @@
-#include "CommandRegister.h"
-#include <imgui.h>
+#include "util/CommandRegister.h"
 #include <iostream>
 
-IMGUI_API bool
-InputText(
-	const char*            label,
-	std::string*           str,
-	ImGuiInputTextFlags    flags     = ImGuiInputTextFlags_EnterReturnsTrue,
-	ImGuiInputTextCallback callback  = NULL,
-	void*                  user_data = NULL);
+using namespace util;
 
 CommandRegister::CommandRegister() : root(std::make_unique<Node>()) {}
 	
@@ -124,9 +117,6 @@ CommandRegister::Execute(const std::string& cmdLine)
 		std::istringstream iss{ remaining };
 		node->handler(iss);
 	};
-
-	//lastError.clear();
-
 }
 
 void

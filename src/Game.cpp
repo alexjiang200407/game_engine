@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <util/CommandRegister.h>
 
 Game::Game() :
 	light(std::move(factory.CreatePointLight(gfx))),
@@ -9,9 +10,15 @@ Game::Game() :
 	camera = wnd.kbd.RegisterConsumer<scene::Camera>();
 	wnd.mouse.RegisterConsumer(camera);
 
-	CommandRegister::Instance().Register(
+	util::CommandRegister::Register(
 		"ResizeBuffers",
 		[this](unsigned int width, unsigned int height) {
+
+			if (width < 800u || height < 600u)
+			{
+				throw std::runtime_error("width or height too small");
+			}
+
 			gfx.ResizeBuffers(width, height);
 			wnd.ResizeWindow(width, height);
 		});

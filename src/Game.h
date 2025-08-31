@@ -7,7 +7,6 @@
 #include <scene/Camera.h>
 #include <util/Timer.h>
 #include <window/Window.h>
-#include "CommandRegister.h"
 #include "CommandLine.h"
 
 class Game
