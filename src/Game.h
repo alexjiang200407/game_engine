@@ -8,6 +8,7 @@
 #include <util/Timer.h>
 #include <window/Window.h>
 #include "CommandRegister.h"
+#include "CommandLine.h"
 
 class Game
 {
@@ -22,11 +23,12 @@ private:
 	DoFrame();
 
 private:
-	gfx::GFXFactory factory;
-	ImGuiManager    imgui;  // Must be before window and graphics
-	wnd::Window     wnd;
-	gfx::Graphics   gfx;
-	util::Timer     timer;
+	gfx::GFXFactory        factory;
+	ImGuiManager           imgui;  // Must be before window and graphics
+	wnd::Window            wnd;
+	gfx::Graphics          gfx;
+	ImGui::CommandLine     cmdLine;
+	util::Timer            timer;
 
 	bool drawDebugUI = true;
 

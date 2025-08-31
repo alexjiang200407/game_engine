@@ -9,7 +9,7 @@ Game::Game() :
 	camera = wnd.kbd.RegisterConsumer<scene::Camera>();
 	wnd.mouse.RegisterConsumer(camera);
 
-	ImGui::CommandRegister::Instance().Register(
+	CommandRegister::Instance().Register(
 		"ResizeBuffers",
 		[this](unsigned int width, unsigned int height) {
 			gfx.ResizeBuffers(width, height);
@@ -38,9 +38,8 @@ Game::Play()
 			wnd.mouse.Clear();
 		}
 
+		cmdLine.ProcessPending();
 		DoFrame();
-		ImGui::CommandRegister::Instance().Process();
-
 	}
 }
 
@@ -70,7 +69,7 @@ Game::DoFrame()
 		light->DrawControlWindow();
 
 		pModel->DrawControlPanel();
-		ImGui::CommandRegister::Instance().DrawControlWindow();
+		cmdLine.DrawControlWindow();
 	}
 	pModel->Draw(gfx);
 
