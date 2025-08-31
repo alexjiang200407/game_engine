@@ -1,9 +1,9 @@
 #include "bindings/PixelShader.h"
 
-gfx::PixelShader::PixelShader(DX11Graphics& gfx, const std::wstring& path)
+gfx::PixelShader::PixelShader(DX11Graphics& gfx, const wchar_t* path) : Bindable(path)
 {
 	Microsoft::WRL::ComPtr<ID3DBlob> pBlob;
-	DX_HR_ERROR_TEST_AND_THROW(D3DReadFileToBlob(path.c_str(), &pBlob));
+	DX_HR_ERROR_TEST_AND_THROW(D3DReadFileToBlob(path, &pBlob));
 	DX_HR_ERROR_TEST_AND_THROW(GetDevice(gfx)->CreatePixelShader(
 		pBlob->GetBufferPointer(),
 		pBlob->GetBufferSize(),

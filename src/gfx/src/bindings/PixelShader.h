@@ -5,10 +5,10 @@ namespace gfx
 {
 	class DX11Graphics;
 
-	class PixelShader : public Bindable
+	class PixelShader : public Bindable<PixelShader, const wchar_t*>
 	{
 	public:
-		PixelShader(DX11Graphics& gfx, const std::wstring& path);
+		PixelShader(DX11Graphics& gfx, const wchar_t* path);
 
 		void
 		Bind(DX11Graphics& gfx) override;

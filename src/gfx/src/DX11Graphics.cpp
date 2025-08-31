@@ -1,6 +1,7 @@
 #include "DX11Graphics.h"
 #include <DirectXMath.h>
 #include <imgui_impl_dx11.h>
+#include "draw/Codex.h"
 
 namespace wrl = Microsoft::WRL;
 namespace dx  = DirectX;
@@ -222,7 +223,11 @@ gfx::DX11Graphics::DX11Graphics() : gfxSettings(util::Settings::Module("Graphics
 	}
 }
 
-gfx::DX11Graphics::~DX11Graphics() noexcept { ImGui_ImplDX11_Shutdown(); }
+gfx::DX11Graphics::~DX11Graphics() noexcept
+{
+	ImGui_ImplDX11_Shutdown();
+	Codex::Clear();
+}
 
 void
 gfx::DX11Graphics::SetNextDrawIndexCount(UINT indexCount) noexcept

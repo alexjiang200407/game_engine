@@ -1,17 +1,19 @@
 #pragma once
 #include "bindings/Bindable.h"
+#include "geom/Vertex.h"
 
 namespace gfx
 {
 	class DX11Graphics;
 
-	class InputLayout : public Bindable
+	class InputLayout : public Bindable<InputLayout, const geom::VertexLayout&>
 	{
 	public:
 		InputLayout(
-			DX11Graphics&                                gfx,
-			const std::vector<D3D11_INPUT_ELEMENT_DESC>& layout,
-			ID3DBlob*                                    pVertexShaderBytecode);
+			DX11Graphics&             gfx,
+			const geom::VertexLayout& layout,
+			ID3DBlob*                 pVertexShaderBytecode);
+
 		void
 		Bind(DX11Graphics& gfx) override;
 

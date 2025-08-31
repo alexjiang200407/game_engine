@@ -1,8 +1,11 @@
 #include "bindings/IndexBuffer.h"
 #include "DX11Graphics.h"
 
-gfx::IndexBuffer::IndexBuffer(DX11Graphics& gfx, const std::vector<unsigned short>& indices) :
-	count((UINT)indices.size())
+gfx::IndexBuffer::IndexBuffer(
+	DX11Graphics&                      gfx,
+	const std::vector<unsigned short>& indices,
+	std::string_view                   fileName,
+	std::string_view tag) : Bindable(fileName, tag), count(static_cast<UINT>(indices.size()))
 {
 	D3D11_BUFFER_DESC ibd      = {};
 	ibd.BindFlags              = D3D11_BIND_INDEX_BUFFER;

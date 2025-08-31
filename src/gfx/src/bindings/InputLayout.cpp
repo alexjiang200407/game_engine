@@ -1,13 +1,14 @@
 #include "bindings/InputLayout.h"
 
 gfx::InputLayout::InputLayout(
-	DX11Graphics&                                gfx,
-	const std::vector<D3D11_INPUT_ELEMENT_DESC>& layout,
-	ID3DBlob*                                    pVertexShaderBytecode)
+	DX11Graphics&             gfx,
+	const geom::VertexLayout& layout,
+	ID3DBlob*                 pVertexShaderBytecode) : Bindable(layout)
 {
+	const auto d3dLayout = layout.GetD3DLayout();
 	DX_HR_ERROR_TEST_AND_THROW(GetDevice(gfx)->CreateInputLayout(
-		layout.data(),
-		(UINT)layout.size(),
+		d3dLayout.data(),
+		static_cast<UINT>(d3dLayout.size()),
 		pVertexShaderBytecode->GetBufferPointer(),
 		pVertexShaderBytecode->GetBufferSize(),
 		&pInputLayout));

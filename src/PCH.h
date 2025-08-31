@@ -16,6 +16,7 @@
 #include <cassert>
 #include <filesystem>
 #include <format>
+#include <iomanip>
 #include <limits>
 #include <memory>
 #include <mutex>
@@ -34,13 +35,15 @@
 #include <variant>
 #include <vector>
 
-#include "util/EnumSet.h"
-#include "util/Settings.h"
-#include "util/logger.h"
-#include "util/math.h"
+#include <util/EnumSet.h>
+#include <util/Settings.h>
+#include <util/logger.h>
+#include <util/math.h>
+#include <util/str.h>
 
 #include <DirectXMath.h>
 
 #include <imgui.h>
 
 using namespace std::string_literals;
+using namespace std::literals;

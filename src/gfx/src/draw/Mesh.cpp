@@ -1,13 +1,15 @@
 #include "draw/Mesh.h"
 #include "bindings/Bindings.h"
+#include "draw/Codex.h"
 #include "geom/Geometry.h"
 
+using namespace std::literals;
+
 gfx::Mesh::Mesh(
-	DX11Graphics&           gfx,
-	std::string_view        modelPath,
-	const aiMesh&           mesh,
-	const aiMaterial*       material,
-	const aiTexture* const* textureArray) : DrawableBase<Mesh>(gfx)
+	DX11Graphics&     gfx,
+	std::string_view  modelPath,
+	const aiMesh&     mesh,
+	const aiMaterial* material)
 {
 	namespace dx      = DirectX;
 	using ElementType = geom::VertexLayout::ElementType;
@@ -42,53 +44,60 @@ gfx::Mesh::Mesh(
 	// Load Textures
 	if (material)
 	{
-		hasDiffuse = AddTexture(
-			modelPath,
-			gfx,
-			aiTextureType_DIFFUSE,
-			Texture::Slot::kDiffuse,
-			material,
-			textureArray);
+		hasDiffuse =
+			AddTexture(modelPath, gfx, aiTextureType_DIFFUSE, Texture::Slot::kDiffuse, material);
 
-		hasSpecular = AddTexture(
-			modelPath,
-			gfx,
-			aiTextureType_SPECULAR,
-			Texture::Slot::kSpecular,
-			material,
-			textureArray);
+		hasSpecular =
+			AddTexture(modelPath, gfx, aiTextureType_SPECULAR, Texture::Slot::kSpecular, material);
 
 		if (hasDiffuse || hasSpecular)
-			AddBind<Sampler>(gfx);
+			AddBind<Sampler>({}, gfx);
 
 		if (!hasSpecular)
 			material->Get(AI_MATKEY_SHININESS, shininess);
 	}
 
-	AddBind<VertexBuffer>(gfx, vbuf);
-	AddBind<IndexBuffer>(gfx, indices);
+	auto tag = std::string_view(mesh.mName.C_Str(), mesh.mName.length);
 
-	auto& pvs   = AddBind<VertexShader>(gfx, L"shaders/vs_phong.cso");
+	AddBind<VertexBuffer>({ modelPath, tag }, gfx, vbuf, modelPath, tag);
+	AddBind<IndexBuffer>({ modelPath, tag }, gfx, indices, modelPath, tag);
+
+	static constexpr const auto* vertexShader = L"shaders/vs_phong.cso";
+
+	auto& pvs   = AddBind<VertexShader>({ vertexShader }, gfx, vertexShader);
 	auto  pvsbc = pvs.GetBytecode();
 
+	const auto& layout = vbuf.GetLayout();
+	AddBind<InputLayout>({ layout }, gfx, layout, pvsbc);
+
 	if (hasSpecular)
-		AddBind<PixelShader>(gfx, L"shaders/ps_phong_specular.cso");
-	else
-		AddBind<PixelShader>(gfx, L"shaders/ps_phong.cso");
-
-	AddBind<InputLayout>(gfx, vbuf.GetLayout().GetD3DLayout(), pvsbc);
-
-	struct PSMaterialConstant
 	{
-		float specularIntensity = 1.6f;
-		float specularPower;
-		float padding[2];
-	} pmc;
+		static constexpr const auto* pixelShader = L"shaders/ps_phong_specular.cso";
+		AddBind<PixelShader>({ pixelShader }, gfx, pixelShader);
+	}
+	else
+	{
+		static constexpr const auto* pixelShader = L"shaders/ps_phong.cso";
+		AddBind<PixelShader>({ pixelShader }, gfx, pixelShader);
 
-	pmc.specularPower = shininess;
+		struct PSMaterialConstant
+		{
+			float specularIntensity = 1.6f;
+			float specularPower;
+			float padding[2];
+		} pmc;
 
-	AddBind<PixelConstantBuffer<PSMaterialConstant>>(gfx, pmc, 1u);
-	AddBind<TransformCBuffer>(gfx, *this);
+		pmc.specularPower = shininess;
+
+		AddBind<PixelConstantBuffer<PSMaterialConstant>>({ 1u }, gfx, pmc, 1u);
+	}
+
+	AddBind<Topology>(
+		{ static_cast<int>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) },
+		gfx,
+		D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	AddUniqueBind<TransformCBuffer>(gfx, *this);
 }
 
 DirectX::XMMATRIX
@@ -104,20 +113,13 @@ gfx::Mesh::Draw(Graphics& gfx, DirectX::FXMMATRIX accumulatedTransform) const no
 	Drawable::Draw(gfx);
 }
 
-void
-gfx::Mesh::StaticBindingsConstructor(DX11Graphics& gfx, DrawableBase<Mesh>& meshBase)
-{
-	meshBase.AddStaticBind<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-}
-
 bool
 gfx::Mesh::AddTexture(
-	std::string_view        modelPath,
-	DX11Graphics&           gfx,
-	aiTextureType           type,
-	Texture::Slot           slot,
-	const aiMaterial*       material,
-	const aiTexture* const* textureArray)
+	std::string_view  modelPath,
+	DX11Graphics&     gfx,
+	aiTextureType     type,
+	Texture::Slot     slot,
+	const aiMaterial* material)
 {
 	namespace fs = std::filesystem;
 
@@ -125,18 +127,9 @@ gfx::Mesh::AddTexture(
 	if (material->GetTexture(type, 0, &texFileName) == AI_SUCCESS)
 	{
 		auto* texFileNameCStr = texFileName.C_Str();
-		if (texFileNameCStr[0] == '*' && textureArray)
+		if (texFileNameCStr[0] == '*')
 		{
-			// Handle embedded textures
-			// TODO: Handle compression
-			int   texIndex = atoi(&texFileNameCStr[1]);
-			auto* tex      = textureArray[texIndex];
-			AddBind<Texture>(
-				gfx,
-				reinterpret_cast<const unsigned char*>(tex->pcData),
-				tex->mWidth,
-				Texture::Format::kPNG,
-				slot);
+			throw std::runtime_error("Embedded textures not supported");
 		}
 		else
 		{
@@ -147,8 +140,10 @@ gfx::Mesh::AddTexture(
 				logger::warn("No parent path");
 			}
 
-			const auto file = path.parent_path() / texFileName.C_Str();
-			AddBind<Texture>(gfx, file.wstring(), Texture::Format::kPNG, slot);
+			const auto file     = path.parent_path() / texFileName.C_Str();
+			const auto fileWstr = file.generic_wstring();
+
+			AddBind<Texture>({ fileWstr }, gfx, fileWstr, Texture::Format::kPNG, slot);
 		}
 		return true;
 	}

@@ -13,7 +13,12 @@ namespace util
 		return success;
 	}
 
+	[[nodiscard]]
 	std::wstring
-	wtos(const std::string& value);
+	stow(const std::string_view& value);
+
+	[[nodiscard]]
+	std::string
+	wtos(const std::wstring_view& value);
 
 }

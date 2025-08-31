@@ -5,11 +5,11 @@
 namespace wrl = Microsoft::WRL;
 
 gfx::Texture::Texture(DX11Graphics& gfx, const std::string& str, Format format, Slot a_slot) :
-	Texture(gfx, util::wtos(str), format, a_slot)
+	Texture(gfx, util::stow(str), format, a_slot)
 {}
 
 gfx::Texture::Texture(DX11Graphics& gfx, const std::wstring& ws, Format format, Slot a_slot) :
-	slot(a_slot)
+	Bindable(ws), slot(a_slot)
 {
 	namespace dx = DirectX;
 
@@ -42,45 +42,6 @@ gfx::Texture::Texture(DX11Graphics& gfx, const std::wstring& ws, Format format, 
 				DirectX::TEX_THRESHOLD_DEFAULT,
 				converted));
 			image = std::move(converted);
-		}
-
-		DX_HR_ERROR_TEST_AND_THROW(dx::CreateTexture(
-			GetDevice(gfx),
-			image.GetImages(),
-			image.GetImageCount(),
-			image.GetMetadata(),
-			&texture));
-	}
-
-	DX_HR_ERROR_TEST_AND_THROW(
-		GetDevice(gfx)->CreateShaderResourceView(texture.Get(), nullptr, &pTextureSRV));
-}
-
-gfx::Texture::Texture(
-	DX11Graphics&        gfx,
-	const unsigned char* bytes,
-	size_t               size,
-	Format               format,
-	Slot                 a_slot) : slot(a_slot)
-{
-	namespace dx = DirectX;
-
-	wrl::ComPtr<ID3D11Resource> texture;
-	{
-		dx::ScratchImage image;
-		switch (format)
-		{
-		case Format::kDDS:
-			DX_HR_ERROR_TEST_AND_THROW(
-				dx::LoadFromDDSMemory(bytes, size, DirectX::DDS_FLAGS_NONE, nullptr, image));
-			break;
-		case Format::kPNG:
-		case Format::kJPG:
-			DX_HR_ERROR_TEST_AND_THROW(
-				dx::LoadFromWICMemory(bytes, size, DirectX::WIC_FLAGS_NONE, nullptr, image));
-			break;
-		default:
-			throw std::runtime_error("Invalid format");
 		}
 
 		DX_HR_ERROR_TEST_AND_THROW(dx::CreateTexture(

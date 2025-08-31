@@ -13,7 +13,8 @@ Game::ResizeWindow(Game& g, unsigned int width, unsigned int height)
 
 Game::Game() :
 	light(std::move(factory.CreatePointLight(gfx))),
-	pModel(std::move(factory.CreateModel(gfx, "assets/meshes/objtest/nanosuit.obj")))
+	pModel(std::move(factory.CreateModel(gfx, "assets/meshes/objtest/nanosuit.obj"))),
+	pModel2(std::move(factory.CreateModel(gfx, "assets/meshes/objtest/nanosuit.obj")))
 {
 	gfx.SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
 	gfx.SetCamera(DirectX::XMMatrixTranslation(0.0f, 0.0f, 20.0f));
@@ -78,6 +79,7 @@ Game::DoFrame()
 		cmdLine.DrawControlWindow();
 	}
 	pModel->Draw(gfx);
+	pModel2->Draw(gfx);
 
 	light->Draw(gfx);
 

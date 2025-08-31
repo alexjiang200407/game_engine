@@ -5,7 +5,7 @@ namespace gfx
 {
 	class DX11Graphics;
 
-	class Texture : public Bindable
+	class Texture : public Bindable<Texture, std::wstring_view>
 	{
 	public:
 		enum class Format
@@ -25,12 +25,6 @@ namespace gfx
 	public:
 		Texture(DX11Graphics& gfx, const std::string& str, Format format, Slot slot);
 		Texture(DX11Graphics& gfx, const std::wstring& ws, Format format, Slot slot);
-		Texture(
-			DX11Graphics&        gfx,
-			const unsigned char* bytes,
-			size_t               size,
-			Format               format,
-			Slot                 slot);
 
 		void
 		Bind(DX11Graphics& gfx) override;

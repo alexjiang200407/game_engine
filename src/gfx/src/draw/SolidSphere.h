@@ -1,9 +1,9 @@
 #pragma once
-#include "draw/DrawableBase.h"
+#include "draw/Drawable.h"
 
 namespace gfx
 {
-	class SolidSphere : public DrawableBase<SolidSphere>
+	class SolidSphere : public Drawable
 	{
 	public:
 		SolidSphere(DX11Graphics& gfx, float radius);
@@ -16,9 +16,6 @@ namespace gfx
 
 		DirectX::XMMATRIX
 		GetTransformXM() const noexcept override;
-
-		static void
-		StaticBindingsConstructor(DX11Graphics& gfx, DrawableBase<SolidSphere>& solidSphereBase);
 
 	private:
 		DirectX::XMFLOAT3 pos = { 1.0f, 1.0f, 1.0f };

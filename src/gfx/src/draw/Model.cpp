@@ -218,8 +218,7 @@ gfx::Model::Model(Graphics& gfx, std::string_view a_fileName) :
 				*gfx,
 				fileNameSv,
 				*pScene->mMeshes[i],
-				idx >= 0 ? pScene->mMaterials[idx] : nullptr,
-				pScene->mTextures));
+				idx >= 0 ? pScene->mMaterials[idx] : nullptr));
 		}
 	}
 
