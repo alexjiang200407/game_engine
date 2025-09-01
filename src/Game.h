@@ -8,8 +8,9 @@
 #include <util/Timer.h>
 #include <window/Window.h>
 #include "CommandLine.h"
+#include <util/CommandContext.h>
 
-class Game
+class Game : public util::CommandContext<Game>
 {
 public:
 	Game();
@@ -20,6 +21,9 @@ public:
 private:
 	void
 	DoFrame();
+
+	static void
+	ResizeWindow(Game& game, unsigned int width, unsigned int height);
 
 private:
 	gfx::GFXFactory        factory;

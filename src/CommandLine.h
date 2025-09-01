@@ -1,12 +1,13 @@
 #pragma once
 #include <string>
+#include <util/CommandContext.h>
 
 namespace ImGui
 {
-	class CommandLine
+	class CommandLine : public util::CommandContext<CommandLine>
 	{
 	public:
-		CommandLine() = default;
+		CommandLine();
 
 		void
 		DrawControlWindow() noexcept;
@@ -15,8 +16,13 @@ namespace ImGui
 		ProcessPending() noexcept;
 
 	private:
+		static void
+		Clear(CommandLine& cl) noexcept;
+
+	private:
 		std::string                               buf;
-		std::vector<std::pair<std::string, bool>> history;
+		std::vector<std::pair<std::string, bool>> displayHistory;
+		std::vector<std::string>                  inputHistory;
 		int                                       historyIdx = -1;
 	};
 }

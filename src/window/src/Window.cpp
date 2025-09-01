@@ -12,6 +12,15 @@ ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 
 using namespace wnd;
 
+namespace
+{
+	void
+	Quit(Window&)
+	{
+		PostQuitMessage(0);
+	}
+}
+
 Window::Window() :
 	hInstance(GetModuleHandle(nullptr)), wndSettings(util::Settings::Module("Window"))
 {
@@ -50,8 +59,7 @@ Window::Window() :
 
 	while (::ShowCursor(FALSE) >= 0);
 
-
-	util::CommandRegister::Register("Quit", []() { PostQuitMessage(0); });
+	RegisterCommand("Quit", Quit);
 }
 
 Window::~Window() noexcept
@@ -63,7 +71,7 @@ Window::~Window() noexcept
 		hWnd = nullptr;
 	}
 	assert(UnregisterClass(CLASS_NAME, hInstance) != 0);
-	util::CommandRegister::Unregister("Quit");
+	//util::CommandRegister::Unregister("Quit");
 }
 
 void

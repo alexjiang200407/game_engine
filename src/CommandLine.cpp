@@ -5,6 +5,12 @@
 namespace ImGui
 {
 
+	void
+	CommandLine::Clear(CommandLine& cl) noexcept
+	{
+		cl.displayHistory.clear();
+	}
+
 	IMGUI_API bool
 	InputText(
 		const char*            label,
@@ -12,6 +18,11 @@ namespace ImGui
 		ImGuiInputTextFlags    flags     = ImGuiInputTextFlags_EnterReturnsTrue,
 		ImGuiInputTextCallback callback  = NULL,
 		void*                  user_data = NULL);
+
+	CommandLine::CommandLine()
+	{
+		RegisterCommand("Clear", Clear);
+	}
 
 	void
 	CommandLine::DrawControlWindow() noexcept
@@ -23,7 +34,7 @@ namespace ImGui
 			false,
 			ImGuiWindowFlags_HorizontalScrollbar);
 
-		for (const auto& [line, isError] : history)
+		for (const auto& [line, isError] : displayHistory)
 		{
 			if (isError)
 				ImGui::TextColored(ImVec4(1.0f, 0.2f, 0.2f, 1.0f), "%s", line.c_str());
@@ -51,28 +62,28 @@ namespace ImGui
 				if (data->EventKey == ImGuiKey_UpArrow)
 				{
 					if (console->historyIdx == -1)
-						console->historyIdx = static_cast<int>(console->history.size()) - 1;
+						console->historyIdx = static_cast<int>(console->inputHistory.size()) - 1;
 					else if (console->historyIdx > 0)
 						console->historyIdx--;
 
 					if (console->historyIdx >= 0 &&
-					    console->historyIdx < (int)console->history.size())
+					    console->historyIdx < (int)console->inputHistory.size())
 						data->DeleteChars(0, data->BufTextLen),
 							data->InsertChars(
 								0,
-								console->history[console->historyIdx].first.c_str());
+								console->inputHistory[console->historyIdx].c_str());
 				}
 				else if (data->EventKey == ImGuiKey_DownArrow)
 				{
 					if (console->historyIdx != -1 &&
-					    console->historyIdx < (int)console->history.size() - 1)
+					    console->historyIdx < (int)console->inputHistory.size() - 1)
 						console->historyIdx++;
 					else
 						console->historyIdx = -1;
 
 					data->DeleteChars(0, data->BufTextLen);
 					if (console->historyIdx >= 0)
-						data->InsertChars(0, console->history[console->historyIdx].first.c_str());
+						data->InsertChars(0, console->inputHistory[console->historyIdx].c_str());
 				}
 			}
 			return 0;
@@ -83,17 +94,19 @@ namespace ImGui
 			try
 			{
 				util::CommandRegister::Execute(buf);
-				history.emplace_back(buf, false);
+				displayHistory.emplace_back(buf, false);
 			}
 			catch (const std::exception& e)
 			{
-				history.emplace_back(e.what(), true);
+				displayHistory.emplace_back(e.what(), true);
 			}
 			catch (...)
 			{
-				history.emplace_back("Unknown exception", true);
+				displayHistory.emplace_back("Unknown exception", true);
 			}
 
+			inputHistory.emplace_back(buf);
+			
 			buf.clear();
 			historyIdx = -1;
 
@@ -112,11 +125,11 @@ namespace ImGui
 		}
 		catch (const std::exception& e)
 		{
-			history.emplace_back(std::string("Command threw: ") + e.what(), true);
+			displayHistory.emplace_back(std::string("Command threw: ") + e.what(), true);
 		}
 		catch (...)
 		{
-			history.emplace_back("Command threw unknown exception", true);
+			displayHistory.emplace_back("Command threw unknown exception", true);
 		}
 	}
 }

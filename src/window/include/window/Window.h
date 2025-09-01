@@ -2,6 +2,7 @@
 #include "window/Keyboard.h"
 #include "window/Mouse.h"
 #include <util/Settings.h>
+#include <util/CommandContext.h>
 
 namespace gfx
 {
@@ -10,7 +11,7 @@ namespace gfx
 
 namespace wnd
 {
-	class Window
+	class Window : public util::CommandContext<Window>
 	{
 	public:
 		Window();

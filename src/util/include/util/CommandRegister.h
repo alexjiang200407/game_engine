@@ -1,20 +1,16 @@
 #pragma once
 #include <shared_mutex>
+#include "util/CommandContext.h"
 
 namespace util
 {
+	template <typename T>
+	class CommandContext;
+
 	class CommandRegister
 	{
-	public:
-		static void
-		Unregister(const std::string& cmdName) noexcept;
-
-		static void
-		Execute(const std::string& cmdLine);
-
-		static void
-		Process();
-
+		template <typename T>
+		friend class CommandContext;
 	private:
 		CommandRegister();
 		~CommandRegister()                      = default;
@@ -22,9 +18,15 @@ namespace util
 		CommandRegister&
 		operator=(const CommandRegister&) = delete;
 
-		//std::string buf;
-		//std::string lastError;
 		std::function<void()> pendingCmd;
+
+	public:
+		static void
+		Execute(const std::string& cmdLine);
+
+		static void
+		Process();
+
 
 	private:
 		struct Node
@@ -174,7 +176,9 @@ namespace util
 			};
 		}
 
-	public:
+		static void
+		Unregister(const std::string& cmdName) noexcept;
+
 		template <typename F>
 		static void
 		Register(const std::string& cmdName, F&& f)

@@ -1,6 +1,17 @@
 #include "Game.h"
 #include <util/CommandRegister.h>
 
+
+void
+Game::ResizeWindow(Game& g, unsigned int width, unsigned int height)
+{
+	if (width < 800u || height < 600u )
+		throw std::runtime_error("width or height invalid");
+
+	g.wnd.ResizeWindow(width, height);
+	g.gfx.ResizeBuffers(width, height);
+}
+
 Game::Game() :
 	light(std::move(factory.CreatePointLight(gfx))),
 	pModel(std::move(factory.CreateModel(gfx, "assets/meshes/stylized_face.glb")))
@@ -10,18 +21,7 @@ Game::Game() :
 	camera = wnd.kbd.RegisterConsumer<scene::Camera>();
 	wnd.mouse.RegisterConsumer(camera);
 
-	util::CommandRegister::Register(
-		"ResizeBuffers",
-		[this](unsigned int width, unsigned int height) {
-
-			if (width < 800u || height < 600u)
-			{
-				throw std::runtime_error("width or height too small");
-			}
-
-			gfx.ResizeBuffers(width, height);
-			wnd.ResizeWindow(width, height);
-		});
+	RegisterCommand("ResizeWindow", ResizeWindow);
 }
 
 void
