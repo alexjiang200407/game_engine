@@ -142,8 +142,20 @@ gfx::Mesh::AddTexture(
 
 			const auto file     = path.parent_path() / texFileName.C_Str();
 			const auto fileWstr = file.generic_wstring();
+			const auto fileExt  = file.extension();
 
-			AddBind<Texture>({ fileWstr }, gfx, fileWstr, Texture::Format::kPNG, slot);
+			if (fileExt == ".dds")
+			{
+				AddBind<Texture>({ fileWstr }, gfx, fileWstr, Texture::Format::kDDS, slot);
+			}
+			else if (fileExt == ".png")
+			{
+				AddBind<Texture>({ fileWstr }, gfx, fileWstr, Texture::Format::kPNG, slot);
+			}
+			else
+			{
+				throw std::runtime_error("Unsupported format " + fileExt.string());
+			}
 		}
 		return true;
 	}

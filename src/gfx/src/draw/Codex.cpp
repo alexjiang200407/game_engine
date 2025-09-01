@@ -5,24 +5,30 @@ gfx::Codex::Get(const std::string& uid)
 {
 	if (auto it = bindings.find(uid); it != bindings.end())
 	{
-		return it->second;
+		if (auto ptr = it->second.lock())
+		{
+			return ptr;
+		}
 	}
 	return nullptr;
 }
 
 void
-gfx::Codex::CullUnused() noexcept
+gfx::Codex::CullUnused(size_t elements) noexcept
 {
-	for (auto it = bindings.begin(); it != bindings.end(); )
+	for (; cur != bindings.end() && elements > 0; --elements)
 	{
-		if (it->second.use_count() == 1u)
+		if (cur->second.expired())
 		{
-			it = bindings.erase(it);
+			cur = bindings.erase(cur);
 		}
 		else
 		{
-			++it;
+			++cur;
 		}
+
+		if (cur == bindings.end())
+			cur = bindings.begin();
 	}
 }
 
