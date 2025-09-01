@@ -24,8 +24,8 @@ namespace
 Window::Window() :
 	hInstance(GetModuleHandle(nullptr)), wndSettings(util::Settings::Module("Window"))
 {
-	unsigned int width  = wndSettings.Get("uWidth", 800u);
-	unsigned int height = wndSettings.Get("uHeight", 600u);
+	width  = wndSettings.Get("uWidth", 800u);
+	height = wndSettings.Get("uHeight", 600u);
 
 	assert(
 		width < static_cast<unsigned int>(std::numeric_limits<int>::max()) &&
@@ -42,7 +42,7 @@ Window::Window() :
 	auto nameStr  = wndSettings.Get("sWindowName", "Game Engine"s);
 	auto nameWStr = std::wstring(nameStr.begin(), nameStr.end());
 
-	CreateAppWindow(hInstance, static_cast<int>(width), static_cast<int>(height), nameWStr.c_str());
+	CreateAppWindow(hInstance, nameWStr.c_str());
 
 	{
 		POINT pt{};
@@ -75,12 +75,12 @@ Window::~Window() noexcept
 }
 
 void
-Window::CreateAppWindow(HINSTANCE a_hInstance, int width, int height, const wchar_t* title)
+Window::CreateAppWindow(HINSTANCE a_hInstance, const wchar_t* title)
 {
 	format        = static_cast<Format>(wndSettings.Get("uWindowFormat", 0u));
 	DWORD style   = 0;
 	DWORD exStyle = 0;
-	RECT  rect    = { 0, 0, width, height };
+	RECT  rect    = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
 
 	switch (format)
 	{
@@ -126,18 +126,18 @@ Window::CreateAppWindow(HINSTANCE a_hInstance, int width, int height, const wcha
 		a_hInstance,
 		this));
 
-	// Has to be after window CreateWindowEx
-	if (format == Format::BorderlessWindowed)
-	{
-		ClipCursor(&rect);
-	}
-
 	WIN32_ERR_TEST_AND_THROW(ShowWindow(hWnd, SW_SHOW));
 
 	if (!ImGui_ImplWin32_Init(hWnd))
 		throw std::runtime_error("Failed to start ImGui");
 
 	WIN32_ERR_TEST_AND_THROW(UpdateWindow(hWnd));
+
+	// Has to be after window CreateWindowEx
+	if (format != Format::BorderlessFullscreen)
+	{
+		ClipCursor(&rect);
+	}
 }
 
 void
@@ -247,6 +247,21 @@ Window::HandleMessage(HWND a_hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) noex
 		PostQuitMessage(0);
 		return 0;
 
+	case WM_SETFOCUS:
+		if (format == Format::BorderlessWindowed)
+		{
+			RECT rect = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
+			ClipCursor(&rect);
+		}
+		break;
+
+	case WM_KILLFOCUS:
+		{
+			kbd.Clear();
+			mouse.Clear();
+			break;
+		}
+
 	case WM_DESTROY:
 		return 0;
 
@@ -355,13 +370,13 @@ Window::HandleMouse(RAWMOUSE& rawMouse)
 }
 
 void
-Window::ResizeWindow(unsigned int width, unsigned int height) const noexcept
+Window::ResizeWindow(unsigned int newWidth, unsigned int newHeight) const noexcept
 {
-	SetWindowPos(hWnd, nullptr, 0, 0, width, height, SWP_NOZORDER | SWP_NOMOVE);
+	SetWindowPos(hWnd, nullptr, 0, 0, newWidth, newHeight, SWP_NOZORDER | SWP_NOMOVE);
 
 	if (format == Format::BorderlessWindowed)
 	{
-		RECT rc{ 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
+		RECT rc{ 0, 0, static_cast<LONG>(newWidth), static_cast<LONG>(newHeight) };
 		ClipCursor(&rc);
 	}
 }

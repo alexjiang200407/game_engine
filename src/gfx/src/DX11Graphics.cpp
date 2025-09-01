@@ -1,7 +1,7 @@
 #include "DX11Graphics.h"
+#include "draw/Codex.h"
 #include <DirectXMath.h>
 #include <imgui_impl_dx11.h>
-#include "draw/Codex.h"
 
 namespace wrl = Microsoft::WRL;
 namespace dx  = DirectX;
