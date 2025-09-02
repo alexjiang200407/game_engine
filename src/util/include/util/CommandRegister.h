@@ -1,6 +1,6 @@
 #pragma once
-#include <shared_mutex>
 #include "util/CommandContext.h"
+#include <shared_mutex>
 
 namespace util
 {
@@ -11,6 +11,7 @@ namespace util
 	{
 		template <typename T>
 		friend class CommandContext;
+
 	private:
 		CommandRegister();
 		~CommandRegister()                      = default;
@@ -26,7 +27,6 @@ namespace util
 
 		static void
 		Process();
-
 
 	private:
 		struct Node

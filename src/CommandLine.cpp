@@ -19,10 +19,7 @@ namespace ImGui
 		ImGuiInputTextCallback callback  = NULL,
 		void*                  user_data = NULL);
 
-	CommandLine::CommandLine()
-	{
-		RegisterCommand("Clear", Clear);
-	}
+	CommandLine::CommandLine() { RegisterCommand("Clear", Clear); }
 
 	void
 	CommandLine::DrawControlWindow() noexcept
@@ -45,7 +42,6 @@ namespace ImGui
 		if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
 			ImGui::SetScrollHereY(1.0f);
 		ImGui::EndChild();
-
 
 		ImGui::Text(">>");
 		ImGui::SameLine();
@@ -106,7 +102,7 @@ namespace ImGui
 			}
 
 			inputHistory.emplace_back(buf);
-			
+
 			buf.clear();
 			historyIdx = -1;
 

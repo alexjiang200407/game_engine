@@ -11,13 +11,12 @@ namespace util
 	public:
 		CommandContext() = default;
 
-
 		//Move this to Cpp
 		~CommandContext()
 		{
 			for (const auto& id : ids)
 			{
-				 CommandRegister::Instance().Unregister(id);
+				CommandRegister::Instance().Unregister(id);
 			}
 		}
 

@@ -4,7 +4,7 @@
 using namespace util;
 
 CommandRegister::CommandRegister() : root(std::make_unique<Node>()) {}
-	
+
 CommandRegister&
 CommandRegister::Instance() noexcept
 {
@@ -75,7 +75,7 @@ CommandRegister::PruneEmptyNodes(const std::string& key) noexcept
 		Node* node = path[i];
 		if (node->hasHandler || !node->children.empty())
 			break;
-		parent = path[i - 1];
+		parent       = path[i - 1];
 		char keyChar = key[i - 1];
 		parent->children.erase(keyChar);
 	}
@@ -87,11 +87,10 @@ CommandRegister::Process()
 	if (!Instance().pendingCmd)
 		return;
 
-	auto cmd = std::move(Instance().pendingCmd);
+	auto cmd              = std::move(Instance().pendingCmd);
 	Instance().pendingCmd = nullptr;
 	cmd();
 }
-
 
 void
 CommandRegister::Execute(const std::string& cmdLine)
@@ -104,7 +103,7 @@ CommandRegister::Execute(const std::string& cmdLine)
 
 	std::shared_lock lock(Instance().mutex);
 	Node*            node = Instance().FindNode(name);
-		
+
 	if (!node || !node->hasHandler)
 	{
 		throw std::runtime_error("Unknown command: " + name);
@@ -113,7 +112,7 @@ CommandRegister::Execute(const std::string& cmdLine)
 	std::string remaining;
 	std::getline(iss, remaining, '\0');
 
-    Instance().pendingCmd = [node, remaining]() {
+	Instance().pendingCmd = [node, remaining]() {
 		std::istringstream iss{ remaining };
 		node->handler(iss);
 	};
@@ -130,5 +129,3 @@ CommandRegister::Unregister(const std::string& cmdName) noexcept
 	node->hasHandler = false;
 	Instance().PruneEmptyNodes(cmdName);
 }
-
-

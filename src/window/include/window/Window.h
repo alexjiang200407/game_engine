@@ -1,8 +1,8 @@
 #pragma once
 #include "window/Keyboard.h"
 #include "window/Mouse.h"
-#include <util/Settings.h>
 #include <util/CommandContext.h>
+#include <util/Settings.h>
 
 namespace gfx
 {

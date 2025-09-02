@@ -1,11 +1,10 @@
 #include "Game.h"
 #include <util/CommandRegister.h>
 
-
 void
 Game::ResizeWindow(Game& g, unsigned int width, unsigned int height)
 {
-	if (width < 800u || height < 600u )
+	if (width < 800u || height < 600u)
 		throw std::runtime_error("width or height invalid");
 
 	g.wnd.ResizeWindow(width, height);
