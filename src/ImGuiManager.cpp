@@ -7,6 +7,7 @@ ImGuiManager::ImGuiManager() noexcept
 	ImGui::StyleColorsDark();
 	show                           = util::Settings::Module("Debug UI").Get("bInitialShown", false);
 	ImGui::GetIO().MouseDrawCursor = show;
+	ImGui::GetIO().FontGlobalScale = 1.3f;
 }
 
 ImGuiManager::~ImGuiManager() noexcept { ImGui::DestroyContext(); }

@@ -33,7 +33,11 @@ gfx::SolidSphere::SolidSphere(DX11Graphics& gfx, float radius)
 		dx::XMFLOAT3 color = { 1.0f, 1.0f, 1.0f };
 		float        padding;
 	} colorConst;
-	AddBind<PixelConstantBuffer<PSColorConstant>>({ 0u }, gfx, colorConst);
+	AddBind<PixelConstantBuffer<PSColorConstant>>(
+		{ "SolidSphereMaterial" },
+		gfx,
+		"SolidSphereMaterial",
+		colorConst);
 
 	geom::VertexBuffer vbuf(std::move(geom::VertexLayout{}.Append(ElementType::Position3D)));
 

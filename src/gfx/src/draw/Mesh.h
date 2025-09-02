@@ -19,19 +19,35 @@ namespace gfx
 		void
 		Draw(Graphics& gfx, DirectX::FXMMATRIX accumulatedTransform) const noexcept;
 
+		void
+		DrawControlPanel(DX11Graphics& gfx);
+
 		DirectX::XMMATRIX
 		GetTransformXM() const noexcept override;
 
 	private:
-		bool
+		Texture*
 		AddTexture(
 			std::string_view  modelPath,
 			DX11Graphics&     gfx,
 			aiTextureType     type,
 			Texture::Slot     slot,
-			const aiMaterial* material);
+			const aiMaterial* material,
+			BOOL&             hasTexture);
 
 	private:
+		struct PSMaterialConstant
+		{
+			BOOL              normalMapEnabled  = FALSE;
+			BOOL              specularEnabled   = FALSE;
+			BOOL              diffuseEnabled    = FALSE;
+			BOOL              hasAlpha          = FALSE;
+			float             specularPower     = 1.0f;
+			DirectX::XMFLOAT3 specularColor     = { 1.0f, 1.0f, 1.0f };
+			float             specularMapWeight = 1.0f;
+			DirectX::XMFLOAT3 diffuseColor      = { 0.45f, 0.45f, 0.85f };
+		} pmc;
+		std::string                 materialName{};
 		mutable DirectX::XMFLOAT4X4 transform{};
 	};
 }

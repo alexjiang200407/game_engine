@@ -32,6 +32,10 @@ gfx::geom::VertexLayout::Element::SizeOf(ElementType type) noexcept
 		return sizeof(Map<ElementType::Texture2D>::SysType);
 	case ElementType::Normal:
 		return sizeof(Map<ElementType::Normal>::SysType);
+	case ElementType::Tangent:
+		return sizeof(Map<ElementType::Tangent>::SysType);
+	case ElementType::BiTangent:
+		return sizeof(Map<ElementType::BiTangent>::SysType);
 	case ElementType::Float3Color:
 		return sizeof(Map<ElementType::Float3Color>::SysType);
 	case ElementType::Float4Color:
@@ -70,6 +74,10 @@ gfx::geom::VertexLayout::Element::GetDesc() const noexcept
 		return GenerateDesc<ElementType::Float4Color>(GetOffset());
 	case ElementType::RGBAColor:
 		return GenerateDesc<ElementType::RGBAColor>(GetOffset());
+	case ElementType::Tangent:
+		return GenerateDesc<ElementType::Tangent>(GetOffset());
+	case ElementType::BiTangent:
+		return GenerateDesc<ElementType::BiTangent>(GetOffset());
 	}
 	assert("Invalid element type" && false);
 	return { "INVALID", 0, DXGI_FORMAT_UNKNOWN, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
@@ -96,6 +104,10 @@ gfx::geom::VertexLayout::Element::GetCode() const noexcept
 		return Map<ElementType::Float4Color>::code;
 	case ElementType::RGBAColor:
 		return Map<ElementType::RGBAColor>::code;
+	case ElementType::Tangent:
+		return Map<ElementType::Tangent>::code;
+	case ElementType::BiTangent:
+		return Map<ElementType::BiTangent>::code;
 	}
 	assert("Invalid element type" && false);
 	return "Invalid";

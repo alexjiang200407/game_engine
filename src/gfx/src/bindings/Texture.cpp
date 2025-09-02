@@ -32,24 +32,16 @@ gfx::Texture::Texture(DX11Graphics& gfx, const std::wstring& ws, Format format, 
 			throw std::runtime_error("Invalid format");
 		}
 
-		if (image.GetImage(0, 0, 0)->format != DXGI_FORMAT_B8G8R8A8_UNORM)
-		{
-			dx::ScratchImage converted;
-			DX_HR_ERROR_TEST_AND_THROW(dx::Convert(
-				*image.GetImage(0, 0, 0),
-				DXGI_FORMAT_B8G8R8A8_UNORM,
-				DirectX::TEX_FILTER_DEFAULT,
-				DirectX::TEX_THRESHOLD_DEFAULT,
-				converted));
-			image = std::move(converted);
-		}
-
 		DX_HR_ERROR_TEST_AND_THROW(dx::CreateTexture(
 			GetDevice(gfx),
 			image.GetImages(),
 			image.GetImageCount(),
 			image.GetMetadata(),
 			&texture));
+
+		hasAlpha = DirectX::HasAlpha(image.GetMetadata().format) &&
+		           (!util::Settings::Module("Graphics").Get("bExpensiveCheckAlpha", true) ||
+		            !image.IsAlphaAllOpaque());
 	}
 
 	DX_HR_ERROR_TEST_AND_THROW(
@@ -61,4 +53,10 @@ gfx::Texture::Bind(DX11Graphics& gfx)
 {
 	DX_CALL(GetContext(gfx)
 	            ->PSSetShaderResources(static_cast<UINT>(slot), 1u, pTextureSRV.GetAddressOf()));
+}
+
+bool
+gfx::Texture::HasAlpha() const noexcept
+{
+	return hasAlpha;
 }

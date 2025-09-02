@@ -19,7 +19,8 @@ namespace gfx
 		enum class Slot : unsigned int
 		{
 			kDiffuse = 0u,
-			kSpecular
+			kSpecular,
+			kNormal
 		};
 
 	public:
@@ -29,8 +30,12 @@ namespace gfx
 		void
 		Bind(DX11Graphics& gfx) override;
 
+		bool
+		HasAlpha() const noexcept;
+
 	private:
 		Slot                                             slot;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pTextureSRV;
+		bool                                             hasAlpha = false;
 	};
 }

@@ -61,7 +61,7 @@ namespace gfx
 		Model(Graphics& gfx, std::string_view fileName);
 
 		void
-		DrawControlPanel() noexcept override;
+		DrawControlPanel(Graphics& gfx) noexcept override;
 
 		void
 		Draw(Graphics& gfx) const noexcept override;

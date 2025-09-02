@@ -6,11 +6,11 @@ namespace gfx
 	class DX11Graphics;
 
 	template <typename Super, typename C>
-	class ConstantBuffer : public Bindable<Super, unsigned int>
+	class ConstantBuffer : public Bindable<Super, std::string_view>
 	{
 	public:
-		ConstantBuffer(DX11Graphics& gfx, unsigned int slot = 0u) :
-			Bindable<Super, unsigned int>(slot), slot(slot)
+		ConstantBuffer(DX11Graphics& gfx, std::string_view tag = ""sv, unsigned int slot = 0u) :
+			Bindable<Super, std::string_view>(tag), slot(slot)
 		{
 			D3D11_BUFFER_DESC cbd{};
 			cbd.BindFlags           = D3D11_BIND_CONSTANT_BUFFER;
@@ -23,8 +23,11 @@ namespace gfx
 				GetDevice(gfx)->CreateBuffer(&cbd, nullptr, &pConstantBuffer));
 		}
 
-		ConstantBuffer(DX11Graphics& gfx, const C& consts, unsigned int slot = 0u) :
-			Bindable<Super, unsigned int>(slot), slot(slot)
+		ConstantBuffer(
+			DX11Graphics&    gfx,
+			std::string_view tag,
+			const C&         consts,
+			unsigned int     slot = 0u) : Bindable<Super, std::string_view>(tag), slot(slot)
 		{
 			D3D11_BUFFER_DESC cbd;
 			cbd.BindFlags           = D3D11_BIND_CONSTANT_BUFFER;

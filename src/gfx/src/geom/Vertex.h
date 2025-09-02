@@ -21,6 +21,8 @@ namespace gfx::geom
 			Position3D,
 			Texture2D,
 			Normal,
+			Tangent,
+			BiTangent,
 			Float3Color,
 			Float4Color,
 			RGBAColor,
@@ -84,6 +86,24 @@ namespace gfx::geom
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 			static constexpr const char* semantic   = "Color";
 			static constexpr const char* code       = "COL32";
+		};
+
+		template <>
+		struct Map<ElementType::Tangent>
+		{
+			using SysType                           = DirectX::XMFLOAT3;
+			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;
+			static constexpr const char* semantic   = "Tangent";
+			static constexpr const char* code       = "Nt";
+		};
+
+		template <>
+		struct Map<ElementType::BiTangent>
+		{
+			using SysType                           = DirectX::XMFLOAT3;
+			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;
+			static constexpr const char* semantic   = "BiTangent";
+			static constexpr const char* code       = "Nb";
 		};
 
 		class Element
@@ -214,6 +234,12 @@ namespace gfx::geom
 				break;
 			case Type::RGBAColor:
 				SetAttribute<Type::RGBAColor>(pAttribute, std::forward<T>(val));
+				break;
+			case Type::Tangent:
+				SetAttribute<Type::Tangent>(pAttribute, std::forward<T>(val));
+				break;
+			case Type::BiTangent:
+				SetAttribute<Type::BiTangent>(pAttribute, std::forward<T>(val));
 				break;
 			default:
 				assert("Bad element type" && false);

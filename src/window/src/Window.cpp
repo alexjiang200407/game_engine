@@ -358,15 +358,17 @@ Window::HandleMouse(RAWMOUSE& rawMouse)
 	    GetLastError() != 0)
 		return;
 
-	bool inside = PtInRect(&rc, pt);
-	if (inside && !mouse.HasStateFlag(MouseEvent::StateFlags::kInsideWindow))
-	{
-		mouse.OnMouseEnter();
-	}
-	else if (!inside && mouse.HasStateFlag(MouseEvent::StateFlags::kInsideWindow))
-	{
-		mouse.OnMouseLeave();
-	}
+	//bool inside = PtInRect(&rc, pt);
+	//if (inside && !mouse.HasStateFlag(MouseEvent::StateFlags::kInsideWindow))
+	//{
+	//	mouse.OnMouseEnter();
+	//}
+	//else if (!inside && mouse.HasStateFlag(MouseEvent::StateFlags::kInsideWindow))
+	//{
+	//	kbd.Clear();
+	//	mouse.Clear();
+	//	mouse.OnMouseLeave();
+	//}
 }
 
 void

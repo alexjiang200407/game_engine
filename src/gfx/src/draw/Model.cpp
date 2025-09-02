@@ -124,7 +124,7 @@ gfx::Node::DrawNodeHierarchyPanel(Node*& pSelectedNode) const
 }
 
 void
-gfx::Model::DrawControlPanel() noexcept
+gfx::Model::DrawControlPanel(Graphics& gfx) noexcept
 {
 	ImGui::PushID("ModelControlPanel");
 	if (ImGui::Begin(imguiID.c_str()))
@@ -150,6 +150,9 @@ gfx::Model::DrawControlPanel() noexcept
 			{
 				transform = {};
 			}
+
+			if (!pSelectedNode->meshPtrs.empty())
+				pSelectedNode->meshPtrs.front()->DrawControlPanel(*gfx);
 		}
 	}
 	ImGui::End();
@@ -204,7 +207,7 @@ gfx::Model::Model(Graphics& gfx, std::string_view a_fileName) :
 	const auto       pScene = imp.ReadFile(
         fileName.c_str(),
         aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_ConvertToLeftHanded |
-            aiProcess_GenNormals);
+            aiProcess_GenNormals | aiProcess_CalcTangentSpace);
 
 	if (!pScene)
 		throw std::runtime_error("Could not load scene "s + imp.GetErrorString());

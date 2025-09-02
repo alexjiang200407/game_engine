@@ -12,7 +12,7 @@ namespace gfx
 		Draw(Graphics& gfx) const noexcept = 0;
 
 		virtual void
-		DrawControlPanel() noexcept = 0;
+		DrawControlPanel(Graphics& gfx) noexcept = 0;
 
 		virtual DirectX::XMMATRIX
 		GetTransform() const noexcept = 0;

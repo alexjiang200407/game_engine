@@ -60,6 +60,23 @@ namespace gfx
 			return *static_cast<T*>(binds.back().get());
 		}
 
+		template <typename T>
+		std::shared_ptr<T>
+		QueryBindable(const typename T::UIDArgs& uidArgs)
+		{
+			auto uid = std::apply(
+				[](auto&&... args) {
+					return T::GenerateUID(std::forward<decltype(args)>(args)...);
+				},
+				uidArgs);
+
+#ifdef DEBUG
+			return std::dynamic_pointer_cast<T>(Codex::Get(uid));
+#else
+			return std::static_pointer_cast<T>(Codex::Get(uid));
+#endif
+		}
+
 	private:
 		std::vector<std::shared_ptr<IBindable>> binds;
 	};
