@@ -9,9 +9,6 @@ namespace util
 	class CommandContext
 	{
 	public:
-		CommandContext() = default;
-
-		//Move this to Cpp
 		~CommandContext()
 		{
 			for (const auto& id : ids)

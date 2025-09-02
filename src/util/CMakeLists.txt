@@ -1,6 +1,6 @@
 file(GLOB_RECURSE SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
-add_library(util STATIC ${SOURCES}  "include/util/CommandContext.h")
+add_library(util STATIC ${SOURCES})
 
 find_path(SIMPLEINI_INCLUDE_DIRS "ConvertUTF.c")
 

@@ -1,8 +1,6 @@
 file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
 
-add_executable(${PROJECT_NAME} WIN32
-    ${SOURCES}
- "CommandLine.cpp" "CommandLine.h")
+add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
 
 target_precompile_headers(${PROJECT_NAME} PRIVATE PCH.h)
 
