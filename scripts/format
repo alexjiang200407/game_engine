@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIRECTORY="${1:-.}"
+DIRECTORY="${1:-src}"
 CHECK_MODE=false
 FORMAT="clang-format"
 if [[ "$@" == *"--check"* ]]; then

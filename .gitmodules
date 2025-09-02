@@ -1,0 +1,3 @@
+[submodule "extern/FidelityFX-SDK"]
+	path = extern/FidelityFX-SDK
+	url = https://github.com/MapleHinata/FidelityFX-SDK.git
