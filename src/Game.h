@@ -1,14 +1,16 @@
 #pragma once
 
+#include "CommandLine.h"
 #include "ImGuiManager.h"
 #include <gfx/GFXFactory.h>
 #include <gfx/Graphics.h>
 #include <gfx/IModel.h>
 #include <scene/Camera.h>
+#include <util/CommandContext.h>
 #include <util/Timer.h>
 #include <window/Window.h>
 
-class Game
+class Game : public util::CommandContext<Game>
 {
 public:
 	Game();
@@ -20,12 +22,16 @@ private:
 	void
 	DoFrame();
 
+	static void
+	ResizeWindow(Game& game, unsigned int width, unsigned int height);
+
 private:
-	gfx::GFXFactory factory;
-	ImGuiManager    imgui;  // Must be before window and graphics
-	wnd::Window     wnd;
-	gfx::Graphics   gfx;
-	util::Timer     timer;
+	gfx::GFXFactory    factory;
+	ImGuiManager       imgui;  // Must be before window and graphics
+	wnd::Window        wnd;
+	gfx::Graphics      gfx;
+	ImGui::CommandLine cmdLine;
+	util::Timer        timer;
 
 	bool drawDebugUI = true;
 

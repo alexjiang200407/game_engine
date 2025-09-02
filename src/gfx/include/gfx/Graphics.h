@@ -1,4 +1,5 @@
 #pragma once
+#include "util/CommandContext.h"
 
 namespace gfx
 {

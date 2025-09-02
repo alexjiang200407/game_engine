@@ -1,4 +1,15 @@
 #include "Game.h"
+#include <util/CommandRegister.h>
+
+void
+Game::ResizeWindow(Game& g, unsigned int width, unsigned int height)
+{
+	if (width < 800u || height < 600u)
+		throw std::runtime_error("width or height invalid");
+
+	g.wnd.ResizeWindow(width, height);
+	g.gfx.ResizeBuffers(width, height);
+}
 
 Game::Game() :
 	light(std::move(factory.CreatePointLight(gfx))),
@@ -8,6 +19,8 @@ Game::Game() :
 	gfx.SetCamera(DirectX::XMMatrixTranslation(0.0f, 0.0f, 20.0f));
 	camera = wnd.kbd.RegisterConsumer<scene::Camera>();
 	wnd.mouse.RegisterConsumer(camera);
+
+	RegisterCommand("ResizeWindow", ResizeWindow);
 }
 
 void
@@ -31,6 +44,7 @@ Game::Play()
 			wnd.mouse.Clear();
 		}
 
+		cmdLine.ProcessPending();
 		DoFrame();
 	}
 }
@@ -61,6 +75,7 @@ Game::DoFrame()
 		light->DrawControlWindow();
 
 		pModel->DrawControlPanel();
+		cmdLine.DrawControlWindow();
 	}
 	pModel->Draw(gfx);
 

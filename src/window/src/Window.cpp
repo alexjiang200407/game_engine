@@ -5,11 +5,21 @@
 #include <imgui_impl_win32.h>
 #include <limits>
 #include <span>
+#include <util/CommandRegister.h>
 
 extern IMGUI_IMPL_API LRESULT
 ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 using namespace wnd;
+
+namespace
+{
+	void
+	Quit(Window&)
+	{
+		PostQuitMessage(0);
+	}
+}
 
 Window::Window() :
 	hInstance(GetModuleHandle(nullptr)), wndSettings(util::Settings::Module("Window"))
@@ -48,6 +58,8 @@ Window::Window() :
 	RegisterInput();
 
 	while (::ShowCursor(FALSE) >= 0);
+
+	RegisterCommand("Quit", Quit);
 }
 
 Window::~Window() noexcept
@@ -59,6 +71,7 @@ Window::~Window() noexcept
 		hWnd = nullptr;
 	}
 	assert(UnregisterClass(CLASS_NAME, hInstance) != 0);
+	//util::CommandRegister::Unregister("Quit");
 }
 
 void
