@@ -1,6 +1,6 @@
 #include "Game.h"
-#include <util/str.h>
 #include <util/CommandRegister.h>
+#include <util/str.h>
 
 void
 Game::ResizeWindow(Game& g, unsigned int width, unsigned int height)
@@ -78,8 +78,8 @@ Game::DoFrame()
 		ImGui::End();
 		light->DrawControlWindow();
 
-		pModel->DrawControlPanel(gfx, "Model 1" csv);
-		pModel2->DrawControlPanel(gfx, "Model 2" csv);
+		pModel->DrawControlPanel(gfx, "Model 1"_csv);
+		pModel2->DrawControlPanel(gfx, "Model 2"_csv);
 
 		cmdLine.DrawControlWindow();
 	}

@@ -97,7 +97,7 @@ namespace util
 }
 
 constexpr util::cstring_view
-operator"" csv(const char* str, std::size_t len) noexcept
+operator""_csv(const char* str, std::size_t len) noexcept
 {
 	return util::cstring_view(str, len);
 }
