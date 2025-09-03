@@ -33,6 +33,9 @@ namespace gfx
 		void
 		SetAppliedTransform(DirectX::FXMMATRIX transform) noexcept;
 
+		const DirectX::XMFLOAT4X4&
+		GetAppliedTransform() const noexcept;
+
 		void
 		AddChild(std::unique_ptr<Node> pChild);
 
@@ -61,13 +64,16 @@ namespace gfx
 		Model(Graphics& gfx, std::string_view fileName);
 
 		void
-		DrawControlPanel(Graphics& gfx) noexcept override;
+		DrawControlPanel(Graphics& gfx, std::optional<util::cstring_view> id) noexcept override;
 
 		void
 		Draw(Graphics& gfx) const noexcept override;
 
 		DirectX::XMMATRIX
 		GetTransform() const noexcept override;
+
+		void
+		SetRootTransform(DirectX::FXMMATRIX tf) const noexcept;
 
 	private:
 		std::string                        fileName;

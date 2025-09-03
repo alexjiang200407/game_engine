@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <util/str.h>
 #include <util/CommandRegister.h>
 
 void
@@ -13,12 +14,15 @@ Game::ResizeWindow(Game& g, unsigned int width, unsigned int height)
 
 Game::Game() :
 	light(std::move(factory.CreatePointLight(gfx))),
-	pModel(std::move(factory.CreateModel(gfx, "assets/meshes/normaltest/gobber/GoblinX.obj")))
+	pModel(std::move(factory.CreateModel(gfx, "assets/meshes/normaltest/gobber/GoblinX.obj"))),
+	pModel2(std::move(factory.CreateModel(gfx, "assets/meshes/normaltest/gobber/GoblinX.obj")))
 {
 	gfx.SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
 	gfx.SetCamera(DirectX::XMMatrixTranslation(0.0f, 0.0f, 20.0f));
 	camera = wnd.kbd.RegisterConsumer<scene::Camera>();
 	wnd.mouse.RegisterConsumer(camera);
+
+	pModel2->SetRootTransform(DirectX::XMMatrixTranslation(0.0f, 0.0f, -25.0f));
 
 	RegisterCommand("ResizeWindow", ResizeWindow);
 }
@@ -74,11 +78,13 @@ Game::DoFrame()
 		ImGui::End();
 		light->DrawControlWindow();
 
-		pModel->DrawControlPanel();
+		pModel->DrawControlPanel(gfx, "Model 1" csv);
+		pModel2->DrawControlPanel(gfx, "Model 2" csv);
+
 		cmdLine.DrawControlWindow();
-		pModel->DrawControlPanel(gfx);
 	}
 	pModel->Draw(gfx);
+	pModel2->Draw(gfx);
 
 	light->Draw(gfx);
 

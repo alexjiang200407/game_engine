@@ -1,6 +1,6 @@
 cbuffer LightCBuf
 {
-    float3 lightPos;
+    float3 viewLightPos;
     float3 ambient;
     float3 diffuseColor;
     float diffuseIntensity;
@@ -21,6 +21,10 @@ cbuffer ObjectCBuf
     float3 diffuseColorConst;
 };
 
+#include "shader_ops.hlsl"
+#include "light_vector.hlsl"
+
+
 Texture2D tex;
 Texture2D spec;
 Texture2D nmap;
@@ -28,41 +32,23 @@ Texture2D nmap;
 SamplerState splr;
 
 
-float4 main(float3 viewPos : Position, float3 n : Normal, float3 tan : Tangent, float3 bitan : Bitangent, float2 tc : Texcoord) : SV_Target
+float4 main(float3 viewFragPos : Position, float3 viewNormal : Normal, float3 viewTan : Tangent, float3 viewBitan : Bitangent, float2 tc : Texcoord) : SV_Target
 {
-    // sample normal from map if normal mapping enabled
     if (normalMapEnabled)
     {
-        // build the tranform (rotation) into tangent space
-        const float3x3 tanToView = float3x3(
-            normalize(tan),
-            normalize(bitan),
-            normalize(n)
-        );
-        // unpack normal data
-        const float3 normalSample = nmap.Sample(splr, tc).xyz;
-        n = normalSample * 2.0f - 1.0f;
-        n.y = -n.y;
-        // bring normal from tanspace into view space
-        n = mul(n, tanToView);
+        viewNormal = MapNormal(viewTan, viewBitan, viewNormal, tc, nmap, splr);
     }
 
-	// fragment to light vector data
-    const float3 vToL = lightPos - viewPos;
-    const float distToL = length(vToL);
-    const float3 dirToL = vToL / distToL;
-	// attenuation
-    const float att = 1.0f / (attConst + attLin * distToL + attQuad * (distToL * distToL));
-	// diffuse intensity
-    const float3 diffuse = diffuseColor * diffuseIntensity * att * max(0.0f, dot(dirToL, n));
-	// reflected light vector
-    const float3 w = n * dot(vToL, n);
-    const float3 r = w * 2.0f - vToL;
-	// calculate specular intensity based on angle between viewing vector and reflection vector, narrow with power function
+    const LightVectorData lv = CalculateLightVectorData(viewLightPos, viewFragPos);
+
+
+    const float att = Attenuate(attConst, attLin, attQuad, lv.distToL);
+    const float3 diffuse = Diffuse(diffuseColor, diffuseIntensity, att, lv.dirToL, viewNormal);
 
     float specularPower = specularPowerConst;
     float3 specularReflectionColor;
-    if (specularEnabled) {
+    if (specularEnabled)
+    {
         const float4 specularSample = spec.Sample(splr, tc);
         if (hasAlpha)
         {
@@ -73,21 +59,26 @@ float4 main(float3 viewPos : Position, float3 n : Normal, float3 tan : Tangent, 
             specularPower = specularPowerConst;
         }
         specularReflectionColor = specularSample.rgb * specularMapWeight;
-    } else {
-		specularReflectionColor = specularColor;
     }
-    const float3 specular = att * (diffuseColor * diffuseIntensity) * pow(max(0.0f, dot(normalize(-r), normalize(viewPos))), specularPower);
-
+    else
+    {
+        specularReflectionColor = specularColor;
+    }
+    const float3 specularReflected = Speculate(
+        specularReflectionColor, 1.0f, viewNormal,
+        lv.vToL, viewFragPos, att, specularPower
+    );
+    
     float3 materialColor;
     if (diffuseEnabled)
     {
         materialColor = tex.Sample(splr, tc).rgb;
     }
-    else 
+    else
     {
         materialColor = diffuseColorConst;
     }
 
 	// final color
-    return float4(saturate((diffuse + ambient) * materialColor + specular * specularReflectionColor), 1.0f);
+    return float4(saturate((diffuse + ambient) * materialColor + specularReflected), 1.0f);
 }
