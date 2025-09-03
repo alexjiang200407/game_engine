@@ -40,7 +40,7 @@ gfx::DX11Graphics::ResizeBuffers(unsigned int a_width, unsigned int a_height)
 	width  = a_width;
 	height = a_height;
 
-	DX_HR_ERROR_TEST_AND_THROW(pSwap->ResizeBuffers(1u, width, height, DXGI_FORMAT_UNKNOWN, 0));
+	DX_HR_ERROR_TEST_AND_THROW(pSwap->ResizeBuffers(2u, width, height, DXGI_FORMAT_UNKNOWN, 0));
 
 	wrl::ComPtr<ID3D11Resource> pBackBuffer{};
 	DX_HR_ERROR_TEST_AND_THROW(pSwap->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer)));

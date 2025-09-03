@@ -122,6 +122,7 @@ namespace ImGui
 		catch (const std::exception& e)
 		{
 			displayHistory.emplace_back(std::string("Command threw: ") + e.what(), true);
+			logger::info("{}", displayHistory.back().first);
 		}
 		catch (...)
 		{

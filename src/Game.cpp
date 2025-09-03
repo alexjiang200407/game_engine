@@ -48,8 +48,8 @@ Game::Play()
 			wnd.mouse.Clear();
 		}
 
-		cmdLine.ProcessPending();
 		DoFrame();
+		cmdLine.ProcessPending();
 	}
 }
 
