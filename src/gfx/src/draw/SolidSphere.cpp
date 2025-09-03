@@ -2,9 +2,13 @@
 #include "bindings/Bindings.h"
 #include "geom/Geometry.h"
 
-gfx::SolidSphere::SolidSphere(DX11Graphics& gfx, float radius) : DrawableBase<SolidSphere>(gfx)
+using namespace std::literals;
+
+gfx::SolidSphere::SolidSphere(DX11Graphics& gfx, float radius)
 {
-	namespace dx = DirectX;
+	namespace dx      = DirectX;
+	using ElementType = geom::VertexLayout::ElementType;
+
 	struct Vertex
 	{
 		dx::XMFLOAT3 pos;
@@ -12,9 +16,38 @@ gfx::SolidSphere::SolidSphere(DX11Graphics& gfx, float radius) : DrawableBase<So
 
 	auto model = geom::Sphere::Make<Vertex>();
 	model.Transform(dx::XMMatrixScaling(radius, radius, radius));
-	AddBind<VertexBuffer>(gfx, model.vertices);
-	AddBind<IndexBuffer>(gfx, model.indices);
-	AddBind<TransformCBuffer>(gfx, *this);
+	AddBind<VertexBuffer>({ "SolidSphere"sv, ""sv }, gfx, model.vertices, "SolidSphere"sv);
+	AddBind<IndexBuffer>({ "SolidSphere"sv, ""sv }, gfx, model.indices, "SolidSphere"sv);
+	AddUniqueBind<TransformCBuffer>(gfx, *this);
+
+	static constexpr const auto* vertexShader = L"shaders/vs_solid.cso";
+	static constexpr const auto* pixelShader  = L"shaders/ps_solid.cso";
+
+	auto& pvs   = AddBind<VertexShader>({ vertexShader }, gfx, vertexShader);
+	auto  pvsbc = pvs.GetBytecode();
+
+	AddBind<PixelShader>({ pixelShader }, gfx, pixelShader);
+
+	struct PSColorConstant
+	{
+		dx::XMFLOAT3 color = { 1.0f, 1.0f, 1.0f };
+		float        padding;
+	} colorConst;
+	AddBind<PixelConstantBuffer<PSColorConstant>>(
+		{ "SolidSphereMaterial" },
+		gfx,
+		"SolidSphereMaterial",
+		colorConst);
+
+	geom::VertexBuffer vbuf(std::move(geom::VertexLayout{}.Append(ElementType::Position3D)));
+
+	auto& layout = vbuf.GetLayout();
+	AddBind<InputLayout>({ layout }, gfx, layout, pvsbc);
+
+	AddBind<Topology>(
+		{ static_cast<int>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) },
+		gfx,
+		D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void
@@ -31,30 +64,4 @@ DirectX::XMMATRIX
 gfx::SolidSphere::GetTransformXM() const noexcept
 {
 	return DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z);
-}
-
-void
-gfx::SolidSphere::StaticBindingsConstructor(
-	DX11Graphics&              gfx,
-	DrawableBase<SolidSphere>& solidSphereBase)
-{
-	namespace dx = DirectX;
-	auto& pvs    = solidSphereBase.AddStaticBind<VertexShader>(gfx, L"shaders/vs_solid.cso");
-	auto  pvsbc  = pvs.GetBytecode();
-
-	solidSphereBase.AddStaticBind<PixelShader>(gfx, L"shaders/ps_solid.cso");
-
-	struct PSColorConstant
-	{
-		dx::XMFLOAT3 color = { 1.0f, 1.0f, 1.0f };
-		float        padding;
-	} colorConst;
-	solidSphereBase.AddStaticBind<PixelConstantBuffer<PSColorConstant>>(gfx, colorConst);
-
-	const std::vector<D3D11_INPUT_ELEMENT_DESC> ied = {
-		{ "Position", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-	solidSphereBase.AddStaticBind<InputLayout>(gfx, ied, pvsbc);
-
-	solidSphereBase.AddStaticBind<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }

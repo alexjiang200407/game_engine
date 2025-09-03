@@ -11,9 +11,9 @@ namespace gfx
 	class DX11Graphics;
 	class Drawable;
 
-	class TransformCBuffer : public Bindable
+	class TransformCBuffer : public Bindable<TransformCBuffer>
 	{
-	private:
+	public:
 		struct Transforms
 		{
 			DirectX::XMMATRIX modelViewProj;

@@ -5,11 +5,12 @@ namespace gfx
 {
 	class DX11Graphics;
 
-	template <typename C>
-	class ConstantBuffer : public Bindable
+	template <typename Super, typename C>
+	class ConstantBuffer : public Bindable<Super, std::string_view>
 	{
 	public:
-		ConstantBuffer(DX11Graphics& gfx, unsigned int slot = 0u) : slot(slot)
+		ConstantBuffer(DX11Graphics& gfx, std::string_view tag = ""sv, unsigned int slot = 0u) :
+			Bindable<Super, std::string_view>(tag), slot(slot)
 		{
 			D3D11_BUFFER_DESC cbd{};
 			cbd.BindFlags           = D3D11_BIND_CONSTANT_BUFFER;
@@ -22,7 +23,11 @@ namespace gfx
 				GetDevice(gfx)->CreateBuffer(&cbd, nullptr, &pConstantBuffer));
 		}
 
-		ConstantBuffer(DX11Graphics& gfx, const C& consts, unsigned int slot = 0u) : slot(slot)
+		ConstantBuffer(
+			DX11Graphics&    gfx,
+			std::string_view tag,
+			const C&         consts,
+			unsigned int     slot = 0u) : Bindable<Super, std::string_view>(tag), slot(slot)
 		{
 			D3D11_BUFFER_DESC cbd;
 			cbd.BindFlags           = D3D11_BIND_CONSTANT_BUFFER;
@@ -47,20 +52,24 @@ namespace gfx
 			DX_CALL(GetContext(gfx)->Unmap(pConstantBuffer.Get(), 0u));
 		}
 
+	private:
+		using IBindable::GetContext;
+		using IBindable::GetDevice;
+
 	protected:
 		unsigned int                         slot;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> pConstantBuffer;
 	};
 
 	template <typename C>
-	class VertexConstantBuffer : public ConstantBuffer<C>
+	class VertexConstantBuffer : public ConstantBuffer<VertexConstantBuffer<C>, C>
 	{
-		using ConstantBuffer<C>::pConstantBuffer;
-		using ConstantBuffer<C>::slot;
-		using Bindable::GetContext;
+		using ConstantBuffer<VertexConstantBuffer<C>, C>::pConstantBuffer;
+		using ConstantBuffer<VertexConstantBuffer<C>, C>::slot;
+		using IBindable::GetContext;
 
 	public:
-		using ConstantBuffer<C>::ConstantBuffer;
+		using ConstantBuffer<VertexConstantBuffer<C>, C>::ConstantBuffer;
 		void
 		Bind(DX11Graphics& gfx) override
 		{
@@ -70,14 +79,15 @@ namespace gfx
 	};
 
 	template <typename C>
-	class PixelConstantBuffer : public ConstantBuffer<C>
+	class PixelConstantBuffer : public ConstantBuffer<PixelConstantBuffer<C>, C>
 	{
-		using ConstantBuffer<C>::pConstantBuffer;
-		using ConstantBuffer<C>::slot;
-		using Bindable::GetContext;
+		using ConstantBuffer<PixelConstantBuffer<C>, C>::pConstantBuffer;
+		using ConstantBuffer<PixelConstantBuffer<C>, C>::slot;
+		using IBindable::GetContext;
 
 	public:
-		using ConstantBuffer<C>::ConstantBuffer;
+		using ConstantBuffer<PixelConstantBuffer<C>, C>::ConstantBuffer;
+
 		void
 		Bind(DX11Graphics& gfx) override
 		{

@@ -44,7 +44,7 @@ namespace wnd
 		HandleMessageStatic(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 		void
-		CreateAppWindow(HINSTANCE hInstance, int width, int height, const wchar_t* title);
+		CreateAppWindow(HINSTANCE hInstance, const wchar_t* title);
 
 		void
 		RegisterInput() const;
@@ -83,5 +83,6 @@ namespace wnd
 		bool                         cursorEnabled = false;
 		util::Settings::ConfigModule wndSettings;
 		Format                       format = Format::Windowed;
+		unsigned int                 width, height;
 	};
 }

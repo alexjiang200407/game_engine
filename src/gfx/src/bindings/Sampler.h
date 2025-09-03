@@ -5,7 +5,7 @@ namespace gfx
 {
 	class DX11Graphics;
 
-	class Sampler : public Bindable
+	class Sampler : public Bindable<Sampler>
 	{
 	public:
 		Sampler(DX11Graphics& gfx);

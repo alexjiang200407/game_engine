@@ -12,9 +12,14 @@ namespace gfx
 		Draw(Graphics& gfx) const noexcept = 0;
 
 		virtual void
-		DrawControlPanel() noexcept = 0;
+		DrawControlPanel(
+			Graphics&                         gfx,
+			std::optional<util::cstring_view> id = std::nullopt) noexcept = 0;
 
 		virtual DirectX::XMMATRIX
 		GetTransform() const noexcept = 0;
+
+		virtual void
+		SetRootTransform(DirectX::FXMMATRIX tf) const noexcept = 0;
 	};
 }

@@ -12,6 +12,7 @@ void
 Mouse::Clear() noexcept
 {
 	mouseBuffer.clear();
+	state.reset();
 }
 
 [[nodiscard]]

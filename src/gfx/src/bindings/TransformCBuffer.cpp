@@ -4,7 +4,7 @@ gfx::TransformCBuffer::TransformCBuffer(DX11Graphics& gfx, const Drawable& paren
 {
 	if (!pVcbuf)
 	{
-		pVcbuf = std::make_unique<VertexConstantBuffer<Transforms>>(gfx, 0u);
+		pVcbuf = std::make_unique<VertexConstantBuffer<Transforms>>(gfx, "", 0u);
 	}
 }
 

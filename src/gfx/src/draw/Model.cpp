@@ -6,6 +6,35 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
+namespace
+{
+	DirectX::XMFLOAT3
+	ExtractEulerAngles(const DirectX::XMFLOAT4X4& mat)
+	{
+		DirectX::XMFLOAT3 euler{};
+
+		euler.x = asinf(-mat._32);   // Pitch
+		if (cosf(euler.x) > 0.0001)  // Not at poles
+		{
+			euler.y = atan2f(mat._31, mat._33);  // Yaw
+			euler.z = atan2f(mat._12, mat._22);  // Roll
+		}
+		else
+		{
+			euler.y = 0.0f;                       // Yaw
+			euler.z = atan2f(-mat._21, mat._11);  // Roll
+		}
+
+		return euler;
+	}
+
+	DirectX::XMFLOAT3
+	ExtractTranslation(const DirectX::XMFLOAT4X4& matrix)
+	{
+		return { matrix._41, matrix._42, matrix._43 };
+	}
+}
+
 std::unique_ptr<gfx::Node>
 gfx::Node::ParseNode(
 	const std::vector<std::unique_ptr<gfx::Mesh>>& meshPtrs,
@@ -124,10 +153,11 @@ gfx::Node::DrawNodeHierarchyPanel(Node*& pSelectedNode) const
 }
 
 void
-gfx::Model::DrawControlPanel() noexcept
+gfx::Model::DrawControlPanel(
+	Graphics&                         gfx,
+	std::optional<util::cstring_view> imguiIDOverride) noexcept
 {
-	ImGui::PushID("ModelControlPanel");
-	if (ImGui::Begin(imguiID.c_str()))
+	if (ImGui::Begin(imguiIDOverride.has_value() ? imguiIDOverride->c_str() : imguiID.c_str()))
 	{
 		ImGui::Columns(2, "", true);
 
@@ -135,7 +165,24 @@ gfx::Model::DrawControlPanel() noexcept
 
 		if (pSelectedNode)
 		{
-			auto& transform = transforms[pSelectedNode->idx];
+			const auto id = pSelectedNode->idx;
+			auto       i  = transforms.find(id);
+			if (i == transforms.end())
+			{
+				const auto&         applied     = pSelectedNode->GetAppliedTransform();
+				const auto          angles      = ExtractEulerAngles(applied);
+				const auto          translation = ExtractTranslation(applied);
+				TransformParameters tp;
+				tp.roll                  = angles.z;
+				tp.pitch                 = angles.x;
+				tp.yaw                   = angles.y;
+				tp.x                     = translation.x;
+				tp.y                     = translation.y;
+				tp.z                     = translation.z;
+				std::tie(i, std::ignore) = transforms.insert({ id, tp });
+			}
+			auto& transform = i->second;
+
 			ImGui::NextColumn();
 			ImGui::Text("Orientation");
 			ImGui::SliderAngle("Roll", &transform.roll, -180.0f, 180.0f);
@@ -150,10 +197,12 @@ gfx::Model::DrawControlPanel() noexcept
 			{
 				transform = {};
 			}
+
+			if (!pSelectedNode->meshPtrs.empty())
+				pSelectedNode->meshPtrs.front()->DrawControlPanel(*gfx);
 		}
 	}
 	ImGui::End();
-	ImGui::PopID();
 }
 
 void
@@ -197,6 +246,12 @@ gfx::Node::SetAppliedTransform(DirectX::FXMMATRIX transform) noexcept
 	dx::XMStoreFloat4x4(&appliedTransform, transform);
 }
 
+const DirectX::XMFLOAT4X4&
+gfx::Node::GetAppliedTransform() const noexcept
+{
+	return appliedTransform;
+}
+
 gfx::Model::Model(Graphics& gfx, std::string_view a_fileName) :
 	fileName(a_fileName), imguiID(fileName + "###scenegraph")
 {
@@ -204,14 +259,22 @@ gfx::Model::Model(Graphics& gfx, std::string_view a_fileName) :
 	const auto       pScene = imp.ReadFile(
         fileName.c_str(),
         aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_ConvertToLeftHanded |
-            aiProcess_GenNormals);
+            aiProcess_GenNormals | aiProcess_CalcTangentSpace);
 
 	if (!pScene)
 		throw std::runtime_error("Could not load scene "s + imp.GetErrorString());
 
-	for (size_t i = 0; i < pScene->mNumMeshes; i++)
 	{
-		allMeshes.push_back(std::make_unique<Mesh>(*gfx, *pScene->mMeshes[i]));
+		auto fileNameSv = std::string_view(fileName);
+		for (size_t i = 0; i < pScene->mNumMeshes; i++)
+		{
+			auto idx = pScene->mMeshes[i]->mMaterialIndex;
+			allMeshes.push_back(std::make_unique<Mesh>(
+				*gfx,
+				fileNameSv,
+				*pScene->mMeshes[i],
+				idx >= 0 ? pScene->mMaterials[idx] : nullptr));
+		}
 	}
 
 	pRoot = Node::ParseNode(allMeshes, *pScene->mRootNode);
@@ -235,4 +298,10 @@ gfx::Model::GetTransform() const noexcept
 	const auto& transform = transforms.at(pSelectedNode->idx);
 	return dx::XMMatrixRotationRollPitchYaw(transform.roll, transform.pitch, transform.yaw) *
 	       dx::XMMatrixTranslation(transform.x, transform.y, transform.z);
+}
+
+void
+gfx::Model::SetRootTransform(DirectX::FXMMATRIX tf) const noexcept
+{
+	pRoot->SetAppliedTransform(tf);
 }

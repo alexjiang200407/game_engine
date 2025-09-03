@@ -38,5 +38,6 @@ private:
 	std::shared_ptr<scene::Camera>    camera;
 	std::unique_ptr<gfx::IPointLight> light;
 	std::unique_ptr<gfx::IModel>      pModel;
+	std::unique_ptr<gfx::IModel>      pModel2;
 	static constexpr size_t           nDrawables = 180;
 };

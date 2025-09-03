@@ -29,7 +29,6 @@ namespace gfx
 		void
 		Bind(Graphics& gfx, DirectX::FXMMATRIX view) const override;
 
-	private:
 		struct PointLightCBuf
 		{
 			alignas(16) DirectX::XMFLOAT3 pos;

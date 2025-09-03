@@ -1,11 +1,12 @@
 #pragma once
 #include "DX11Graphics.h"
+#include "draw/Codex.h"
 #include <DirectXMath.h>
 #include <vector>
 
 namespace gfx
 {
-	class Bindable;
+	class IBindable;
 
 	class Drawable
 	{
@@ -27,26 +28,56 @@ namespace gfx
 		GetTransformXM() const noexcept = 0;
 
 		virtual void
-		Update(float dt) noexcept = 0;
+		Update(float) noexcept {};
 
 	protected:
 		template <typename T, typename... Args>
 		T&
-		AddBind(Args&&... args)
+		AddBind(const typename T::UIDArgs& uidArgs, Args&&... creationArgs)
 		{
-			using U = std::decay_t<T>;
+			auto uid = std::apply(
+				[](auto&&... args) {
+					return T::GenerateUID(std::forward<decltype(args)>(args)...);
+				},
+				uidArgs);
+			auto bind = Codex::Get(uid);
 
-			auto bind = std::make_unique<U>(std::forward<Args>(args)...);
+			if (!bind)
+			{
+				bind = Codex::Insert<T>(uid, std::forward<Args>(creationArgs)...);
+			}
 
 			binds.push_back(std::move(bind));
-			return *static_cast<U*>(binds.back().get());
+			return *static_cast<T*>(binds.back().get());
+		}
+
+		template <typename T, typename... Args>
+		T&
+		AddUniqueBind(Args&&... args)
+		{
+			auto bind = std::make_shared<T>(std::forward<Args>(args)...);
+			binds.push_back(std::move(bind));
+			return *static_cast<T*>(binds.back().get());
+		}
+
+		template <typename T>
+		std::shared_ptr<T>
+		QueryBindable(const typename T::UIDArgs& uidArgs)
+		{
+			auto uid = std::apply(
+				[](auto&&... args) {
+					return T::GenerateUID(std::forward<decltype(args)>(args)...);
+				},
+				uidArgs);
+
+#ifdef DEBUG
+			return std::dynamic_pointer_cast<T>(Codex::Get(uid));
+#else
+			return std::static_pointer_cast<T>(Codex::Get(uid));
+#endif
 		}
 
 	private:
-		virtual const std::vector<std::unique_ptr<Bindable>>&
-		GetStaticBinds() const noexcept = 0;
-
-	private:
-		std::vector<std::unique_ptr<Bindable>> binds;
+		std::vector<std::shared_ptr<IBindable>> binds;
 	};
 }

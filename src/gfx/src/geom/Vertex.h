@@ -21,6 +21,8 @@ namespace gfx::geom
 			Position3D,
 			Texture2D,
 			Normal,
+			Tangent,
+			BiTangent,
 			Float3Color,
 			Float4Color,
 			RGBAColor,
@@ -35,6 +37,7 @@ namespace gfx::geom
 			using SysType                           = DirectX::XMFLOAT2;
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32_FLOAT;
 			static constexpr const char* semantic   = "Position";
+			static constexpr const char* code       = "POS2";
 		};
 		template <>
 		struct Map<ElementType::Position3D>
@@ -42,6 +45,7 @@ namespace gfx::geom
 			using SysType                           = DirectX::XMFLOAT3;
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;
 			static constexpr const char* semantic   = "Position";
+			static constexpr const char* code       = "POS3";
 		};
 		template <>
 		struct Map<ElementType::Texture2D>
@@ -49,6 +53,7 @@ namespace gfx::geom
 			using SysType                           = DirectX::XMFLOAT2;
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32_FLOAT;
 			static constexpr const char* semantic   = "Texcoord";
+			static constexpr const char* code       = "TEX2";
 		};
 		template <>
 		struct Map<ElementType::Normal>
@@ -56,6 +61,7 @@ namespace gfx::geom
 			using SysType                           = DirectX::XMFLOAT3;
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;
 			static constexpr const char* semantic   = "Normal";
+			static constexpr const char* code       = "NORM";
 		};
 		template <>
 		struct Map<ElementType::Float3Color>
@@ -63,6 +69,7 @@ namespace gfx::geom
 			using SysType                           = DirectX::XMFLOAT3;
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;
 			static constexpr const char* semantic   = "Color";
+			static constexpr const char* code       = "COL3";
 		};
 		template <>
 		struct Map<ElementType::Float4Color>
@@ -70,6 +77,7 @@ namespace gfx::geom
 			using SysType                           = DirectX::XMFLOAT4;
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
 			static constexpr const char* semantic   = "Color";
+			static constexpr const char* code       = "COL4";
 		};
 		template <>
 		struct Map<ElementType::RGBAColor>
@@ -77,6 +85,25 @@ namespace gfx::geom
 			using SysType                           = RGBAColor;
 			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 			static constexpr const char* semantic   = "Color";
+			static constexpr const char* code       = "COL32";
+		};
+
+		template <>
+		struct Map<ElementType::Tangent>
+		{
+			using SysType                           = DirectX::XMFLOAT3;
+			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;
+			static constexpr const char* semantic   = "Tangent";
+			static constexpr const char* code       = "Nt";
+		};
+
+		template <>
+		struct Map<ElementType::BiTangent>
+		{
+			using SysType                           = DirectX::XMFLOAT3;
+			static constexpr DXGI_FORMAT dxgiFormat = DXGI_FORMAT_R32G32B32_FLOAT;
+			static constexpr const char* semantic   = "BiTangent";
+			static constexpr const char* code       = "Nb";
 		};
 
 		class Element
@@ -85,78 +112,25 @@ namespace gfx::geom
 			Element(ElementType type, size_t offset) : type(type), offset(offset) {}
 
 			size_t
-			GetOffsetAfter() const noexcept
-			{
-				return offset + Size();
-			}
+			GetOffsetAfter() const noexcept;
 
 			size_t
-			GetOffset() const
-			{
-				return offset;
-			}
+			GetOffset() const;
 
 			size_t
-			Size() const noexcept
-			{
-				return SizeOf(type);
-			}
+			Size() const noexcept;
 
 			static constexpr size_t
-			SizeOf(ElementType type) noexcept
-			{
-				using namespace DirectX;
-				switch (type)
-				{
-				case ElementType::Position2D:
-					return sizeof(Map<ElementType::Position2D>::SysType);
-				case ElementType::Position3D:
-					return sizeof(Map<ElementType::Position3D>::SysType);
-				case ElementType::Texture2D:
-					return sizeof(Map<ElementType::Texture2D>::SysType);
-				case ElementType::Normal:
-					return sizeof(Map<ElementType::Normal>::SysType);
-				case ElementType::Float3Color:
-					return sizeof(Map<ElementType::Float3Color>::SysType);
-				case ElementType::Float4Color:
-					return sizeof(Map<ElementType::Float4Color>::SysType);
-				case ElementType::RGBAColor:
-					return sizeof(Map<ElementType::RGBAColor>::SysType);
-				default:
-					assert("Invalid element type" && false);
-				}
-				return 0u;
-			}
+			SizeOf(ElementType type) noexcept;
+
 			ElementType
-			GetType() const noexcept
-			{
-				return type;
-			}
+			GetType() const noexcept;
 
 			D3D11_INPUT_ELEMENT_DESC
-			GetDesc() const noexcept
-			{
-				using ElementType = VertexLayout::ElementType;
-				switch (type)
-				{
-				case ElementType::Position2D:
-					return GenerateDesc<ElementType::Position2D>(GetOffset());
-				case ElementType::Position3D:
-					return GenerateDesc<ElementType::Position3D>(GetOffset());
-				case ElementType::Texture2D:
-					return GenerateDesc<ElementType::Texture2D>(GetOffset());
-				case ElementType::Normal:
-					return GenerateDesc<ElementType::Normal>(GetOffset());
-				case ElementType::Float3Color:
-					return GenerateDesc<ElementType::Float3Color>(GetOffset());
-				case ElementType::Float4Color:
-					return GenerateDesc<ElementType::Float4Color>(GetOffset());
-				case ElementType::RGBAColor:
-					return GenerateDesc<ElementType::RGBAColor>(GetOffset());
-				}
-				assert("Invalid element type" && false);
-				return { "INVALID", 0, DXGI_FORMAT_UNKNOWN, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
-			}
+			GetDesc() const noexcept;
+
+			const char*
+			GetCode() const noexcept;
 
 		private:
 			template <ElementType type>
@@ -189,45 +163,29 @@ namespace gfx::geom
 		}
 
 		const Element&
-		ResolveByIndex(size_t i) const noexcept
-		{
-			return elements[i];
-		}
+		ResolveByIndex(size_t i) const noexcept;
 
 		VertexLayout&
-		Append(ElementType type)
-		{
-			elements.emplace_back(type, Size());
-			return *this;
-		}
+		Append(ElementType type);
 
 		size_t
-		Size() const noexcept
-		{
-			return elements.empty() ? 0u : elements.back().GetOffsetAfter();
-		}
+		Size() const noexcept;
 
 		size_t
-		GetElementCount() const noexcept
-		{
-			return elements.size();
-		}
+		GetElementCount() const noexcept;
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC>
-		GetD3DLayout() const
-		{
-			std::vector<D3D11_INPUT_ELEMENT_DESC> desc;
-			desc.reserve(GetElementCount());
-			for (const auto& e : elements)
-			{
-				desc.push_back(e.GetDesc());
-			}
-			return desc;
-		}
+		GetD3DLayout() const;
+
+		std::string
+		GetCode() const;
 
 	private:
 		std::vector<Element> elements;
 	};
+
+	std::ostream&
+	operator<<(std::ostream& os, const VertexLayout& layout);
 
 	class VertexBuffer;
 
@@ -277,16 +235,19 @@ namespace gfx::geom
 			case Type::RGBAColor:
 				SetAttribute<Type::RGBAColor>(pAttribute, std::forward<T>(val));
 				break;
+			case Type::Tangent:
+				SetAttribute<Type::Tangent>(pAttribute, std::forward<T>(val));
+				break;
+			case Type::BiTangent:
+				SetAttribute<Type::BiTangent>(pAttribute, std::forward<T>(val));
+				break;
 			default:
 				assert("Bad element type" && false);
 			}
 		}
 
 	protected:
-		Vertex(char* pData, const VertexLayout& layout) noexcept : pData(pData), layout(layout)
-		{
-			assert(pData != nullptr);
-		}
+		Vertex(char* pData, const VertexLayout& layout) noexcept;
 
 	private:
 		template <typename First, typename... Rest>
@@ -320,7 +281,7 @@ namespace gfx::geom
 	class ConstVertex
 	{
 	public:
-		ConstVertex(const Vertex& v) noexcept : vertex(v) {}
+		ConstVertex(const Vertex& v) noexcept;
 		template <VertexLayout::ElementType Type>
 		const auto&
 		Attr() const noexcept
@@ -335,25 +296,16 @@ namespace gfx::geom
 	class VertexBuffer
 	{
 	public:
-		VertexBuffer(VertexLayout layout) noexcept : layout(std::move(layout)) {}
+		VertexBuffer(VertexLayout layout) noexcept;
 
 		const VertexLayout&
-		GetLayout() const noexcept
-		{
-			return layout;
-		}
+		GetLayout() const noexcept;
 
 		size_t
-		Size() const noexcept
-		{
-			return buffer.size() / layout.Size();
-		}
+		Size() const noexcept;
 
 		size_t
-		SizeBytes() const noexcept
-		{
-			return buffer.size();
-		}
+		SizeBytes() const noexcept;
 
 		template <typename... Args>
 		void
@@ -367,55 +319,28 @@ namespace gfx::geom
 		}
 
 		void
-		Reserve(size_t capacity)
-		{
-			buffer.reserve(capacity * layout.Size());
-		}
+		Reserve(size_t capacity);
 
 		Vertex
-		Back() noexcept
-		{
-			assert(buffer.size() != 0u);
-			return Vertex{ buffer.data() + buffer.size() - layout.Size(), layout };
-		}
+		Back() noexcept;
 
 		Vertex
-		Front() noexcept
-		{
-			assert(buffer.size() != 0u);
-			return Vertex{ buffer.data(), layout };
-		}
+		Front() noexcept;
 
 		Vertex
-		operator[](size_t i) noexcept
-		{
-			assert(i < Size());
-			return Vertex{ buffer.data() + layout.Size() * i, layout };
-		}
+		operator[](size_t i) noexcept;
 
 		ConstVertex
-		Back() const noexcept
-		{
-			return const_cast<VertexBuffer&>(*this).Back();
-		}
+		Back() const noexcept;
 
 		ConstVertex
-		Front() const noexcept
-		{
-			return const_cast<VertexBuffer&>(*this).Front();
-		}
+		Front() const noexcept;
 
 		ConstVertex
-		operator[](size_t i) const noexcept
-		{
-			return const_cast<VertexBuffer&>(*this)[i];
-		}
+		operator[](size_t i) const noexcept;
 
 		const char*
-		GetData() const noexcept
-		{
-			return buffer.data();
-		}
+		GetData() const noexcept;
 
 	private:
 		std::vector<char> buffer;

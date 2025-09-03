@@ -4,11 +4,11 @@
 
 namespace gfx
 {
-	class Bindable;
+	class IBindable;
 
 	class DX11Graphics
 	{
-		friend class gfx::Bindable;
+		friend class IBindable;
 
 	public:
 		DX11Graphics();
