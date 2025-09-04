@@ -11,37 +11,55 @@ gfx::Texture::Texture(DX11Graphics& gfx, const std::string& str, Format format, 
 gfx::Texture::Texture(DX11Graphics& gfx, const std::wstring& ws, Format format, Slot a_slot) :
 	Bindable(ws), slot(a_slot)
 {
-	namespace dx = DirectX;
+	namespace dx       = DirectX;
+	auto textureConfig = util::Settings::Module("Textures");
 
 	wrl::ComPtr<ID3D11Resource> texture;
 	{
-		dx::ScratchImage image;
+		auto image = std::make_unique<dx::ScratchImage>();
 
 		switch (format)
 		{
 		case Format::kDDS:
 			DX_HR_ERROR_TEST_AND_THROW(
-				dx::LoadFromDDSFile(ws.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image));
+				dx::LoadFromDDSFile(ws.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, *image));
 			break;
 		case Format::kPNG:
 		case Format::kJPG:
 			DX_HR_ERROR_TEST_AND_THROW(
-				dx::LoadFromWICFile(ws.c_str(), DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image));
+				dx::LoadFromWICFile(ws.c_str(), DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, *image));
 			break;
 		default:
 			throw std::runtime_error("Invalid format");
 		}
 
+		if (textureConfig.Get("bGenerateMipMaps", false))
+		{
+			auto& metadata = image->GetMetadata();
+			if (!dx::IsCompressed(metadata.format) && metadata.mipLevels == 1u)
+			{
+				auto mipChain = std::make_unique<dx::ScratchImage>();
+				DX_HR_ERROR_TEST_AND_THROW(dx::GenerateMipMaps(
+					image->GetImages(),
+					image->GetImageCount(),
+					metadata,
+					dx::TEX_FILTER_FANT,
+					0,
+					*mipChain));
+				image.swap(mipChain);
+			}
+		}
+
 		DX_HR_ERROR_TEST_AND_THROW(dx::CreateTexture(
 			GetDevice(gfx),
-			image.GetImages(),
-			image.GetImageCount(),
-			image.GetMetadata(),
+			image->GetImages(),
+			image->GetImageCount(),
+			image->GetMetadata(),
 			&texture));
 
-		hasAlpha = DirectX::HasAlpha(image.GetMetadata().format) &&
+		hasAlpha = DirectX::HasAlpha(image->GetMetadata().format) &&
 		           (!util::Settings::Module("Graphics").Get("bExpensiveCheckAlpha", true) ||
-		            !image.IsAlphaAllOpaque());
+		            !image->IsAlphaAllOpaque());
 	}
 
 	DX_HR_ERROR_TEST_AND_THROW(
