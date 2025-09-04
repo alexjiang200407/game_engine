@@ -2,6 +2,7 @@
 #include "draw/Mesh.h"
 #include "draw/Model.h"
 #include "lighting/PointLight.h"
+#include <util/Bencher.h>
 
 gfx::GFXFactory::GFXFactory() noexcept {}
 
@@ -15,5 +16,14 @@ gfx::GFXFactory::CreatePointLight(Graphics& gfx)
 std::unique_ptr<gfx::IModel>
 gfx::GFXFactory::CreateModel(Graphics& gfx, const std::string& path)
 {
-	return std::make_unique<gfx::Model>(gfx, path);
+	if (util::Settings::Module("Graphics").Get("bDoBenchmark", false))
+	{
+		return util::Bencher::Run("Load Model", [&]() {
+			return std::make_unique<gfx::Model>(gfx, path);
+		});
+	}
+	else
+	{
+		return std::make_unique<gfx::Model>(gfx, path);
+	}
 }
