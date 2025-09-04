@@ -56,11 +56,12 @@ namespace gfx
 			aiTextureType     type,
 			Texture::Slot     slot,
 			const aiMaterial& material,
-			BOOL&             hasTexture);
+			bool&             hasTexture);
 
 	private:
 		PSMaterialConstant pmc;
 		std::string        materialName{};
+		bool               hasSpecMap, hasNormMap, hasDiffuseMap;
 	};
 
 }

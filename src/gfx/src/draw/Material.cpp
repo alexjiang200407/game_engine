@@ -17,9 +17,9 @@ gfx::Material::Material(
 		aiTextureType_DIFFUSE,
 		Texture::Slot::kDiffuse,
 		material,
-		pmc.diffuseEnabled);
+		hasDiffuseMap);
 
-	if (!pmc.diffuseEnabled)
+	if (!hasDiffuseMap)
 	{
 		material.Get(AI_MATKEY_COLOR_DIFFUSE, reinterpret_cast<aiColor3D&>(pmc.diffuseColor));
 	}
@@ -31,12 +31,11 @@ gfx::Material::Material(
 		aiTextureType_SPECULAR,
 		Texture::Slot::kSpecular,
 		material,
-		pmc.specularEnabled);
+		hasSpecMap);
 
-	if (!pmc.specularEnabled)
+	if (!hasSpecMap)
 	{
-		pmc.specularEnabled =
-			material.Get(AI_MATKEY_SHININESS, pmc.specularPower) == aiReturn_SUCCESS;
+		material.Get(AI_MATKEY_SHININESS, pmc.specularPower);
 		material.Get(AI_MATKEY_COLOR_SPECULAR, reinterpret_cast<aiColor3D&>(pmc.specularColor));
 	}
 	else if (specularTex)
@@ -49,10 +48,14 @@ gfx::Material::Material(
 		aiTextureType_NORMALS,
 		Texture::Slot::kNormal,
 		material,
-		pmc.normalMapEnabled);
+		hasNormMap);
 
-	if (pmc.diffuseEnabled || pmc.specularEnabled || pmc.normalMapEnabled)
+	if (hasSpecMap || hasNormMap || hasDiffuseMap)
 		mesh.AddBind<Sampler>({}, gfx);
+
+	pmc.diffuseEnabled   = hasDiffuseMap;
+	pmc.normalMapEnabled = hasNormMap;
+	pmc.specularEnabled  = hasSpecMap;
 
 	materialName = material.GetName().C_Str();
 }
@@ -63,10 +66,18 @@ gfx::Material::DrawSubControlPanel(Mesh& mesh, DX11Graphics& gfx) noexcept
 	if (auto pcb = mesh.QueryBindable<PixelConstantBuffer<PSMaterialConstant>>({ materialName }))
 	{
 		ImGui::Text("Material");
-
+		ImGui::BeginDisabled(!hasNormMap);
 		ImGui::Checkbox("Norm Map", reinterpret_cast<bool*>(&pmc.normalMapEnabled));
+		ImGui::EndDisabled();
 
+		ImGui::BeginDisabled(!hasSpecMap);
 		ImGui::Checkbox("Spec Map", reinterpret_cast<bool*>(&pmc.specularEnabled));
+		ImGui::EndDisabled();
+
+		ImGui::BeginDisabled(!hasDiffuseMap);
+		ImGui::Checkbox("Diffuse Map", reinterpret_cast<bool*>(&pmc.diffuseEnabled));
+		ImGui::EndDisabled();
+
 		ImGui::Checkbox("Gloss Alpha", reinterpret_cast<bool*>(&pmc.hasAlpha));
 		ImGui::SliderFloat("Spec Pow", &pmc.specularPower, 1.0f, 1000.0f, "%f");
 
@@ -81,8 +92,6 @@ gfx::Material::DrawSubControlPanel(Mesh& mesh, DX11Graphics& gfx) noexcept
 			ImGui::ColorPicker3("Spec Color", reinterpret_cast<float*>(&pmc.specularColor));
 		}
 		ImGui::EndDisabled();
-
-		ImGui::Checkbox("Diffuse Map", reinterpret_cast<bool*>(&pmc.diffuseEnabled));
 
 		ImGui::BeginDisabled(pmc.diffuseEnabled);
 		{
@@ -102,17 +111,15 @@ gfx::Material::AddTexture(
 	aiTextureType     type,
 	Texture::Slot     slot,
 	const aiMaterial& material,
-	BOOL&             hasTexture)
+	bool&             hasTexture)
 {
 	namespace fs = std::filesystem;
 
-	hasTexture = FALSE;
+	hasTexture = false;
 
 	aiString texFileName;
 	if (material.GetTexture(type, 0, &texFileName) == AI_SUCCESS)
 	{
-		hasTexture = false;
-
 		auto* texFileNameCStr = texFileName.C_Str();
 		if (texFileNameCStr[0] == '*')
 		{

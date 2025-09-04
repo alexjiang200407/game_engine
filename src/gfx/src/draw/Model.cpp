@@ -198,8 +198,14 @@ gfx::Model::DrawControlPanel(
 				transform = {};
 			}
 
-			if (!pSelectedNode->meshPtrs.empty())
-				pSelectedNode->meshPtrs.front()->DrawControlPanel(*gfx);
+			// TODO: Temporary fix remove later
+			for (const auto& x : pSelectedNode->meshPtrs)
+			{
+				if (ImGui::CollapsingHeader(x->GetName().c_str()))
+				{
+					x->DrawControlPanel(*gfx);
+				}
+			}
 		}
 	}
 	ImGui::End();

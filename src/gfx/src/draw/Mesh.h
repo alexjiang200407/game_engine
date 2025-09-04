@@ -30,7 +30,7 @@ namespace gfx
 		DirectX::XMMATRIX
 		GetTransformXM() const noexcept override;
 
-		std::string_view
+		util::cstring_view
 		GetName() const noexcept
 		{
 			return name;
