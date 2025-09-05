@@ -58,8 +58,6 @@ scene::Camera::Consume(const wnd::KeyEvent& event, const util::Producer<wnd::Key
 
 	auto translation = dx::XMFLOAT3{};
 
-	logger::info("{}", event.code);
-
 	if (event.type != wnd::KeyEvent::Type::kPressed)
 		return;
 

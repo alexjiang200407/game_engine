@@ -49,10 +49,8 @@ set(SRC_ASSETS_DIR "${CMAKE_SOURCE_DIR}/assets")
 set(BIN_ASSETS_DIR "$<TARGET_FILE_DIR:game_engine>/assets")
 
 # Copy assets every build
-add_custom_command(
-    TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            "${SRC_ASSETS_DIR}"
-            "${BIN_ASSETS_DIR}"
-    COMMENT "Copying assets to binary directory"
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E env python "${CMAKE_SOURCE_DIR}/scripts/copy_assets.py"
+            "${SRC_ASSETS_DIR}" "${BIN_ASSETS_DIR}"
+    COMMENT "Copying changed assets only"
 )

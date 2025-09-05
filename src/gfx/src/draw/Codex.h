@@ -15,6 +15,7 @@ namespace gfx
 		static std::shared_ptr<IBindable>
 		Insert(const std::string& uid, Args&&... args)
 		{
+			std::lock_guard lg{ mut };
 			static_assert(
 				std::is_base_of<IBindable, T>::value,
 				"Inserted element must inherit IBindable");
@@ -36,6 +37,7 @@ namespace gfx
 	private:
 		using Map = std::unordered_map<std::string, std::weak_ptr<IBindable>>;
 
+		static inline std::mutex    mut;
 		static inline Map           bindings;
 		static inline Map::iterator cur = bindings.end();
 	};

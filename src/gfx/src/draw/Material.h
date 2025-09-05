@@ -24,13 +24,10 @@ namespace gfx
 		};
 
 	public:
+		// Constructors must be thread safe
 		Material() noexcept = default;
 		Material(Mesh& mesh);
-		Material(
-			DX11Graphics&     gfx,
-			Mesh&             mesh,
-			std::string_view  modelPath,
-			const aiMaterial& material);
+		Material(DX11Graphics& gfx, Mesh& mesh, const aiMaterial& material);
 
 		void
 		DrawSubControlPanel(Mesh& mesh, DX11Graphics& gfx) noexcept;
@@ -51,7 +48,6 @@ namespace gfx
 		Texture*
 		AddTexture(
 			Mesh&             mesh,
-			std::string_view  modelPath,
 			DX11Graphics&     gfx,
 			aiTextureType     type,
 			Texture::Slot     slot,
@@ -61,7 +57,7 @@ namespace gfx
 	private:
 		PSMaterialConstant pmc;
 		std::string        materialName{};
-		bool               hasSpecMap, hasNormMap, hasDiffuseMap;
+		bool               hasSpecMap = false, hasNormMap = false, hasDiffuseMap = false;
 	};
 
 }

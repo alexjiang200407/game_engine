@@ -4,20 +4,9 @@
 
 gfx::Material::Material(Mesh& mesh) : materialName(mesh.GetName()) {}
 
-gfx::Material::Material(
-	DX11Graphics&     gfx,
-	Mesh&             mesh,
-	std::string_view  modelPath,
-	const aiMaterial& material)
+gfx::Material::Material(DX11Graphics& gfx, Mesh& mesh, const aiMaterial& material)
 {
-	AddTexture(
-		mesh,
-		modelPath,
-		gfx,
-		aiTextureType_DIFFUSE,
-		Texture::Slot::kDiffuse,
-		material,
-		hasDiffuseMap);
+	AddTexture(mesh, gfx, aiTextureType_DIFFUSE, Texture::Slot::kDiffuse, material, hasDiffuseMap);
 
 	if (!hasDiffuseMap)
 	{
@@ -26,7 +15,6 @@ gfx::Material::Material(
 
 	Texture* specularTex = AddTexture(
 		mesh,
-		modelPath,
 		gfx,
 		aiTextureType_SPECULAR,
 		Texture::Slot::kSpecular,
@@ -41,17 +29,9 @@ gfx::Material::Material(
 	else if (specularTex)
 		pmc.hasAlpha = specularTex->HasAlpha();
 
-	AddTexture(
-		mesh,
-		modelPath,
-		gfx,
-		aiTextureType_NORMALS,
-		Texture::Slot::kNormal,
-		material,
-		hasNormMap);
+	AddTexture(mesh, gfx, aiTextureType_NORMALS, Texture::Slot::kNormal, material, hasNormMap);
 
-	if (hasSpecMap || hasNormMap || hasDiffuseMap)
-		mesh.AddBind<Sampler>({}, gfx);
+	mesh.AddBind<Sampler>({}, gfx);
 
 	pmc.diffuseEnabled   = hasDiffuseMap;
 	pmc.normalMapEnabled = hasNormMap;
@@ -106,7 +86,6 @@ gfx::Material::DrawSubControlPanel(Mesh& mesh, DX11Graphics& gfx) noexcept
 gfx::Texture*
 gfx::Material::AddTexture(
 	Mesh&             mesh,
-	std::string_view  modelPath,
 	DX11Graphics&     gfx,
 	aiTextureType     type,
 	Texture::Slot     slot,
@@ -127,16 +106,9 @@ gfx::Material::AddTexture(
 		}
 		else
 		{
-			fs::path path = modelPath;
-			Texture* tex  = nullptr;
-
-			if (!path.has_parent_path())
-			{
-				logger::warn("No parent path");
-			}
-
-			const auto file     = path.parent_path() / texFileName.C_Str();
-			const auto fileWstr = file.generic_wstring();
+			Texture*   tex      = nullptr;
+			const auto file     = fs::path{ texFileName.C_Str() };
+			const auto fileWstr = file.wstring();
 			const auto fileExt  = file.extension();
 
 			if (fileExt == ".dds")

@@ -15,6 +15,8 @@ namespace gfx
 		friend class Material;
 
 	public:
+
+		// Constructors must be thread safe
 		Mesh(
 			DX11Graphics&     gfx,
 			std::string_view  modelPath,

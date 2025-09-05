@@ -44,7 +44,7 @@ gfx::Mesh::Mesh(
 
 	if (a_material)
 	{
-		material = Material(gfx, *this, modelPath, *a_material);
+		material = Material(gfx, *this, *a_material);
 	}
 	else
 	{
