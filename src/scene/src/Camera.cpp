@@ -22,9 +22,9 @@ scene::Camera::GetMatrix() const noexcept
 void
 scene::Camera::Reset() noexcept
 {
-	pos   = { 0.0f, 7.5f, -18.0f };
+	pos   = { -13.5f, 6.0f, 3.5f };
 	pitch = 0.0f;
-	yaw   = 0.0f;
+	yaw   = util::math::PI / 2.0f;
 }
 
 void
@@ -57,8 +57,6 @@ scene::Camera::Consume(const wnd::KeyEvent& event, const util::Producer<wnd::Key
 	namespace dx = DirectX;
 
 	auto translation = dx::XMFLOAT3{};
-
-	logger::info("{}", event.code);
 
 	if (event.type != wnd::KeyEvent::Type::kPressed)
 		return;

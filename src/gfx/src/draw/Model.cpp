@@ -5,6 +5,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+#include <util/Bencher.h>
 
 namespace
 {
@@ -198,8 +199,14 @@ gfx::Model::DrawControlPanel(
 				transform = {};
 			}
 
-			if (!pSelectedNode->meshPtrs.empty())
-				pSelectedNode->meshPtrs.front()->DrawControlPanel(*gfx);
+			// TODO: Temporary fix remove later
+			for (const auto& x : pSelectedNode->meshPtrs)
+			{
+				if (ImGui::CollapsingHeader(x->GetName().c_str()))
+				{
+					x->DrawControlPanel(*gfx);
+				}
+			}
 		}
 	}
 	ImGui::End();
@@ -256,25 +263,43 @@ gfx::Model::Model(Graphics& gfx, std::string_view a_fileName) :
 	fileName(a_fileName), imguiID(fileName + "###scenegraph")
 {
 	Assimp::Importer imp;
-	const auto       pScene = imp.ReadFile(
-        fileName.c_str(),
-        aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_ConvertToLeftHanded |
-            aiProcess_GenNormals | aiProcess_CalcTangentSpace);
+	const auto       pScene = util::Bencher::Run("Assimp Read File", [&]() {
+        return imp.ReadFile(
+            fileName.c_str(),
+            aiProcess_Triangulate | aiProcess_JoinIdenticalVertices |
+                aiProcess_ConvertToLeftHanded | aiProcess_GenNormals | aiProcess_CalcTangentSpace);
+    });
 
 	if (!pScene)
 		throw std::runtime_error("Could not load scene "s + imp.GetErrorString());
 
 	{
-		auto fileNameSv = std::string_view(fileName);
-		for (size_t i = 0; i < pScene->mNumMeshes; i++)
+		std::vector<std::unique_ptr<Mesh>> tempMeshes(pScene->mNumMeshes);
+		auto                               fileNameSv = std::string_view(fileName);
+		std::vector<std::exception_ptr>    exceptions(tempMeshes.size());
+
+		std::for_each(std::execution::par, tempMeshes.begin(), tempMeshes.end(), [&](auto& slot) {
+			size_t i = &slot - tempMeshes.data();
+			try
+			{
+				auto* mesh = pScene->mMeshes[i];
+				auto* mat =
+					mesh->mMaterialIndex >= 0 ? pScene->mMaterials[mesh->mMaterialIndex] : nullptr;
+				slot = std::make_unique<Mesh>(*gfx, fileNameSv, *mesh, mat);
+			}
+			catch (...)
+			{
+				exceptions[i] = std::current_exception();
+			}
+		});
+
+		// Handle exceptions after all threads finish
+		for (auto& e : exceptions)
 		{
-			auto idx = pScene->mMeshes[i]->mMaterialIndex;
-			allMeshes.push_back(std::make_unique<Mesh>(
-				*gfx,
-				fileNameSv,
-				*pScene->mMeshes[i],
-				idx >= 0 ? pScene->mMaterials[idx] : nullptr));
+			if (e)
+				std::rethrow_exception(e);
 		}
+		allMeshes = std::move(tempMeshes);
 	}
 
 	pRoot = Node::ParseNode(allMeshes, *pScene->mRootNode);

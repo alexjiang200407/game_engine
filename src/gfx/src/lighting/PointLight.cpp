@@ -11,9 +11,9 @@ gfx::PointLight::DrawControlWindow() noexcept
 	if (ImGui::Begin("Light"))
 	{
 		ImGui::Text("Position");
-		ImGui::SliderFloat("X", &cbData.pos.x, -60.0f, 60.0f);
-		ImGui::SliderFloat("Y", &cbData.pos.y, -60.0f, 60.0f);
-		ImGui::SliderFloat("Z", &cbData.pos.z, -60.0f, 60.0f);
+		ImGui::SliderFloat("X", &cbData.pos.x, -120.0f, 120.0f);
+		ImGui::SliderFloat("Y", &cbData.pos.y, -120.0f, 120.0f);
+		ImGui::SliderFloat("Z", &cbData.pos.z, -120.0f, 120.0f);
 
 		ImGui::Text("Intensity/Color");
 		ImGui::SliderFloat("Intensity", &cbData.diffuseIntensity, 0.01f, 2.0f);

@@ -4,55 +4,48 @@
 
 gfx::Material::Material(Mesh& mesh) : materialName(mesh.GetName()) {}
 
-gfx::Material::Material(
-	DX11Graphics&     gfx,
-	Mesh&             mesh,
-	std::string_view  modelPath,
-	const aiMaterial& material)
+gfx::Material::Material(DX11Graphics& gfx, Mesh& mesh, const aiMaterial& material)
 {
-	AddTexture(
-		mesh,
-		modelPath,
-		gfx,
-		aiTextureType_DIFFUSE,
-		Texture::Slot::kDiffuse,
-		material,
-		pmc.diffuseEnabled);
-
-	if (!pmc.diffuseEnabled)
 	{
-		material.Get(AI_MATKEY_COLOR_DIFFUSE, reinterpret_cast<aiColor3D&>(pmc.diffuseColor));
+		auto* diffuseTex = AddTexture(
+			mesh,
+			gfx,
+			aiTextureType_DIFFUSE,
+			Texture::Slot::kDiffuse,
+			material,
+			hasDiffuseMap);
+
+		if (!hasDiffuseMap)
+		{
+			material.Get(AI_MATKEY_COLOR_DIFFUSE, reinterpret_cast<aiColor3D&>(pmc.diffuseColor));
+		}
+
+		hasDiffuseAlpha = diffuseTex && diffuseTex->HasAlpha();
 	}
 
 	Texture* specularTex = AddTexture(
 		mesh,
-		modelPath,
 		gfx,
 		aiTextureType_SPECULAR,
 		Texture::Slot::kSpecular,
 		material,
-		pmc.specularEnabled);
+		hasSpecMap);
 
-	if (!pmc.specularEnabled)
+	if (!hasSpecMap)
 	{
-		pmc.specularEnabled =
-			material.Get(AI_MATKEY_SHININESS, pmc.specularPower) == aiReturn_SUCCESS;
+		material.Get(AI_MATKEY_SHININESS, pmc.specularPower);
 		material.Get(AI_MATKEY_COLOR_SPECULAR, reinterpret_cast<aiColor3D&>(pmc.specularColor));
 	}
 	else if (specularTex)
 		pmc.hasAlpha = specularTex->HasAlpha();
 
-	AddTexture(
-		mesh,
-		modelPath,
-		gfx,
-		aiTextureType_NORMALS,
-		Texture::Slot::kNormal,
-		material,
-		pmc.normalMapEnabled);
+	AddTexture(mesh, gfx, aiTextureType_NORMALS, Texture::Slot::kNormal, material, hasNormMap);
 
-	if (pmc.diffuseEnabled || pmc.specularEnabled || pmc.normalMapEnabled)
-		mesh.AddBind<Sampler>({}, gfx);
+	mesh.AddBind<Sampler>({}, gfx);
+
+	pmc.diffuseEnabled   = hasDiffuseMap;
+	pmc.normalMapEnabled = hasNormMap;
+	pmc.specularEnabled  = hasSpecMap;
 
 	materialName = material.GetName().C_Str();
 }
@@ -63,10 +56,18 @@ gfx::Material::DrawSubControlPanel(Mesh& mesh, DX11Graphics& gfx) noexcept
 	if (auto pcb = mesh.QueryBindable<PixelConstantBuffer<PSMaterialConstant>>({ materialName }))
 	{
 		ImGui::Text("Material");
-
+		ImGui::BeginDisabled(!hasNormMap);
 		ImGui::Checkbox("Norm Map", reinterpret_cast<bool*>(&pmc.normalMapEnabled));
+		ImGui::EndDisabled();
 
+		ImGui::BeginDisabled(!hasSpecMap);
 		ImGui::Checkbox("Spec Map", reinterpret_cast<bool*>(&pmc.specularEnabled));
+		ImGui::EndDisabled();
+
+		ImGui::BeginDisabled(!hasDiffuseMap);
+		ImGui::Checkbox("Diffuse Map", reinterpret_cast<bool*>(&pmc.diffuseEnabled));
+		ImGui::EndDisabled();
+
 		ImGui::Checkbox("Gloss Alpha", reinterpret_cast<bool*>(&pmc.hasAlpha));
 		ImGui::SliderFloat("Spec Pow", &pmc.specularPower, 1.0f, 1000.0f, "%f");
 
@@ -82,8 +83,6 @@ gfx::Material::DrawSubControlPanel(Mesh& mesh, DX11Graphics& gfx) noexcept
 		}
 		ImGui::EndDisabled();
 
-		ImGui::Checkbox("Diffuse Map", reinterpret_cast<bool*>(&pmc.diffuseEnabled));
-
 		ImGui::BeginDisabled(pmc.diffuseEnabled);
 		{
 			ImGui::ColorPicker3("Diffuse Color", reinterpret_cast<float*>(&pmc.diffuseColor));
@@ -94,25 +93,28 @@ gfx::Material::DrawSubControlPanel(Mesh& mesh, DX11Graphics& gfx) noexcept
 	}
 }
 
+bool
+gfx::Material::HasDiffuseAlpha() const noexcept
+{
+	return hasDiffuseAlpha;
+}
+
 gfx::Texture*
 gfx::Material::AddTexture(
 	Mesh&             mesh,
-	std::string_view  modelPath,
 	DX11Graphics&     gfx,
 	aiTextureType     type,
 	Texture::Slot     slot,
 	const aiMaterial& material,
-	BOOL&             hasTexture)
+	bool&             hasTexture)
 {
 	namespace fs = std::filesystem;
 
-	hasTexture = FALSE;
+	hasTexture = false;
 
 	aiString texFileName;
 	if (material.GetTexture(type, 0, &texFileName) == AI_SUCCESS)
 	{
-		hasTexture = false;
-
 		auto* texFileNameCStr = texFileName.C_Str();
 		if (texFileNameCStr[0] == '*')
 		{
@@ -120,16 +122,9 @@ gfx::Material::AddTexture(
 		}
 		else
 		{
-			fs::path path = modelPath;
-			Texture* tex  = nullptr;
-
-			if (!path.has_parent_path())
-			{
-				logger::warn("No parent path");
-			}
-
-			const auto file     = path.parent_path() / texFileName.C_Str();
-			const auto fileWstr = file.generic_wstring();
+			Texture*   tex      = nullptr;
+			const auto file     = fs::path{ texFileName.C_Str() };
+			const auto fileWstr = file.wstring();
 			const auto fileExt  = file.extension();
 
 			if (fileExt == ".dds")

@@ -14,8 +14,11 @@
 #include <algorithm>
 #include <bitset>
 #include <cassert>
+#include <chrono>
+#include <execution>
 #include <filesystem>
 #include <format>
+#include <functional>
 #include <iomanip>
 #include <limits>
 #include <memory>

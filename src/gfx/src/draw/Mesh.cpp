@@ -21,6 +21,11 @@ gfx::Mesh::Mesh(
 	                                      .Append(ElementType::BiTangent)
 	                                      .Append(ElementType::Texture2D)));
 
+	if (!mesh.HasTangentsAndBitangents())
+	{
+		throw std::runtime_error("Mesh must have tangents and Bittangents");
+	}
+
 	for (unsigned int i = 0; i < mesh.mNumVertices; i++)
 	{
 		vbuf.EmplaceBack(
@@ -36,7 +41,8 @@ gfx::Mesh::Mesh(
 	for (unsigned int i = 0; i < mesh.mNumFaces; i++)
 	{
 		const auto& face = mesh.mFaces[i];
-		assert(face.mNumIndices == 3);
+		if (face.mNumIndices != 3)
+			throw std::runtime_error("Mesh must be triangulated");
 		indices.push_back(static_cast<unsigned short>(face.mIndices[0]));
 		indices.push_back(static_cast<unsigned short>(face.mIndices[1]));
 		indices.push_back(static_cast<unsigned short>(face.mIndices[2]));
@@ -44,7 +50,7 @@ gfx::Mesh::Mesh(
 
 	if (a_material)
 	{
-		material = Material(gfx, *this, modelPath, *a_material);
+		material = Material(gfx, *this, *a_material);
 	}
 	else
 	{
@@ -64,7 +70,8 @@ gfx::Mesh::Mesh(
 	const auto& layout = vbuf.GetLayout();
 	AddBind<InputLayout>({ layout }, gfx, layout, pvsbc);
 
-	static constexpr const auto* pixelShader = L"shaders/ps_lit.cso";
+	const auto* pixelShader =
+		material.HasDiffuseAlpha() ? L"shaders/ps_lit_mask.cso" : L"shaders/ps_lit.cso";
 	AddBind<PixelShader>({ pixelShader }, gfx, pixelShader);
 	AddBind<PixelConstantBuffer<Material::PSMaterialConstant>>(
 		{ material.GetName() },
@@ -77,6 +84,9 @@ gfx::Mesh::Mesh(
 		{ static_cast<int>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) },
 		gfx,
 		D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	//AddBind<Blender>({ material.HasDiffuseAlpha() }, gfx, material.HasDiffuseAlpha());
+	AddBind<Rasterizer>({ material.HasDiffuseAlpha() }, gfx, material.HasDiffuseAlpha());
 
 	AddUniqueBind<TransformCBuffer>(gfx, *this);
 }
