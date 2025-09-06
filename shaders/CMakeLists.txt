@@ -29,7 +29,7 @@ foreach(SHADER ${SHADERS})
         OUTPUT ${OUTPUT_CSO}
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/shaders"
         COMMAND "${FXC_EXE}" /T ${TARGET_PROFILE} /E main /Fo "${OUTPUT_CSO}" "${SHADER}"
-        DEPENDS ${SHADER}
+        DEPENDS ${SHADERS} # Compile ALL SHADERS if ONE is modified
         COMMENT "Compiling shader ${NAME_WE}.hlsl -> ${NAME_WE}.cso"
     )
 

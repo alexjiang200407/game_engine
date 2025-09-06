@@ -64,7 +64,8 @@ gfx::Mesh::Mesh(
 	const auto& layout = vbuf.GetLayout();
 	AddBind<InputLayout>({ layout }, gfx, layout, pvsbc);
 
-	static constexpr const auto* pixelShader = L"shaders/ps_lit.cso";
+	const auto* pixelShader =
+		material.HasDiffuseAlpha() ? L"shaders/ps_lit_mask.cso" : L"shaders/ps_lit.cso";
 	AddBind<PixelShader>({ pixelShader }, gfx, pixelShader);
 	AddBind<PixelConstantBuffer<Material::PSMaterialConstant>>(
 		{ material.GetName() },
@@ -77,6 +78,9 @@ gfx::Mesh::Mesh(
 		{ static_cast<int>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) },
 		gfx,
 		D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	//AddBind<Blender>({ material.HasDiffuseAlpha() }, gfx, material.HasDiffuseAlpha());
+	AddBind<Rasterizer>({ material.HasDiffuseAlpha() }, gfx, material.HasDiffuseAlpha());
 
 	AddUniqueBind<TransformCBuffer>(gfx, *this);
 }

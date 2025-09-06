@@ -6,11 +6,21 @@ gfx::Material::Material(Mesh& mesh) : materialName(mesh.GetName()) {}
 
 gfx::Material::Material(DX11Graphics& gfx, Mesh& mesh, const aiMaterial& material)
 {
-	AddTexture(mesh, gfx, aiTextureType_DIFFUSE, Texture::Slot::kDiffuse, material, hasDiffuseMap);
-
-	if (!hasDiffuseMap)
 	{
-		material.Get(AI_MATKEY_COLOR_DIFFUSE, reinterpret_cast<aiColor3D&>(pmc.diffuseColor));
+		auto* diffuseTex = AddTexture(
+			mesh,
+			gfx,
+			aiTextureType_DIFFUSE,
+			Texture::Slot::kDiffuse,
+			material,
+			hasDiffuseMap);
+
+		if (!hasDiffuseMap)
+		{
+			material.Get(AI_MATKEY_COLOR_DIFFUSE, reinterpret_cast<aiColor3D&>(pmc.diffuseColor));
+		}
+
+		hasDiffuseAlpha = diffuseTex && diffuseTex->HasAlpha();
 	}
 
 	Texture* specularTex = AddTexture(
@@ -81,6 +91,12 @@ gfx::Material::DrawSubControlPanel(Mesh& mesh, DX11Graphics& gfx) noexcept
 
 		pcb->Update(gfx, pmc);
 	}
+}
+
+bool
+gfx::Material::HasDiffuseAlpha() const noexcept
+{
+	return hasDiffuseAlpha;
 }
 
 gfx::Texture*

@@ -44,6 +44,9 @@ namespace gfx
 			return pmc;
 		}
 
+		bool
+		HasDiffuseAlpha() const noexcept;
+
 	private:
 		Texture*
 		AddTexture(
@@ -58,6 +61,7 @@ namespace gfx
 		PSMaterialConstant pmc;
 		std::string        materialName{};
 		bool               hasSpecMap = false, hasNormMap = false, hasDiffuseMap = false;
+		bool               hasDiffuseAlpha = false;
 	};
 
 }

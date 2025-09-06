@@ -37,7 +37,8 @@ gfx::SolidSphere::SolidSphere(DX11Graphics& gfx, float radius)
 		{ "SolidSphereMaterial" },
 		gfx,
 		"SolidSphereMaterial",
-		colorConst);
+		colorConst,
+		1u);
 
 	geom::VertexBuffer vbuf(std::move(geom::VertexLayout{}.Append(ElementType::Position3D)));
 
@@ -48,6 +49,8 @@ gfx::SolidSphere::SolidSphere(DX11Graphics& gfx, float radius)
 		{ static_cast<int>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) },
 		gfx,
 		D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	//AddBind<Blender>({ false }, gfx, false);
 }
 
 void
