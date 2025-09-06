@@ -4,8 +4,31 @@
 
 gfx::Material::Material(Mesh& mesh) : materialName(mesh.GetName()) {}
 
-gfx::Material::Material(DX11Graphics& gfx, Mesh& mesh, const aiMaterial& material)
+gfx::Material::Material(DX11Graphics& gfx, Mesh& mesh, const aiMaterial& material) :
+	materialName(material.GetName().C_Str())
 {
+	namespace dx = DirectX;
+
+	dcb::RawLayout layout;
+	layout.Add<dcb::Bool>("normalMapEnabled");
+	layout.Add<dcb::Bool>("specularMapEnabled");
+	layout.Add<dcb::Bool>("diffuseMapEnabled");
+	layout.Add<dcb::Bool>("hasAlpha");
+	layout.Add<dcb::Float>("specularPower");
+	layout.Add<dcb::Float3>("specularColor");
+	layout.Add<dcb::Float>("specularMapWeight");
+	layout.Add<dcb::Float3>("diffuseColor");
+
+	auto buf = dcb::Buffer(std::move(layout));
+
+	// Default values
+	{
+		buf["specularPower"]     = 5.0f;
+		buf["specularColor"]     = dx::XMFLOAT3{ 1.0f, 1.0f, 1.0f };
+		buf["specularMapWeight"] = 1.0f;
+		buf["diffuseColor"]      = dx::XMFLOAT3{ 0.45f, 0.45f, 0.85f };
+	}
+
 	{
 		auto* diffuseTex = AddTexture(
 			mesh,
@@ -17,7 +40,9 @@ gfx::Material::Material(DX11Graphics& gfx, Mesh& mesh, const aiMaterial& materia
 
 		if (!hasDiffuseMap)
 		{
-			material.Get(AI_MATKEY_COLOR_DIFFUSE, reinterpret_cast<aiColor3D&>(pmc.diffuseColor));
+			material.Get(
+				AI_MATKEY_COLOR_DIFFUSE,
+				reinterpret_cast<aiColor3D&>(static_cast<DirectX::XMFLOAT3&>(buf["diffuseColor"])));
 		}
 
 		hasDiffuseAlpha = diffuseTex && diffuseTex->HasAlpha();
@@ -33,63 +58,90 @@ gfx::Material::Material(DX11Graphics& gfx, Mesh& mesh, const aiMaterial& materia
 
 	if (!hasSpecMap)
 	{
-		material.Get(AI_MATKEY_SHININESS, pmc.specularPower);
-		material.Get(AI_MATKEY_COLOR_SPECULAR, reinterpret_cast<aiColor3D&>(pmc.specularColor));
+		material.Get(AI_MATKEY_SHININESS, layout["specularPower"]);
+		material.Get(
+			AI_MATKEY_COLOR_SPECULAR,
+			reinterpret_cast<aiColor3D&>(layout["specularColor"]));
 	}
 	else if (specularTex)
-		pmc.hasAlpha = specularTex->HasAlpha();
+		buf["hasAlpha"] = specularTex->HasAlpha();
 
 	AddTexture(mesh, gfx, aiTextureType_NORMALS, Texture::Slot::kNormal, material, hasNormMap);
 
 	mesh.AddBind<Sampler>({}, gfx);
 
-	pmc.diffuseEnabled   = hasDiffuseMap;
-	pmc.normalMapEnabled = hasNormMap;
-	pmc.specularEnabled  = hasSpecMap;
+	buf["diffuseMapEnabled"]  = hasDiffuseMap;
+	buf["normalMapEnabled"]   = hasNormMap;
+	buf["specularMapEnabled"] = hasSpecMap;
 
-	materialName = material.GetName().C_Str();
+	const auto* pixelShader = hasDiffuseAlpha ? L"shaders/ps_lit_mask.cso" : L"shaders/ps_lit.cso";
+	mesh.AddBind<PixelShader>({ pixelShader }, gfx, pixelShader);
+
+	mesh.AddBind<CachingPixelConstantBufferEX>({ GetName() }, gfx, GetName(), buf, 1u);
 }
 
 void
-gfx::Material::DrawSubControlPanel(Mesh& mesh, DX11Graphics& gfx) noexcept
+gfx::Material::DrawSubControlPanel(Mesh& mesh) noexcept
 {
-	if (auto pcb = mesh.QueryBindable<PixelConstantBuffer<PSMaterialConstant>>({ materialName }))
+	namespace dx = DirectX;
+
+	if (auto handle = mesh.QueryBindable<CachingPixelConstantBufferEX>({ materialName }))
 	{
+		auto buf   = handle->GetBuffer();
+		bool dirty = false;
+
 		ImGui::Text("Material");
-		ImGui::BeginDisabled(!hasNormMap);
-		ImGui::Checkbox("Norm Map", reinterpret_cast<bool*>(&pmc.normalMapEnabled));
-		ImGui::EndDisabled();
 
-		ImGui::BeginDisabled(!hasSpecMap);
-		ImGui::Checkbox("Spec Map", reinterpret_cast<bool*>(&pmc.specularEnabled));
-		ImGui::EndDisabled();
-
-		ImGui::BeginDisabled(!hasDiffuseMap);
-		ImGui::Checkbox("Diffuse Map", reinterpret_cast<bool*>(&pmc.diffuseEnabled));
-		ImGui::EndDisabled();
-
-		ImGui::Checkbox("Gloss Alpha", reinterpret_cast<bool*>(&pmc.hasAlpha));
-		ImGui::SliderFloat("Spec Pow", &pmc.specularPower, 1.0f, 1000.0f, "%f");
-
-		ImGui::BeginDisabled(!pmc.specularEnabled);
+		if (auto v = buf["normalMapEnabled"]; v.Exists())
 		{
-			ImGui::SliderFloat("Spec Weight", &pmc.specularMapWeight, 0.0f, 2.0f);
+			ImGui::BeginDisabled(!hasNormMap);
+			dirty |= ImGui::Checkbox("Norm Map", &v);
+			ImGui::EndDisabled();
 		}
-		ImGui::EndDisabled();
 
-		ImGui::BeginDisabled(pmc.specularEnabled);
+		if (auto v = buf["specularMapEnabled"]; v.Exists())
 		{
-			ImGui::ColorPicker3("Spec Color", reinterpret_cast<float*>(&pmc.specularColor));
+			ImGui::BeginDisabled(!hasSpecMap);
+			dirty |= ImGui::Checkbox("Spec Map", &v);
+			ImGui::EndDisabled();
+			if (auto v2 = buf["specularPower"]; v2.Exists())
+			{
+				dirty |= ImGui::SliderFloat("Spec Pow", &v2, 1.0f, 1000.0f, "%f");
+			}
+			ImGui::BeginDisabled(!v);
+			{
+				if (auto v2 = buf["hasAlpha"]; v2.Exists())
+				{
+					dirty |= ImGui::Checkbox("Gloss Alpha", &v2);
+				}
+				if (auto v3 = buf["specularMapWeight"]; v3.Exists())
+				{
+					dirty |=
+						ImGui::SliderFloat("Spec Weight", &buf["specularMapWeight"], 0.0f, 2.0f);
+				}
+			}
+			ImGui::EndDisabled();
 		}
-		ImGui::EndDisabled();
 
-		ImGui::BeginDisabled(pmc.diffuseEnabled);
+		if (auto v = buf["diffuseMapEnabled"]; v.Exists())
 		{
-			ImGui::ColorPicker3("Diffuse Color", reinterpret_cast<float*>(&pmc.diffuseColor));
-		}
-		ImGui::EndDisabled();
+			ImGui::BeginDisabled(!hasDiffuseMap);
+			dirty |= ImGui::Checkbox("Diffuse Map", &v);
+			ImGui::EndDisabled();
 
-		pcb->Update(gfx, pmc);
+			ImGui::BeginDisabled(v);
+			{
+				if (auto v2 = buf["diffuseColor"]; v2.Exists())
+				{
+					dirty |= ImGui::ColorPicker3(
+						"Diffuse Color",
+						reinterpret_cast<float*>(&static_cast<dx::XMFLOAT3&>(v2)));
+				}
+			}
+			ImGui::EndDisabled();
+		}
+
+		handle->SetBuffer(buf);
 	}
 }
 

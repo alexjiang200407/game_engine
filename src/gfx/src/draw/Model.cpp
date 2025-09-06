@@ -154,9 +154,7 @@ gfx::Node::DrawNodeHierarchyPanel(Node*& pSelectedNode) const
 }
 
 void
-gfx::Model::DrawControlPanel(
-	Graphics&                         gfx,
-	std::optional<util::cstring_view> imguiIDOverride) noexcept
+gfx::Model::DrawControlPanel(std::optional<util::cstring_view> imguiIDOverride) noexcept
 {
 	if (ImGui::Begin(imguiIDOverride.has_value() ? imguiIDOverride->c_str() : imguiID.c_str()))
 	{
@@ -204,7 +202,7 @@ gfx::Model::DrawControlPanel(
 			{
 				if (ImGui::CollapsingHeader(x->GetName().c_str()))
 				{
-					x->DrawControlPanel(*gfx);
+					x->DrawControlPanel();
 				}
 			}
 		}
@@ -273,11 +271,11 @@ gfx::Model::Model(Graphics& gfx, std::string_view a_fileName) :
 	if (!pScene)
 		throw std::runtime_error("Could not load scene "s + imp.GetErrorString());
 
+	auto fileNameSv = std::string_view(fileName);
+	if (util::Settings::Module("General").Get("bMultiThreaded", true))
 	{
 		std::vector<std::unique_ptr<Mesh>> tempMeshes(pScene->mNumMeshes);
-		auto                               fileNameSv = std::string_view(fileName);
 		std::vector<std::exception_ptr>    exceptions(tempMeshes.size());
-
 		std::for_each(std::execution::par, tempMeshes.begin(), tempMeshes.end(), [&](auto& slot) {
 			size_t i = &slot - tempMeshes.data();
 			try
@@ -300,6 +298,15 @@ gfx::Model::Model(Graphics& gfx, std::string_view a_fileName) :
 				std::rethrow_exception(e);
 		}
 		allMeshes = std::move(tempMeshes);
+	}
+	else
+	{
+		for (size_t i = 0u; i < pScene->mNumMeshes; ++i)
+		{
+			auto* m   = pScene->mMeshes[i];
+			auto* mat = m->mMaterialIndex >= 0 ? pScene->mMaterials[m->mMaterialIndex] : nullptr;
+			allMeshes.push_back(std::make_unique<Mesh>(*gfx, fileNameSv, *m, mat));
+		}
 	}
 
 	pRoot = Node::ParseNode(allMeshes, *pScene->mRootNode);

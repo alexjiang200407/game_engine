@@ -2,6 +2,7 @@
 
 #include "bindings/Bindable.h"
 #include "bindings/Blender.h"
+#include "bindings/ConstantBufferEx.h"
 #include "bindings/ConstantBuffers.h"
 #include "bindings/IndexBuffer.h"
 #include "bindings/InputLayout.h"

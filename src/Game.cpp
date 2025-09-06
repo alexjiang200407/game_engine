@@ -75,7 +75,7 @@ Game::DoFrame()
 		ImGui::End();
 		light->DrawControlWindow();
 
-		pModel->DrawControlPanel(gfx, "Model 1"_csv);
+		pModel->DrawControlPanel("Model 1"_csv);
 		cmdLine.DrawControlWindow();
 	}
 	pModel->Draw(gfx);
