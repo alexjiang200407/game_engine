@@ -21,6 +21,11 @@ gfx::Mesh::Mesh(
 	                                      .Append(ElementType::BiTangent)
 	                                      .Append(ElementType::Texture2D)));
 
+	if (!mesh.HasTangentsAndBitangents())
+	{
+		throw std::runtime_error("Mesh must have tangents and Bittangents");
+	}
+
 	for (unsigned int i = 0; i < mesh.mNumVertices; i++)
 	{
 		vbuf.EmplaceBack(
@@ -36,7 +41,8 @@ gfx::Mesh::Mesh(
 	for (unsigned int i = 0; i < mesh.mNumFaces; i++)
 	{
 		const auto& face = mesh.mFaces[i];
-		assert(face.mNumIndices == 3);
+		if (face.mNumIndices != 3)
+			throw std::runtime_error("Mesh must be triangulated");
 		indices.push_back(static_cast<unsigned short>(face.mIndices[0]));
 		indices.push_back(static_cast<unsigned short>(face.mIndices[1]));
 		indices.push_back(static_cast<unsigned short>(face.mIndices[2]));
