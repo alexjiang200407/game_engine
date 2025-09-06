@@ -26,7 +26,7 @@ namespace gfx
 		Draw(Graphics& gfx, DirectX::FXMMATRIX accumulatedTransform) const noexcept;
 
 		void
-		DrawControlPanel(DX11Graphics& gfx);
+		DrawControlPanel();
 
 		DirectX::XMMATRIX
 		GetTransformXM() const noexcept override;

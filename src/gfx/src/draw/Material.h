@@ -1,5 +1,7 @@
 #pragma once
+#include "bindings/ConstantBufferEx.h"
 #include "bindings/Texture.h"
+#include "dcbuffer/DynamicConstant.h"
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
@@ -11,38 +13,19 @@ namespace gfx
 	class Material
 	{
 	public:
-		struct PSMaterialConstant
-		{
-			BOOL              normalMapEnabled  = FALSE;
-			BOOL              specularEnabled   = FALSE;
-			BOOL              diffuseEnabled    = FALSE;
-			BOOL              hasAlpha          = FALSE;
-			float             specularPower     = 5.0f;
-			DirectX::XMFLOAT3 specularColor     = { 1.0f, 1.0f, 1.0f };
-			float             specularMapWeight = 1.0f;
-			DirectX::XMFLOAT3 diffuseColor      = { 0.45f, 0.45f, 0.85f };
-		};
-
-	public:
 		// Constructors must be thread safe
 		Material() noexcept = default;
 		Material(Mesh& mesh);
 		Material(DX11Graphics& gfx, Mesh& mesh, const aiMaterial& material);
 
 		void
-		DrawSubControlPanel(Mesh& mesh, DX11Graphics& gfx) noexcept;
+		DrawSubControlPanel(Mesh& mesh) noexcept;
 
 		std::string_view
 		GetName() const noexcept
 		{
 			return materialName;
 		};
-
-		const PSMaterialConstant&
-		GetConstant() const noexcept
-		{
-			return pmc;
-		}
 
 		bool
 		HasDiffuseAlpha() const noexcept;
@@ -58,10 +41,9 @@ namespace gfx
 			bool&             hasTexture);
 
 	private:
-		PSMaterialConstant pmc;
-		std::string        materialName{};
-		bool               hasSpecMap = false, hasNormMap = false, hasDiffuseMap = false;
-		bool               hasDiffuseAlpha = false;
+		std::string materialName{};
+		bool        hasSpecMap = false, hasNormMap = false, hasDiffuseMap = false;
+		bool        hasDiffuseAlpha = false;
 	};
 
 }

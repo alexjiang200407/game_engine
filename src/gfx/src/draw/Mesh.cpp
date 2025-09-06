@@ -67,18 +67,10 @@ gfx::Mesh::Mesh(
 	auto& pvs   = AddBind<VertexShader>({ vertexShader }, gfx, vertexShader);
 	auto  pvsbc = pvs.GetBytecode();
 
-	const auto& layout = vbuf.GetLayout();
-	AddBind<InputLayout>({ layout }, gfx, layout, pvsbc);
-
-	const auto* pixelShader =
-		material.HasDiffuseAlpha() ? L"shaders/ps_lit_mask.cso" : L"shaders/ps_lit.cso";
-	AddBind<PixelShader>({ pixelShader }, gfx, pixelShader);
-	AddBind<PixelConstantBuffer<Material::PSMaterialConstant>>(
-		{ material.GetName() },
-		gfx,
-		material.GetName(),
-		material.GetConstant(),
-		1u);
+	{
+		const auto& layout = vbuf.GetLayout();
+		AddBind<InputLayout>({ layout }, gfx, layout, pvsbc);
+	}
 
 	AddBind<Topology>(
 		{ static_cast<int>(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) },
@@ -105,7 +97,7 @@ gfx::Mesh::Draw(Graphics& gfx, DirectX::FXMMATRIX accumulatedTransform) const no
 }
 
 void
-gfx::Mesh::DrawControlPanel(DX11Graphics& gfx)
+gfx::Mesh::DrawControlPanel()
 {
-	material.DrawSubControlPanel(*this, gfx);
+	material.DrawSubControlPanel(*this);
 }
